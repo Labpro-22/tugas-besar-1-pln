@@ -18,8 +18,6 @@ TARGET := $(BIN_DIR)/game
 # 1. Recursive Source Finding
 # Secara otomatis mencari semua file .cpp di dalam src/ dan semua sub-foldernya
 SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
-HPPS := $(shell find $(INCLUDE_DIR) -name '*.hpp')
-CPPS := $(patsubst $(INCLUDE_DIR)/%.hpp, $(SRC_DIR)/%.cpp, $(HPPS))
 
 # 2. Dynamic Object Mapping
 # Mengubah path src/xxx/yyy.cpp menjadi build/xxx/yyy.o
@@ -27,12 +25,6 @@ OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
 # Main targets
 all: directories $(TARGET)
-
-CPPS: $(CPPS)
-
-$(SRC_DIR)/%.cpp:
-	@mkdir -p $(dir $@)
-	@touch $@
 
 # Create necessary root directories
 directories:
@@ -44,9 +36,9 @@ $(TARGET): $(OBJS)
 	@echo "Build successful! Executable is at $(TARGET)"
 
 # Compile source files into object files
-# $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-# 	@mkdir -p $(dir $@)
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Run the game
 run: all
