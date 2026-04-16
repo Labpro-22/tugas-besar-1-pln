@@ -5,7 +5,12 @@
 #include "models/player/Player.hpp"
 
 class Bank {
+private:
+    long long initialMoney;
+
 public:
+    Bank(long long initialMoney);
+    
     void giveInitialMoney(std::vector<Player> &players);
     void giveMoney(Player &player, long long amount);
     void giveMoneyToAll(std::vector<Player> &players, long long amount);
