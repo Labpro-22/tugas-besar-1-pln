@@ -19,12 +19,13 @@
 #include "views/GameView.hpp"
 
 template <typename T>
-class CardDeck<T>;
+class CardDeck<T> {
+};
 
 class GameManager {
 private:
     bool running;
-    bool inMainMenu;
+    bool playing;
     Config config;
     GameView gameView;
     int turn;
@@ -35,31 +36,19 @@ private:
     Bank bank;
     TransactionLogger logger;
     CardDeck<ChanceCard> chanceCardDeck;
-    CardDeck<CommunityChestCard> communityCardDeck;
+    CardDeck<CommunityChestCard> communityChestCardDeck;
     CardDeck<SkillCard> skillCardDeck;
 
     // main game runner
     void gameLoop();
     bool isRunning() const;
     bool isGameEnded() const;
+    void initGame();
     void nextTurn();
     void nextPlayer();
 
-    void releaseResource();
-
 public:
-    GameManager()
-        : running{false},
-          inMainMenu{false},
-          config{ConfigLoader::loadConfig("config/config.txt")},
-          gameView{this},
-          board{nullptr}
-    {
-    }
-    ~GameManager()
-    {
-        releaseResource();
-    }
+    GameManager();
 
     // Main game runner
     void runGame();
@@ -68,10 +57,10 @@ public:
     const Config &getConfig() const;
     int getCurrentTurn() const;
     Player &getCurrentPlayer() const;
-    Board &getBoard() const;
-    Bank &getBank() const;
-    std::vector<Player>& getPlayers() const;
-    TransactionLogger &getLogger() const;
+    Board &getBoard();
+    Bank &getBank();
+    std::vector<Player> &getPlayers();
+    TransactionLogger &getLogger();
 
     void processMainMenu();
     void processNewGame();
