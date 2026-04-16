@@ -1,8 +1,8 @@
-#pragma once
-#include "SkillCard.hpp"
+#include "DemolitionCard.hpp"
+#include "../../../Player.hpp"
 
-class DemolitionCard : public SkillCard {
-public:
-    explicit DemolitionCard(const std::string& message);
-    void takeEffect(Player& p) override;
-};
+DemolitionCard::DemolitionCard(const std::string& message) : SkillCard(message) {}
+
+void DemolitionCard::takeEffect(Player& p) {
+    p.setPendingDemolition(true);
+}
