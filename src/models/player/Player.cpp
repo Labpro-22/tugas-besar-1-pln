@@ -116,7 +116,7 @@ void Player::payRent(Property* pr) {
     Player* owner = pr->getOwner();
     
     if (pr->getPropertyType == PropertyType::UTILITY){
-        rent *= lastRoll;
+        rent *= (lastRoll.first + lastRoll.second);
     }
 
     if (money < rent) {
