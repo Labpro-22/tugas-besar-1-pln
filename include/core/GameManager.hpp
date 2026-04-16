@@ -1,6 +1,5 @@
 #pragma once
 
-#include <list>
 #include <queue>
 #include <vector>
 
@@ -25,18 +24,26 @@ class Bank;
 
 class GameManager {
 private:
-    bool isRunning;
+    bool running;
     Config config;
     GameView gameView;
     int turn;
     Board *board;
     std::vector<Player *> players;
-    Bank bank;
-    TransactionLogger logger;
+    std::vector<Player *> playerLeaderboard;
+    std::queue<Player *> playerQueue;
+    Bank* bank;
+    TransactionLogger *logger;
     CardDeck<ChanceCard> chanceCardDeck;
     CardDeck<CommunityChestCard> communityCardDeck;
     CardDeck<SkillCard> skillCardDeck;
+
+    // main game runner
     void gameLoop();
+    bool isRunning() const;
+    bool isGameEnded() const;
+    void nextTurn();
+    void nextPlayer();
 
 public:
     GameManager() : config{ConfigLoader::loadConfig("config/config.txt")}, gameView{this}, board{nullptr}
@@ -48,7 +55,14 @@ public:
             delete board;
             board = nullptr;
         }
+        while (!players.empty()) {
+            delete players.back();
+            players.pop_back();
+        }
     }
+
+    // Main game runner
+    void runGame();
 
     const Config &getConfig() const;
     int getCurrentTurn() const;
@@ -58,12 +72,10 @@ public:
     const std::vector<Player *> getPlayers() const;
     TransactionLogger *getLogger() const;
 
-    void runGame();
     void processMainMenu();
     void processNewGame();
     void processLoadGame();
     void processSaveGame();
-    void startNextTurn();
     void processLoadGame();
     void processRollDice();
     void processSetDice(int value1, int value2);
@@ -75,4 +87,5 @@ public:
     void processDropSkillCard();
     void processLiquidation();
     void processPrintLogs();
+    void processWin();
 };
