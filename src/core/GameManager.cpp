@@ -48,11 +48,11 @@ void GameManager::gameLoop()
 // Getters
 const Config &GameManager::getConfig() const { return config; }
 int GameManager::getCurrentTurn() const { return turn; }
-Player *GameManager::getCurrentPlayer() const { return playerQueue.front(); }
-Board *GameManager::getBoard() const { return board; }
-Bank *GameManager::getBank() const { return bank; }
-const std::vector<Player *> GameManager::getPlayers() const { return players; }
-TransactionLogger *GameManager::getLogger() const { return logger; }
+Player &GameManager::getCurrentPlayer() const { return playerQueue.front(); }
+Board &GameManager::getBoard() const { return board; }
+Bank &GameManager::getBank() const { return bank; }
+std::vector<Player *>& GameManager::getPlayers() const { return players; }
+TransactionLogger &GameManager::getLogger() const { return logger; }
 
 // Game action
 void GameManager::processMainMenu()
