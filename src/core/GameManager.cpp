@@ -51,7 +51,7 @@ int GameManager::getCurrentTurn() const { return turn; }
 Player &GameManager::getCurrentPlayer() const { return playerQueue.front(); }
 Board &GameManager::getBoard() const { return board; }
 Bank &GameManager::getBank() const { return bank; }
-std::vector<Player *>& GameManager::getPlayers() const { return players; }
+std::vector<Player>& GameManager::getPlayers() const { return players; }
 TransactionLogger &GameManager::getLogger() const { return logger; }
 
 // Game action
