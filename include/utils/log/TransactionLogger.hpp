@@ -11,4 +11,5 @@ private:
 public:
     void log(int turn, std::string username, std::string action, std::string details);
     const std::vector<TransactionLog>& getLogs() const;
+    void clear();
 };
