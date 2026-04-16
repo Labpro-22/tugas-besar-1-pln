@@ -2,10 +2,23 @@
 #include <random>
 
 #include "core/GameManager.hpp"
+#include "models/tile/PropertyTile.hpp"
 
 GameManager::GameManager()
-{
-}
+    : running{false},
+      playing{false},
+      config{ConfigLoader::loadConfig()},
+      gameView{this},
+      turn{0},
+      board{config.properties.size(), {}, config.properties, {}},
+      players{},
+      playerLeaderboard{},
+      playerQueue{},
+      bank{config.initialMoney},
+      logger{},
+      chanceCardDeck{},
+      communityChestCardDeck{},
+      skillCardDeck{} {}
 
 // Game runner
 void GameManager::runGame()
@@ -20,19 +33,23 @@ void GameManager::stopGame()
 {
     running = false;
 }
-bool GameManager::isGameEnded()
+bool GameManager::isGameEnded() const
 {
     return playerLeaderboard.size() == players.size() - 1 || turn >= config.maxTurn;
 }
 
-void GameManager::startGame()
+void GameManager::initGame()
 {
-    running = false;
+    turn = 0;
+    bank.giveInitialMoney(getPlayers());
+    chanceCardDeck.reshuffle();
+    communityChestCardDeck.reshuffle();
+    skillCardDeck.reshuffle();
 }
 
 void GameManager::gameLoop()
 {
-    if (inMainMenu) {
+    if (!playing) {
         processMainMenu();
     }
     else {
@@ -41,18 +58,28 @@ void GameManager::gameLoop()
         }
         else {
             gameView.nextCommand();
+            nextPlayer();
         }
     }
+}
+
+void GameManager::nextTurn()
+{
+}
+
+void GameManager::nextPlayer()
+{
+    playerQueue.pop();
 }
 
 // Getters
 const Config &GameManager::getConfig() const { return config; }
 int GameManager::getCurrentTurn() const { return turn; }
-Player &GameManager::getCurrentPlayer() const { return playerQueue.front(); }
-Board &GameManager::getBoard() const { return board; }
-Bank &GameManager::getBank() const { return bank; }
-std::vector<Player>& GameManager::getPlayers() const { return players; }
-TransactionLogger &GameManager::getLogger() const { return logger; }
+Player &GameManager::getCurrentPlayer() const { return *playerQueue.front(); }
+Board &GameManager::getBoard() { return board; }
+Bank &GameManager::getBank() { return bank; }
+std::vector<Player> &GameManager::getPlayers() { return players; }
+TransactionLogger &GameManager::getLogger() { return logger; }
 
 // Game action
 void GameManager::processMainMenu()
@@ -77,24 +104,114 @@ void GameManager::processNewGame()
     // Create board
     board = Board(40, tileID, config.properties, players);
 
+    // Create bank
+    bank = Bank(config.initialMoney);
+
     // Clear logger
     logger.clear();
 
-    inMainMenu = false;
-    startGame();
-    startNextTurn();
+    playing = true;
+    initGame();
+    nextTurn();
 }
-void GameManager::processLoadGame();
-void GameManager::processSaveGame();
-void GameManager::startNextTurn();
-void GameManager::processLoadGame();
-void GameManager::processRollDice();
-void GameManager::processSetDice(int value1, int value2);
-void GameManager::processBuyProperty();
-void GameManager::processMortgageProperty();
-void GameManager::processUnmortgageProperty();
-void GameManager::processBuild();
-void GameManager::processUseSkillCard();
-void GameManager::processDropSkillCard();
-void GameManager::processLiquidation();
-void GameManager::processPrintLogs();
+void GameManager::processLoadGame()
+{
+}
+void GameManager::processSaveGame()
+{
+}
+void GameManager::processRollDice()
+{
+    Player &player = getCurrentPlayer();
+    player.rollDiceAndMove();
+    PlayerPiece &piece = player.getPiece();
+    piece.getCurrentTile()->onLanded(player, *this);
+}
+void GameManager::processSetDice(int value1, int value2)
+{
+    Player &player = getCurrentPlayer();
+    player.setDiceAndMove(value1, value2);
+    PlayerPiece &piece = player.getPiece();
+    piece.getCurrentTile()->onLanded(player, *this);
+}
+void GameManager::processBuyProperty()
+{
+    Player &player = getCurrentPlayer();
+    PlayerPiece &piece = player.getPiece();
+
+    PropertyTile *tile = dynamic_cast<PropertyTile *>(piece.getCurrentTile());
+    if (tile != nullptr) {
+        player.buyProperty(tile->getProperty());
+    }
+}
+void GameManager::processMortgageProperty()
+{
+    Player &player = getCurrentPlayer();
+    MortgageView &view = gameView.getMortgageView();
+    int propertyIndex = view.promptChooseProperty(player.getProperties());
+    if (propertyIndex == 0) return;
+
+    Property *property = player.getProperties()[propertyIndex];
+    player.mortgageProperty(property);
+}
+void GameManager::processUnmortgageProperty()
+{
+    Player &player = getCurrentPlayer();
+    UnmortgageView &view = gameView.getUnmortgageView();
+    int propertyIndex = view.promptChooseProperty(player.getProperties());
+    if (propertyIndex == 0) return;
+
+    Property *property = player.getProperties()[propertyIndex];
+    StreetProperty *street = dynamic_cast<StreetProperty *>(property);
+    if (street != nullptr && (street->getHouseCount() > 0 || street->hasHotel())) {
+        street->removeBuilding();
+    }
+    else {
+        player.unmortgageProperty(property);
+    }
+}
+void GameManager::processBuild()
+{
+    Player &player = getCurrentPlayer();
+
+    BuildView &view = gameView.getBuildView();
+
+    int propertyIndex = view.promptChooseProperty(player.getProperties());
+    Property *property = player.getProperties()[propertyIndex];
+    StreetProperty *street = dynamic_cast<StreetProperty *>(property);
+    if (street != nullptr) {
+        if (street->getHouseCount() < 4) {
+            street->buildHouse(1);
+        }
+        else {
+            street->buildHotel();
+        }
+    }
+}
+void GameManager::processUseSkillCard()
+{
+    Player &player = getCurrentPlayer();
+
+    UseSkillCardView &view = gameView.getUseSkillCardView();
+
+    int skillIndex = view.promptChooseSkillCard(player.getSkillCards());
+    player.useSkillCard(skillIndex);
+}
+void GameManager::processDropSkillCard() {
+    Player &player = getCurrentPlayer();
+
+    DropSkillCardView &view = gameView.getDropSkillCardView();
+
+    int skillIndex = view.promptChooseSkillCard(player.getSkillCards());
+    player.dropSkillCard(skillIndex);
+}
+void GameManager::processLiquidation() {
+    Player &player = getCurrentPlayer();
+
+    BankruptView &view = gameView.getBankruptView();
+}
+void GameManager::processPrintLogs() {
+    for (TransactionLog log : logger.getLogs()) {
+        std::cout << log.toString() << std::endl;
+    }
+}
