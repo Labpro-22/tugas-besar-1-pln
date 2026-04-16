@@ -3,14 +3,14 @@
 #include <queue>
 #include <vector>
 
-#include "models/Player.hpp"
+#include "models/bank/Bank.hpp"
 #include "models/board/Board.hpp"
 #include "models/card/Card.hpp"
-#include "models/bank/Bank.hpp"
 #include "models/card/CardDeck.hpp"
 #include "models/card/chance-card/ChanceCard.hpp"
 #include "models/card/community-chest-card/CommunityChestCard.hpp"
 #include "models/card/skill-card/SkillCard.hpp"
+#include "models/player/Player.hpp"
 #include "models/property/Property.hpp"
 #include "models/tile/Tile.hpp"
 #include "utils/config/Config.hpp"
@@ -70,8 +70,8 @@ public:
     Player &getCurrentPlayer() const;
     Board &getBoard() const;
     Bank &getBank() const;
-    const std::vector<Player> getPlayers() const;
-    TransactionLogger *getLogger() const;
+    std::vector<Player>& getPlayers() const;
+    TransactionLogger &getLogger() const;
 
     void processMainMenu();
     void processNewGame();
