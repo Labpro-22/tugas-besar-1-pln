@@ -7,7 +7,7 @@
 #include "models/property/UtilityProperty.hpp"
 #include "models/card/skill-card/SkillCard.hpp"
 #include "models/board/Board.hpp"
-#include "core/DiceRoller.hpp"
+#include "utils/DiceRoller.hpp"
 
 #include <string>
 #include <vector>
