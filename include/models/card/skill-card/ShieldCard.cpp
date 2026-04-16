@@ -4,6 +4,6 @@
 ShieldCard::ShieldCard(const std::string& message) : SkillCard(message) {}
 
 void ShieldCard::takeEffect(Player& p) {
-    // Asumsi class Player memiliki method setShielded
+    // TODO : create p set shielded
     p.setShielded(true); 
 }
