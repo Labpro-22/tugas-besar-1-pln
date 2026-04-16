@@ -1,0 +1,15 @@
+#pragma once
+
+#include "Property.hpp"
+#include <vector>
+#include <string>
+
+class RailroadProperty: public Property {
+    public:
+        RailroadProperty(const std::string& code,const std::string& name,const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, std::vector<long long> rentPrice);
+
+        long long calculateRent() noexcept override;
+        
+    private: 
+        std::vector<long long> rent;
+};
