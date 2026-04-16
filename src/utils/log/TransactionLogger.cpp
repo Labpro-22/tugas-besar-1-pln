@@ -9,3 +9,8 @@ const std::vector<TransactionLog> &TransactionLogger::getLogs() const
 {
     return logs;
 }
+
+void TransactionLogger::clear() {
+    logs.clear();
+}
+
