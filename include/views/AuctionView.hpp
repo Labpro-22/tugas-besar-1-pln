@@ -1,5 +1,5 @@
 #pragma once
-#include "../core/GameManager.hpp"
+#include "core/GameManager.hpp"
 
 class AuctionView
 {
@@ -8,6 +8,6 @@ private:
 public:
     AuctionView(GameManager& gm) : gameManager(gm) {}
     void outputProperty(Property& pr);
-    long long promptBidOrPass(Player& p)
+    long long promptBidOrPass(Player& p);
 };
 
