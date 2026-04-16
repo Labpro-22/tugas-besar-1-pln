@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include "core/GameManager.hpp"
+
 #include "AuctionView.hpp"
 #include "BankruptView.hpp"
 #include "BoardView.hpp"
