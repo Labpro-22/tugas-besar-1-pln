@@ -1,5 +1,7 @@
 #include "models/bank/Bank.hpp"
 
+Bank::Bank(long long initialMoney) : initialMoney{initialMoney} {}
+
 void Bank::giveMoney(Player &player, long long amount)
 {
     player.getMoney(amount);
@@ -24,6 +26,6 @@ void Bank::collectMoneyFromAll(std::vector<Player> &players, long long amount)
     }
 }
 
-void Bank::startAuction(Property &property) {
-    
+void Bank::startAuction(Property &property)
+{
 }
