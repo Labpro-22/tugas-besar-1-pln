@@ -369,6 +369,19 @@ void Player::rollToGetOutOfJail() {
 
     return;
 }
+
+void Player::setDiceToGetOutOfJail(int value1, int value2) {
+    if (state != PlayerState::JAILED)
+        throw InJailException("Pemain tidak sedang di penjara.");
+
+    lastRoll = {value1, value2}
+
+    if (lastRoll.first == lastRoll.second) {
+        getOutOfJail();
+        piece.goForward(lastRoll.first + lastRoll.second);
+    }
+}
+
 void Player::payFineToGetOutOfJail(long long fine) {
     if (state != PlayerState::JAILED)
         throw InJailException("Pemain tidak sedang di penjara.");
