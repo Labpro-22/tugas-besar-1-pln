@@ -4,8 +4,10 @@
 
 #include "utils/config/Config.hpp"
 
-class ConfigLoader
-{
+class ConfigLoader {
+private:
+    ConfigLoader() = default;
+
 public:
     static Config loadConfig(std::filesystem::path path);
 };
