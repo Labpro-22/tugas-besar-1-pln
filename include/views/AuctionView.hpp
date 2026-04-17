@@ -7,7 +7,7 @@ private:
     GameManager& gameManager;
 public:
     AuctionView(GameManager& gm) : gameManager(gm) {}
-    void outputProperty(Property& pr);
-    long long promptBidOrPass(Player& p);
+    void outputProperty(Property& pr) const;
+    long long promptBidOrPass(Player& p) const;
 };
 

@@ -7,7 +7,7 @@ private:
     GameManager& gameManager;
 public:
     BuyView(GameManager& gm) : gameManager(gm){}
-    void outputProperty(Property& pr);
-    void outputBuyStatus(bool bought);
+    void outputProperty(Property& pr) const;
+    void outputBuyStatus(bool bought) const;
 };
 

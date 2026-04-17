@@ -7,8 +7,8 @@ private:
     GameManager& gameManager;
 public:
     SaveView(GameManager& gm) : gameManager(gm) {}
-    void outputSaving();
-    int promptOverwriteSaveFile(std::string path);
-    void outputSaveStatus(bool success);
+    void outputSaving() const;
+    int promptOverwriteSaveFile(std::string path) const;
+    void outputSaveStatus(bool success) const;
 };
 
