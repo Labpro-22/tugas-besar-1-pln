@@ -71,6 +71,7 @@ public:
     void useGetOutOfJailCard();
     void addGetOutOfJailCard();
     void rollToGetOutOfJail();
+    void setDiceToGetOutOfJail(int value1, int value2);
     void payFineToGetOutOfJail(long long fine);
     void getOutOfJail();
     void onNextTurn();
