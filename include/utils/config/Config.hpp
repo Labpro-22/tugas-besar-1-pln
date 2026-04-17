@@ -17,5 +17,4 @@ public:
     long long goSalary;
     long long jailFine;
     long long initialMoney;
-    std::vector<int> tileSequence;
 };
