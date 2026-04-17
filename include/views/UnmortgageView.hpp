@@ -7,8 +7,8 @@ private:
     GameManager& gameManager;
 public:
     UnmortgageView(GameManager& gm) : gameManager(gm) {}
-    int promptChooseProperty(std::vector<Property*> pr);
-    void outputUnmortgageStatus(bool success);
+    int promptChooseProperty(std::vector<Property*> pr) const;
+    void outputUnmortgageStatus(bool success) const;
 };
 
 
