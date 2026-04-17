@@ -7,7 +7,7 @@ private:
     GameManager& gameManager;
 public:
     FestivalView(GameManager& gm) : gameManager(gm) {}
-    int promptChooseProperty(std::vector<Property*> pr);
-    void outputFestivalStatus(Property& pr);
+    int promptChooseProperty(std::vector<Property*> pr) const;
+    void outputFestivalStatus(Property& pr) const;
 };
 

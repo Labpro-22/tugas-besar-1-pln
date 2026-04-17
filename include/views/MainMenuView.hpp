@@ -7,6 +7,6 @@ private:
     GameManager& gameManager;
 public:
     MainMenuView(GameManager& gm) : gameManager(gm) {}
-    int promptNewOrLoadGame();
+    int promptNewOrLoadGame() const;
 };
 

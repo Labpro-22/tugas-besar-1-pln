@@ -7,7 +7,7 @@ private:
     GameManager& gameManager;
 public:
     BoardView(GameManager& gm) : gameManager(gm) {}
-    void drawBoard();
+    void drawBoard() const;
 };
 
 

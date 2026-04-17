@@ -7,6 +7,6 @@ private:
     GameManager& gameManager;
 public:
     WinView(GameManager& gm) : gameManager(gm) {}
-    void outputWinner(std::vector<Player*>);
+    void outputWinner(std::vector<Player*>) const;
 };
 

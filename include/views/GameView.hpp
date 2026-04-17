@@ -18,6 +18,7 @@
 #include "UnmortgageView.hpp"
 #include "UseSkillCardView.hpp"
 #include "WinView.hpp"
+#include "LogView.hpp"
 
 
 
@@ -36,6 +37,7 @@ private:
     DropSkillCardView dropSkillCardView;
     FestivalView festivalView;
     LoadView loadView;
+    LogView logView;
     MainMenuView mainMenuView;
     MortgageView mortgageView;
     PropertyView propertyView;
@@ -57,6 +59,7 @@ GameView(GameManager &gm)
           dropSkillCardView(gm),
           festivalView(gm),
           loadView(gm),
+          logView(gm),
           mainMenuView(gm),
           mortgageView(gm),
           propertyView(gm),
@@ -66,72 +69,77 @@ GameView(GameManager &gm)
           winView(gm)
     {
     }
-    AuctionView& getAuctionView() {
-    return auctionView;
+    const AuctionView& getAuctionView() const{
+        return auctionView;
     }
 
-    BankruptView& getBankruptView() {
+    const BankruptView& getBankruptView() const {
         return bankruptView;
     }
 
-    BoardView& getBoardView() {
+    const BoardView& getBoardView() const {
         return boardView;
     }
 
-    BuildView& getBuildView() {
+    const BuildView& getBuildView() const {
         return buildView;
     }
 
-    BuyView& getBuyView() {
+    const BuyView& getBuyView() const {
         return buyView;
     }
 
-    CardView& getCardView() {
+    const CardView& getCardView() const {
         return cardView;
     }
 
-    DiceView& getDiceView() {
+    
+    const DiceView& getDiceView() const {
         return diceView;
     }
 
-    DropSkillCardView& getDropSkillCardView() {
+    const DropSkillCardView& getDropSkillCardView() const {
         return dropSkillCardView;
     }
 
-    FestivalView& getFestivalView() {
+    const FestivalView& getFestivalView() const {
         return festivalView;
     }
 
-    LoadView& getLoadView() {
+    const LoadView& getLoadView() const {
         return loadView;
     }
 
-    MainMenuView& getMainMenuView() {
+    const MainMenuView& getMainMenuView() const {
         return mainMenuView;
     }
 
-    MortgageView& getMortgageView() {
+    const MortgageView& getMortgageView() const {
         return mortgageView;
     }
 
-    PropertyView& getPropertyView() {
+    const PropertyView& getPropertyView() const {
         return propertyView;
     }
 
-    SaveView& getSaveView() {
+    const SaveView& getSaveView() const {
         return saveView;
     }
 
-    UnmortgageView& getUnmortgageView() {
+    const UnmortgageView& getUnmortgageView() const {
         return unmortgageView;
     }
 
-    UseSkillCardView& getUseSkillCardView() {
+    const UseSkillCardView& getUseSkillCardView() const {
         return useSkillCardView;
     }
 
-    WinView& getWinView() {
+    const WinView& getWinView() const {
         return winView;
+    }
+
+    const LogView& getLogView() const{
+        return logView;
     }
     void InputNextCommand();
 };
