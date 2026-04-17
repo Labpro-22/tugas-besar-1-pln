@@ -4,6 +4,7 @@
 
 class DiceRoller {
 private:
+    DiceRoller() = default;
     static std::random_device rd_;
     static std::mt19937 rng_;
     static std::uniform_int_distribution<> dist_;
