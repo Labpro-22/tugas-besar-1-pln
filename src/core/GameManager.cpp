@@ -2,6 +2,7 @@
 #include <random>
 
 #include "core/GameManager.hpp"
+#include "core/GameManagerException.hpp"
 #include "models/tile/PropertyTile.hpp"
 
 GameManager::GameManager()
@@ -12,7 +13,6 @@ GameManager::GameManager()
       turn{0},
       board{config.properties.size(), {}, config.properties, {}},
       players{},
-      playerLeaderboard{},
       playerQueue{},
       bank{config.initialMoney},
       logger{},
@@ -33,6 +33,12 @@ void GameManager::stopGame()
 {
     running = false;
 }
+
+bool GameManager::isRunning() const
+{
+    return running;
+}
+
 bool GameManager::isGameEnded() const
 {
     return playerLeaderboard.size() == players.size() - 1 || turn >= config.maxTurn;
@@ -57,7 +63,7 @@ void GameManager::gameLoop()
             processWin();
         }
         else {
-            gameView.nextCommand();
+            gameView.InputNextCommand();
             nextPlayer();
         }
     }
@@ -70,6 +76,15 @@ void GameManager::nextTurn()
 void GameManager::nextPlayer()
 {
     playerQueue.pop();
+    if (playerQueue.empty()) {
+        // TODO: Display new turn in game view
+
+        // Reset player queue
+        for (Player &player : players) {
+            playerQueue.push(&player);
+        }
+    }
+    getCurrentPlayer().onNextTurn();
 }
 
 // Getters
@@ -116,6 +131,7 @@ void GameManager::processNewGame()
 }
 void GameManager::processLoadGame()
 {
+    
 }
 void GameManager::processSaveGame()
 {
@@ -123,16 +139,32 @@ void GameManager::processSaveGame()
 void GameManager::processRollDice()
 {
     Player &player = getCurrentPlayer();
-    player.rollDiceAndMove();
-    PlayerPiece &piece = player.getPiece();
-    piece.getCurrentTile()->onLanded(player, *this);
+    if (player.getState() == PlayerState::ACTIVE) {
+        player.rollDiceAndMove();
+        PlayerPiece &piece = player.getPiece();
+        piece.getCurrentTile()->onLanded(player, *this);
+    }
+    else if (player.getState() == PlayerState::JAILED) {
+        player.rollToGetOutOfJail();
+    }
+    else {
+        throw AlreadyBankruptException("Player tidak bisa melakukan aksi apapun setelah bangkrut!");
+    }
 }
 void GameManager::processSetDice(int value1, int value2)
 {
     Player &player = getCurrentPlayer();
-    player.setDiceAndMove(value1, value2);
-    PlayerPiece &piece = player.getPiece();
-    piece.getCurrentTile()->onLanded(player, *this);
+    if (player.getState() == PlayerState::ACTIVE) {
+        player.setDiceAndMove(value1, value2);
+        PlayerPiece &piece = player.getPiece();
+        piece.getCurrentTile()->onLanded(player, *this);
+    }
+    else if (player.getState() == PlayerState::JAILED) {
+        player.setDiceToGetOutOfJail(value1, value2);
+    }
+    else {
+        throw AlreadyBankruptException("Player tidak bisa melakukan aksi apapun setelah bangkrut!");
+    }
 }
 void GameManager::processBuyProperty()
 {
@@ -142,6 +174,9 @@ void GameManager::processBuyProperty()
     PropertyTile *tile = dynamic_cast<PropertyTile *>(piece.getCurrentTile());
     if (tile != nullptr) {
         player.buyProperty(tile->getProperty());
+    }
+    else {
+        throw GameManagerException("Tidak bisa membeli properti ");
     }
 }
 void GameManager::processMortgageProperty()
@@ -197,7 +232,8 @@ void GameManager::processUseSkillCard()
     int skillIndex = view.promptChooseSkillCard(player.getSkillCards());
     player.useSkillCard(skillIndex);
 }
-void GameManager::processDropSkillCard() {
+void GameManager::processDropSkillCard()
+{
     Player &player = getCurrentPlayer();
 
     DropSkillCardView &view = gameView.getDropSkillCardView();
@@ -205,13 +241,33 @@ void GameManager::processDropSkillCard() {
     int skillIndex = view.promptChooseSkillCard(player.getSkillCards());
     player.dropSkillCard(skillIndex);
 }
-void GameManager::processLiquidation() {
+void GameManager::processLiquidation()
+{
     Player &player = getCurrentPlayer();
 
     BankruptView &view = gameView.getBankruptView();
 }
-void GameManager::processPrintLogs() {
+void GameManager::processPrintLogs()
+{
     for (TransactionLog log : logger.getLogs()) {
         std::cout << log.toString() << std::endl;
     }
+}
+
+void GameManager::processWin() {
+    Player* winner = nullptr;
+    vector<Player*> remainingPlayer;
+    for (Player& player: players) {
+        if (!player.isBankrupt()) {
+            remainingPlayer.push_back(&player);
+            if (winner == nullptr || winner->calculateTotalWealth() < player.calculateTotalWealth()) {
+                winner = &player;
+            }
+        }
+    }
+    
+    WinView view = gameView.getWinView();
+    view.outputWinner(winner, remainingPlayer);
+    
+    playing = false;
 }
