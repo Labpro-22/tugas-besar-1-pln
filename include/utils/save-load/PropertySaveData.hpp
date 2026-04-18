@@ -10,4 +10,6 @@ public:
     std::string status;
     long long festivalMultiplier;
     int festivalDuration;
+    int houseCount;
+    bool hasHotel;
 };
