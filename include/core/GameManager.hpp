@@ -11,6 +11,7 @@
 #include "models/card/community-chest-card/CommunityChestCard.hpp"
 #include "models/card/skill-card/SkillCard.hpp"
 #include "models/player/Player.hpp"
+#include "models/player/PlayerPiece.hpp"
 #include "models/property/Property.hpp"
 #include "models/tile/Tile.hpp"
 #include "utils/config/Config.hpp"
@@ -31,7 +32,6 @@ private:
     int turn;
     Board board;
     std::vector<Player> players;
-    std::vector<Player *> playerLeaderboard;
     std::queue<Player *> playerQueue;
     Bank bank;
     TransactionLogger logger;
