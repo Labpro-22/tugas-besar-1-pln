@@ -5,5 +5,5 @@
 class Nimonspoli
 {
 public:
-    static void run() const;
+    static void run();
 };
