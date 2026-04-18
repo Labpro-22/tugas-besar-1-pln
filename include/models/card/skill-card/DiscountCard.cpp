@@ -1,5 +1,4 @@
-#include "DiscountCard.hpp"
-#include "../../../Player.hpp"
+#include "models/card/skill-card/DiscountCard.hpp"
 #include <random>
 
 DiscountCard::DiscountCard(const std::string& message) : SkillCard(message) {
@@ -15,6 +14,7 @@ void DiscountCard::rerandomizePercentage() {
     percentage = dist(gen) * 10; 
 }
 
-void DiscountCard::takeEffect(Player& p) {
-    p.applyDiscount(percentage); 
+void DiscountCard::takeEffect(Player& p, GameManager& gm) {
+    p.applyDiscount(percentage, 1); 
+    std::cout << "[Discount] Kamu mengaktifkan Diskon " << percentage << "% untuk 1 putaran ke depan!\n";
 }

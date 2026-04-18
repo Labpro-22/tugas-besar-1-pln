@@ -1,8 +1,9 @@
 #pragma once
-#include "SkillCard.hpp"
+#include "models/card/skill-card/SkillCard.hpp"
 
 class TeleportCard : public SkillCard {
 public:
     explicit TeleportCard(const std::string& message);
-    void takeEffect(Player& p) override;
+    void void takeEffect(Player& p,GameManager& gm) override;
+    void setTargetPosition(int pos) { targetPosition = pos; }
 };

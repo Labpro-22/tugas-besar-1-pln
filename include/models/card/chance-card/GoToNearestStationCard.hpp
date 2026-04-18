@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ChanceCard.hpp"
+#include "models/card/chance-card/ChanceCard.hpp"
 
 class GoToNearestStationCard : public ChanceCard {
 public:
-    GoToNearestStationCard() {};
-    void takeEffect(Player& player);
+    GoToNearestStationCard(const std::string& message) : ChanceCard(message) {}
+    void takeEffect(Player& p,GameManager& gm) override;
 };

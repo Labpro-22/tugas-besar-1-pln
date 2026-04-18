@@ -1,12 +1,9 @@
 #pragma once
-#include "../Card.hpp"
+#include "models/card/Card.hpp"
+#include "models/Player.hpp"
 
 // TODO : message attribute
 class ChanceCard : public Card {
-private:
-    std::string message;
 public:
-    ChanceCard(const std::string& message);
-    virtual ~ChanceCard() = default;
-    virtual takeEffect(Player& player) = 0;
+    ChanceCard(const std::string& message) : Card(message){}
 };

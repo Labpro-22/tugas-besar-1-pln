@@ -2,11 +2,11 @@
 
 #include "models/card/community-chest-card/CommunityChestCard.hpp"
 
-class CollectMoneyCard : public CommunityChestCard {
+class PayMoneyToPlayersCard: public CommunityChestCard {
 private:
     int amount;
 
 public:
-    CollectMoneyCard(const std::string& message, int amount);
+    PayMoneyToPlayersCard(const std::string& message, int amount);
     void takeEffect(Player& p, GameManager& gm) override;
 };
