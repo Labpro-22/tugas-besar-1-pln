@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 
 #include "utils/config/PropertyConfig.hpp"
 
@@ -9,11 +10,11 @@ public:
     int maxTurn;
     int playerCount;
     std::vector<PropertyConfig> properties;
-    long long railroadRent;
-    long long utilityRent;
+    std::map<int, long long> railroadRent;
+    std::map<int, long long> utilityRent;
     long long incomeFlatTax;
     long long incomePercentageTax;
-    long long luxuryTax;
+    long long luxuryFlatTax;
     long long goSalary;
     long long jailFine;
     long long initialMoney;
