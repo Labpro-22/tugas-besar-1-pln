@@ -1,6 +1,7 @@
 #pragma once
 
-#include <stdexcept>
+#include <exception>
+#include <string>
 
 class ConfigException : std::exception {
 private:
@@ -15,14 +16,14 @@ public:
     }
 };
 
-class FileNotFoundException : ConfigException {
+class ConfigFileNotFoundException : ConfigException {
 public:
-    FileNotFoundException(const std::string &path) : ConfigException("File tidak ditemukan pada: " + path) {}
+    ConfigFileNotFoundException(const std::string &path) : ConfigException("File tidak ditemukan pada: " + path) {}
 };
 
-class InputFormatException : ConfigException {
+class ConfigFileFormatException : ConfigException {
 public:
-    InputFormatException(const std::string &expected, const std::string &path, int col, int line)
+    ConfigFileFormatException(const std::string &expected, const std::string &path, int col, int line)
         : ConfigException("Error format input. Ekspektasi " + expected + " sebagai input ke-" + std::to_string(col) +
                           ". File: " + path + " baris ke-" + std::to_string(line) + ".") {}
 };
