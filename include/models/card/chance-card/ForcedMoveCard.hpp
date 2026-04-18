@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ChanceCard.hpp"
+#include "models/card/chance-card/ChanceCard.hpp"
 
 class ForcedMoveCard : public ChanceCard {
 private:
@@ -8,5 +8,5 @@ private:
 
 public:
     ForcedMoveCard(const int moveOffset);
-    void takeEffect(Player& player) override;
-}
+    void takeEffect(Player& p,GameManager& gm) override;
+};

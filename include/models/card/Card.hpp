@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include "Player.h"
+#include "models/Player.hpp"
+#include "models/GameManager.hpp"
 
 class Card {
 private:
@@ -9,6 +10,6 @@ private:
 public:
     Card(const std::string& message);
     virtual ~Card() = default;
-    virtual void takeEffect(Player& p) = 0;
+    virtual void takeEffect(Player& p,GameManager& gm) = 0;
     std::string getMessage();
 };

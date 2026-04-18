@@ -1,16 +1,17 @@
 #include "GoToNearestStationCard.hpp"
+#include "models/PlayerPiece.hpp"
 
 GoToNearestStationCard::GoToNearestStationCard() {
-    message =  "Pindah ke stasiun terdekat!"
+    message =  "Pindah ke stasiun terdekat!";
 }
 
-void GoToNearestStationCard::takeEffect(Player& p){
+void GoToNearestStationCard::takeEffect(Player& p,GameManager& gm) {
     PlayerPiece& piece = p.getPiece(); 
     Board* board = piece.getBoard();
 
     if (board == nullptr) {
-        message = "error: board bernilai null"
-       return;
+        message = "error: board bernilai null";
+        return;
     }
 
     int currentPos = piece.getPosition();
@@ -27,10 +28,11 @@ void GoToNearestStationCard::takeEffect(Player& p){
             Property* prop = propTile->getProperty();
             if (dynamic_cast<RailroadProperty*>(prop) != nullptr) {
                 targetPos = checkPos;
-                break'
+                break;
             }
         }
     }
 
+    cout << "[Kesempatan] Kamu dipindahkan ke stasiun terdekat!\n";
     if (targetPos != -1) piece.setPosition(targetPos);
 }
