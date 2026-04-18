@@ -1,9 +1,9 @@
+#include <exception>
 #include <iostream>
-#include <stdexcept>
 
 #include "core/Nimonspoli.hpp"
 
-void Nimonspoli::run() const
+void Nimonspoli::run()
 {
     try {
         GameManager gameManager;
