@@ -1,4 +1,4 @@
-#include "include/models/tile/PropertyTile.hpp"
+#include "models/tile/PropertyTile.hpp"
 
 PropertyTile::PropertyTile(Property* p) : Tile(p->getName(), p->getCode()), property(p) {}
 
@@ -9,8 +9,14 @@ Property* PropertyTile::getProperty() const noexcept {
 void PropertyTile::onLanded(Player& p, GameManager& gm) {
     Player* owner = property->getOwner();
 
-    if (owner == nullptr && p.money >= property->getPrice()) {
-        gm.processBuyProperty();
+    if (owner == nullptr) {
+        if (p.getMoney() >= property->getPrice()) {
+            gm.processBuyProperty();
+        }
+        else {
+            Bank bank = gm.getBank();
+            bank.startAuction(*property);
+        }
     }
     else if (owner != &p) {
         if (property->isMortgaged()) {
