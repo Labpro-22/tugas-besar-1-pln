@@ -8,6 +8,7 @@
 #include "models/card/skill-card/SkillCard.hpp"
 #include "models/board/Board.hpp"
 #include "utils/DiceRoller.hpp"
+#include "models/player/PlayerPiece.hpp"
 
 #include <string>
 #include <vector>

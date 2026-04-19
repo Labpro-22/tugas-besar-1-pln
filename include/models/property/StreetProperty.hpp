@@ -26,6 +26,12 @@ class StreetProperty: public Property {
 
         void removeBuilding();
 
+        PropertyType getPropertyType() const noexcept override;
+
+        long long calculateSellValue() const override;
+
+        long long calculateAssetValue() const override;
+
     private:
         int houseCount;
 

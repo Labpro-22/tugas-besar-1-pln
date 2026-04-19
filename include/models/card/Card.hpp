@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "Player.h"
+#include "models/player/Player.hpp"
 
 class Card {
 private:

@@ -1,4 +1,4 @@
-#include "include/models/property/StreetProperty.hpp"
+#include "models/property/StreetProperty.hpp"
 
 StreetProperty::StreetProperty(const std::string& code, const std::string& name, const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, long long housePrice, long long hotelPrice, long long rent[6]): Property(code, name, color, price, mortgageValue, festivalMultiplier, festivalDuration), housePrice(housePrice), hotelPrice(hotelPrice), houseCount(0) {
     for (int i = 0; i < 6; i++) {
@@ -65,4 +65,34 @@ void StreetProperty::removeBuilding() {
     else {
         houseCount--;
     }
+}
+
+PropertyType StreetProperty::getPropertyType() const noexcept {
+    return PropertyType::STREET;
+}
+
+long long StreetProperty::calculateSellValue() const {
+    long long sellValue = getPrice();
+
+    int houses = getHouseCount();
+    if (houses > 0 && houses <= 4) {
+        sellValue += (houses * getHousePrice()) / 2;
+    } else if (houses == 5) {
+        sellValue += (4 * getHousePrice() + getHotelPrice()) / 2;
+    }
+
+    return sellValue;
+}
+
+long long StreetProperty::calculateAssetValue() const {
+    long long sellValue = getPrice();
+
+    int houses = getHouseCount();
+    if (houses > 0 && houses <= 4) {
+        sellValue += (houses * getHousePrice());
+    } else if (houses == 5) {
+        sellValue += (4 * getHousePrice() + getHotelPrice());
+    }
+
+    return sellValue;
 }

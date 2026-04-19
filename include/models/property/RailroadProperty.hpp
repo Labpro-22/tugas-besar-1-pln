@@ -9,6 +9,14 @@ class RailroadProperty: public Property {
         RailroadProperty(const std::string& code,const std::string& name,const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, std::vector<long long> rentPrice);
 
         long long calculateRent() noexcept override;
+
+        PropertyType getPropertyType() const noexcept override;
+
+        long long calculateSellValue() const override;
+
+        long long calculateAssetValue() const override;
+
+
         
     private: 
         std::vector<long long> rent;

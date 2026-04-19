@@ -1,5 +1,9 @@
-#include "include/models/property/RailroadProperty.hpp"
+#include "models/property/RailroadProperty.hpp"
 
+
+PropertyType RailroadProperty::getPropertyType() const noexcept {
+    return PropertyType::RAILROAD;
+}
 
 RailroadProperty::RailroadProperty(const std::string& code,const std::string& name,const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, std::vector<long long> rentPrice): Property(code, name, color, price, mortgageValue, festivalMultiplier, festivalDuration) {
     rent = rentPrice;
@@ -17,4 +21,12 @@ long long RailroadProperty::calculateRent() noexcept {
         return baseRent * getFestivalMultiplier();
     }
     return baseRent;
+}
+
+long long RailroadProperty::calculateSellValue() const {
+    return getPrice();
+}
+
+long long RailroadProperty::calculateAssetValue() const {
+    return getPrice();
 }

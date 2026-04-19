@@ -1,6 +1,6 @@
 #pragma once
 #include "Tile.hpp"
-#include "../property/Property.hpp"
+#include "models/property/Property.hpp"
 
 class Player;
 class GameManager;
