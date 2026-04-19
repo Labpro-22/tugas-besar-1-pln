@@ -2,15 +2,21 @@
 
 
 #include "PropertyException.hpp"
+#include "models/player/Player.hpp"
 #include <string>
 
-class Player;
 
 typedef enum {
     BANK,
     OWNED,
     MORTGAGED
 } PropertyState;
+
+enum class PropertyType {
+    STREET,
+    RAILROAD,
+    UTILITY
+};
 
 class Property {
     public:
@@ -36,7 +42,7 @@ class Property {
 
         void setMortgaged(bool mortgaged) noexcept;
 
-        virtual long long calculateRent() noexcept;
+        virtual long long calculateRent() noexcept = 0;
         
         void startFestival();
 
@@ -48,10 +54,23 @@ class Property {
 
         bool isMortgaged() const noexcept;
 
+        virtual PropertyType getPropertyType() const noexcept = 0;
+
+        virtual long long calculateSellValue() const {
+            return price;
+        }
+
+        virtual long long calculateAssetValue() const {
+            return price;
+        }
+
+        virtual ~Property() {}
+     
+
     protected:
         Player *owner;
 
-    private: 
+    private:
         std::string code;
 
         std::string name;

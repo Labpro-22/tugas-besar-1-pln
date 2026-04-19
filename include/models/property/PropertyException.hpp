@@ -1,33 +1,32 @@
 #include <exception>
 #include <string>
 
-class PropertyException: public std::exception {
-    public:
-        PropertyException(const std::string& errorMessage): errorMessage(errorMessage) {}
-        const char* what() const noexcept {
-            return errorMessage.c_str();
-        }
-    private:
+class PropertyException : public std::exception {
+    protected:
         std::string errorMessage;
-
+    public:
+        explicit PropertyException(const std::string& msg) : errorMessage(msg) {}
+        const char* what() const noexcept override { 
+            return errorMessage.c_str(); 
+        }
 };
 
-class StreetProperty: virtual public PropertyException {
+class StreetPropertyException : public PropertyException {
     public:
-        StreetProperty(const std::string& errorMessage): PropertyException(errorMessage) {}
+        using PropertyException::PropertyException;
 };
 
-class CantBuildException: public StreetProperty {
+class CantBuildException : public StreetPropertyException {
     public:
-        CantBuildException(const std::string& errorMessage): PropertyException(errorMessage), StreetProperty(errorMessage) {}
-    };
-    
-class InvalidHouseCountException: public StreetProperty {
+        explicit CantBuildException(const std::string& msg) : StreetPropertyException(msg) {}
+};
+
+class InvalidHouseCountException : public StreetPropertyException {
     public:
-        InvalidHouseCountException(const std::string& errorMessage): PropertyException(errorMessage), StreetProperty(errorMessage) {}
-    };
-    
-class CantRemoveBuilding: public StreetProperty {
+        explicit InvalidHouseCountException(const std::string& msg) : StreetPropertyException(msg) {}
+};
+
+class CantRemoveBuilding: public StreetPropertyException {
     public:
-        CantRemoveBuilding(const std::string& errorMessage): PropertyException(errorMessage), StreetProperty(errorMessage) {}      
+        explicit CantRemoveBuilding(const std::string& msg): StreetPropertyException(msg) {}      
 };
