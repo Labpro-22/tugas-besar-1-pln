@@ -4,9 +4,8 @@
 class MoveCard : public SkillCard {
 private:
     int amount;
-
+    
 public:
-    explicit MoveCard(const std::string& message);
-    void takeEffect(Player& p,GameManager& gm) override;
-    void rerandomizeAmount();
+    MoveCard(const std::string& message, int amount);
+    void takeEffect(Player& p, GameManager& gm) override;
 };

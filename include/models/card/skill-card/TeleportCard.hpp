@@ -2,8 +2,10 @@
 #include "models/card/skill-card/SkillCard.hpp"
 
 class TeleportCard : public SkillCard {
+private:
+    int targetPosition = -1;
 public:
-    explicit TeleportCard(const std::string& message);
-    void void takeEffect(Player& p,GameManager& gm) override;
-    void setTargetPosition(int pos) { targetPosition = pos; }
+    TeleportCard(const std::string& message);
+    void setTargetPosition(int pos);
+    void takeEffect(Player& p, GameManager& gm) override;
 };

@@ -4,6 +4,6 @@
 
 class GoToNearestStationCard : public ChanceCard {
 public:
-    GoToNearestStationCard(const std::string& message) : ChanceCard(message) {}
-    void takeEffect(Player& p,GameManager& gm) override;
+    GoToNearestStationCard(const std::string& message);
+    void takeEffect(Player& p, GameManager& gm) override;
 };

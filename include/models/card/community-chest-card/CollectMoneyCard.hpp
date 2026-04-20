@@ -5,7 +5,7 @@
 class CollectMoneyCard : public CommunityChestCard {
 private:
     int amount;
-
+    
 public:
     CollectMoneyCard(const std::string& message, int amount);
     void takeEffect(Player& p, GameManager& gm) override;

@@ -7,6 +7,6 @@ private:
     int moveOffset;
 
 public:
-    ForcedMoveCard(const int moveOffset);
-    void takeEffect(Player& p,GameManager& gm) override;
+    ForcedMoveCard(int moveOffset);
+    void takeEffect(Player& p, GameManager& gm) override;
 };
