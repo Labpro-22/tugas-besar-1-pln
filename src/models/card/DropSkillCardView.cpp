@@ -1,5 +1,5 @@
-#include "views/DropSkillCardView.hpp"
-#include "models/card/skill-card/SkillCard.hpp"
+#include "include/views/DropSkillCardView.hpp"
+#include "include/models/card/skill-card/SkillCard.hpp"
 #include <iostream>
 
 int DropSkillCardView::promptChooseCardToDrop(const std::vector<SkillCard*>& cards) {
