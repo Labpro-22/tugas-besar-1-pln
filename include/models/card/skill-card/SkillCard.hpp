@@ -1,5 +1,5 @@
 #pragma once
-#include "include/models/card/Card.hpp"
+#include "models/card/Card.hpp"
 
 class SkillCard : public Card {
 public:
