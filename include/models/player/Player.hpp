@@ -16,8 +16,6 @@
 #include <algorithm>
 #include <map>
 
-using namespace std;
-
 enum class PlayerState {
   ACTIVE,
   JAILED,
@@ -27,16 +25,16 @@ enum class PlayerState {
 class Player
 {
 public:
-    Player(const string& username, long long initialMoney, Board* board);
-    Player( const string& username, long long money, PlayerState state, const vector<Property*>& properties, 
-            const vector<SkillCard*>& skillCards , int getOutOfJailCardCount, int jailTurns, int position, Board* board);
+    Player(const std::string& username, long long initialMoney, Board* board);
+    Player( const std::string& username, long long money, PlayerState state, const std::vector<Property*>& properties, 
+            const std::vector<SkillCard*>& skillCards , int getOutOfJailCardCount, int jailTurns, int position, Board* board);
 
     PlayerPiece& getPiece();
     long long getMoney() const;
     PlayerState getState() const;
-    const string& getUsername() const;
-    const vector<Property*>& getProperties() const;
-    const vector<SkillCard*>& getSkillCards() const;
+    const std::string& getUsername() const;
+    const std::vector<Property*>& getProperties() const;
+    const std::vector<SkillCard*>& getSkillCards() const;
     int getStreetPropertyCount() const;
     int getRailroadPropertyCount() const;
     int getUtilityPropertyCount() const;
@@ -78,18 +76,18 @@ public:
     void onNextTurn();
 
 private:
-    string username;
+    std::string username;
     long long money;
     PlayerState state;
-    vector<Property*> properties;
+    std::vector<Property*> properties;
     int streetPropertyCount;
     int railroadPropertyCount;
     int utilityPropertyCount;
-    vector<SkillCard*> skillCards;
+    std::vector<SkillCard*> skillCards;
     PlayerPiece piece;
     int doubleRollCounter;
     int getOutOfJailCardCount;
     int jailTurns;
-    pair<int, int> lastRoll;
+    std::pair<int, int> lastRoll;
 };
 

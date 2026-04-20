@@ -1,12 +1,12 @@
 #include "include/models/player/Player.hpp"
 
-Player::Player(const string& username, long long initialMoney, Board* board) :
+Player::Player(const std::string& username, long long initialMoney, Board* board) :
     username(username), money(initialMoney), state(PlayerState::ACTIVE),
     properties(), streetPropertyCount(0), railroadPropertyCount(0),
     utilityPropertyCount(0), skillCards(), piece(board, 0),
     doubleRollCounter(0), getOutOfJailCardCount(0), jailTurns(0) {}
-Player::Player( const string& username, long long money, PlayerState state, const vector<Property*>& properties,
-                const vector<SkillCard*>& skillCards, int getOutOfJailCardCount, int jailTurns, int position, Board* board) : 
+Player::Player( const std::string& username, long long money, PlayerState state, const std::vector<Property*>& properties,
+                const std::vector<SkillCard*>& skillCards, int getOutOfJailCardCount, int jailTurns, int position, Board* board) : 
     username(username), money(money), state(state),
     properties(), streetPropertyCount(0), railroadPropertyCount(0), 
     utilityPropertyCount(0), skillCards(skillCards), piece(board, position),
@@ -17,12 +17,12 @@ Player::Player( const string& username, long long money, PlayerState state, cons
         }
     }
 
-const string& Player::getUsername() const { return username; }
+const std::string& Player::getUsername() const { return username; }
 long long Player::getMoney() const { return money; }
 PlayerState Player::getState() const { return state; }
 PlayerPiece& Player::getPiece() { return piece; }
-const vector<Property*>& Player::getProperties() const{ return properties; }
-const vector<SkillCard*>& Player::getSkillCards() const{ return skillCards; }
+const std::vector<Property*>& Player::getProperties() const{ return properties; }
+const std::vector<SkillCard*>& Player::getSkillCards() const{ return skillCards; }
 int Player::getStreetPropertyCount() const { return streetPropertyCount; }
 int Player::getRailroadPropertyCount() const { return railroadPropertyCount; }
 int Player::getUtilityPropertyCount() const { return utilityPropertyCount; }
@@ -270,7 +270,7 @@ bool Player::isPropertySetComplete(const std::string& color, const Board& board)
         }
     }
     
-    map<string,int> map = board.getMapTilesColorCount();
+    std::map<std::string,int> map = board.getMapTilesColorCount();
     int totalInGroup = map[color];
 
     return ownedCount == totalInGroup;
