@@ -4,6 +4,6 @@
 
 class GetOutOfJailCard : public ChanceCard {
 public:
-    GetOutOfJailCard(const std::string& message) : ChanceCard(message) {}
-    void takeEffect(Player& p,GameManager& gm) override;
+    GetOutOfJailCard(const std::string& message);
+    void takeEffect(Player& p, GameManager& gm) override;
 };

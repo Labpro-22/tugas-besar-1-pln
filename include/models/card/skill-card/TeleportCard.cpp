@@ -2,17 +2,15 @@
 
 TeleportCard::TeleportCard(const std::string& message) : SkillCard(message) {}
 
+void TeleportCard::setTargetPosition(int pos) {
+    targetPosition = pos;
+}
+
 void TeleportCard::takeEffect(Player& p, GameManager& gm) {
-    int pos;
-    std::cout << "[Teleport] Pilih ID petak tujuan (0 - 39): "; // TODO : adjust size
-    std::cin >> pos;
-    
-    if ( pos >= 0 && pos < 40 && p.getPiece() != nullptr ) {
-        p.getPiece()->setPosition(pos);
-        std::cout << "Kamu berteleportasi ke petak " << pos << "!\n";
-        gm.getBoard()->getTile(pos)->onLanded(&p, &gm);
-    } 
-    else {
-        std::cout << "Petak tidak valid. Teleportasi gagal.\n";
+    if (targetPosition >= 0 && targetPosition < 40 && p.getPiece() != nullptr) {
+        p.getPiece()->setPosition(targetPosition);
+        std::cout << "Berpindah ke petak " << targetPosition << "!\n";
+        gm.getBoard()->getTile(targetPosition)->onLanded(&p, &gm);
+        targetPosition = -1; 
     }
 }

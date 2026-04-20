@@ -1,22 +1,13 @@
 #include "models/card/skill-card/MoveCard.hpp"
 #include <random>
 
-MoveCard::MoveCard(const std::string& message) : SkillCard(message) {
-    rerandomizeAmount();
-}
-
-void MoveCard::rerandomizeAmount() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dist(1, 12); // TODO : adjust the range of randomizer
-    amount = dist(gen);
-}
+MoveCard::MoveCard(const std::string& message, int amount) 
+    : SkillCard(message), amount(amount) {}
 
 void MoveCard::takeEffect(Player& p, GameManager& gm) {
     if (p.getPiece() != nullptr) {
-        std::cout << "[Move] Anda maju " << amount << " langkah.\n";
+        std::cout << "Maju " << amount << " langkah.\n";
         p.getPiece()->goForward(amount);
-        
         int currentPos = p.getPiece()->getPosition();
         gm.getBoard()->getTile(currentPos)->onLanded(&p, &gm);
     }
