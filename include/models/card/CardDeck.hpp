@@ -1,5 +1,5 @@
 #pragma once
-#include "models/card/Card.hpp"
+#include "include/models/card/Card.hpp"
 #include <vector>
 
 template <typename T>
