@@ -1,4 +1,4 @@
-#include "models/card/community-chest-card/PayMoneyToPlayersCard.hpp"
+#include "include/models/card/community-chest-card/PayMoneyToPlayersCard.hpp"
 #include <iostream>
 
 PayMoneyCardToPlayersCard::PayMoneyCardToPlayersCard(const std::string& message, int amount) 

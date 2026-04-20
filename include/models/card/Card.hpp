@@ -1,8 +1,9 @@
 #pragma once
 
 #include <string>
-#include "models/player/Player.hpp"
-#include "core/GameManager.hpp"
+
+class Player;
+class GameManager;
 
 class Card {
 protected:
