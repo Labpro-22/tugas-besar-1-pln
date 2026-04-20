@@ -1,6 +1,6 @@
 #pragma once
 
-#include "models/card/community-chest-card/CommunityChestCard.hpp"
+#include "include/models/card/community-chest-card/CommunityChestCard.hpp"
 
 class CollectMoneyFromPlayersCard : public CommunityChestCard {
 private:

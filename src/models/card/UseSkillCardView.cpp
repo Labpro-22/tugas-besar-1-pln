@@ -1,9 +1,9 @@
-#include "views/UseSkillCardView.hpp"
-#include "models/Player.hpp"
-#include "models/GameManager.hpp"
-#include "models/card/skill-card/TeleportCard.hpp"
-#include "models/card/skill-card/LassoCard.hpp"
-#include "models/card/skill-card/DemolitionCard.hpp"
+#include "include/views/UseSkillCardView.hpp"
+#include "include/models/Player.hpp"
+#include "include/models/GameManager.hpp"
+#include "include/models/card/skill-card/TeleportCard.hpp"
+#include "include/models/card/skill-card/LassoCard.hpp"
+#include "include/models/card/skill-card/DemolitionCard.hpp"
 #include <iostream>
 #include <string>
 

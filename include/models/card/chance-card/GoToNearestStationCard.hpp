@@ -1,6 +1,6 @@
 #pragma once
 
-#include "models/card/chance-card/ChanceCard.hpp"
+#include "include/models/card/chance-card/ChanceCard.hpp"
 
 class GoToNearestStationCard : public ChanceCard {
 public:
