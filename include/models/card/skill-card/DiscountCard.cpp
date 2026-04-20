@@ -1,20 +1,10 @@
-#include "DiscountCard.hpp"
-#include "../../../Player.hpp"
+#include "models/card/skill-card/DiscountCard.hpp"
 #include <random>
 
-DiscountCard::DiscountCard(const std::string& message) : SkillCard(message) {
-    rerandomizePercentage();
-}
+DiscountCard::DiscountCard(const std::string& message, int percentage) 
+    : SkillCard(message), percentage(percentage) {}
 
-void DiscountCard::rerandomizePercentage() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-
-    // TODO : adjust randomizer range
-    std::uniform_int_distribution<> dist(1, 5);
-    percentage = dist(gen) * 10; 
-}
-
-void DiscountCard::takeEffect(Player& p) {
-    p.applyDiscount(percentage); 
+void DiscountCard::takeEffect(Player& p, GameManager& gm) {
+    p.addEffect(PlayerEffect("DISCOUNT", false, 1, percentage));
+    std::cout << "Diskon " << percentage << "% aktif untuk 1 putaran!\n";
 }

@@ -1,12 +1,11 @@
 #pragma once
-#include "SkillCard.hpp"
+#include "models/card/skill-card/SkillCard.hpp"
 
 class MoveCard : public SkillCard {
 private:
     int amount;
-
+    
 public:
-    explicit MoveCard(const std::string& message);
-    void takeEffect(Player& p) override;
-    void rerandomizeAmount();
+    MoveCard(const std::string& message, int amount);
+    void takeEffect(Player& p, GameManager& gm) override;
 };

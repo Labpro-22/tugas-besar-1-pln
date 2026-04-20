@@ -2,7 +2,11 @@
 #include "SkillCard.hpp"
 
 class DemolitionCard : public SkillCard {
+private:
+    int targetTileId = -1;
+
 public:
-    explicit DemolitionCard(const std::string& message);
-    void takeEffect(Player& p) override;
+    DemolitionCard(const std::string& message);
+    void setTargetTileId(int id);
+    void takeEffect(Player& p, GameManager& gm) override;
 };
