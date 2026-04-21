@@ -17,3 +17,7 @@ void LassoCard::takeEffect(Player& p, GameManager& gm) {
 void LassoCard::prepareUse(UseSkillCardView& view, GameManager& gm) {
     this->setTargetPlayer(view.askForTargetPlayer(gm));
 }
+
+std::string LassoCard::getType() const override {
+    return "LASSO"; 
+}
