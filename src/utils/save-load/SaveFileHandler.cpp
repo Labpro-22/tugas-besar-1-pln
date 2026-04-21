@@ -1,7 +1,10 @@
 #include "utils/save-load/SaveFileHandler.hpp"
 
-void SaveFileHandler::saveGame(SaveData saveData, std::filesystem::path path)
+void SaveFileHandler::saveGame(SaveData saveData, std::string fileName)
 {
+    std::filesystem::path path = "data/" + fileName + ".txt";
+    std::filesystem::create_directories(path.parent_path());
+
     std::ofstream out(path);
     if (!out.is_open()) {
         throw SaveFileNotFoundException(path.string());
@@ -66,8 +69,9 @@ void SaveFileHandler::saveLog(SaveData &saveData, std::ofstream &out)
     }
 }
 
-SaveData SaveFileHandler::loadGame(std::filesystem::path path)
+SaveData SaveFileHandler::loadGame(std::string fileName)
 {
+    std::filesystem::path path = "data/" + fileName + ".txt";
     std::ifstream in(path);
     if (!in.is_open()) {
         throw SaveFileNotFoundException(path.string());
