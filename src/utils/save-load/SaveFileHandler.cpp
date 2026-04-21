@@ -1,5 +1,4 @@
 #include "utils/save-load/SaveFileHandler.hpp"
-#include "utils/save-load/SaveFileException.hpp"
 
 void SaveFileHandler::saveGame(SaveData saveData, std::filesystem::path path)
 {
