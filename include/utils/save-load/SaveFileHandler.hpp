@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include "utils/save-load/SaveData.hpp"
+#include "utils/save-load/SaveFileException.hpp"
 
 class SaveFileHandler {
 private:
