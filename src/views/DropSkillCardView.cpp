@@ -24,3 +24,4 @@ void DropSkillCardView::showDropResult(bool success) {
         std::cout << "Input tidak valid. Gagal membuang kartu.\n";
     }
 }
+

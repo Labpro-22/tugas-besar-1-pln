@@ -1,5 +1,4 @@
 #include "models/card/skill-card/LassoCard.hpp"
-
 LassoCard::LassoCard(const std::string& message) : SkillCard(message) {}
 
 void LassoCard::setTargetPlayer(Player* p) {
@@ -13,4 +12,8 @@ void LassoCard::takeEffect(Player& p, GameManager& gm) {
         message = targetPlayer->getUsername() + " ditarik ke petakmu!";
         targetPlayer = nullptr;
     }
+}
+
+void LassoCard::prepareUse(UseSkillCardView& view, GameManager& gm) {
+    this->setTargetPlayer(view.askForTargetPlayer(gm));
 }
