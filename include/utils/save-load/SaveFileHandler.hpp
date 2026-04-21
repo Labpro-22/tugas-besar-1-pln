@@ -21,6 +21,6 @@ private:
     static void loadLog(SaveData &saveData, std::ifstream &in, std::filesystem::path &path, int &line);
 
 public:
-    static void saveGame(SaveData saveData, std::filesystem::path path);
-    static SaveData loadGame(std::filesystem::path path);
+    static void saveGame(SaveData saveData, std::string fileName);
+    static SaveData loadGame(std::string fileName);
 };
