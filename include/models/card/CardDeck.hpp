@@ -20,5 +20,3 @@ public:
     std::vector<T> getCards() const;
     T removeCardAt(int index);
 };
-
-#include "CardDeck.cpp"
