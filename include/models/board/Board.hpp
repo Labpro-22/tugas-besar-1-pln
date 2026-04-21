@@ -10,10 +10,11 @@ class Tile;
 class Player;
 class PlayerPiece;
 class PropertyConfig;
+class Config;
 
 class Board {
 public:
-    Board(int tileCount, const std::vector<int>& tileIDSequence, const std::vector<PropertyConfig>& propertiesConfig, const std::vector<Player*>& players);
+    Board(int tileCount, const std::vector<int>& tileIDSequence, const Config& config, const std::vector<Player*>& players);
 
     ~Board();
 
