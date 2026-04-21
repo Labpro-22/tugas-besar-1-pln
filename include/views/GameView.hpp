@@ -69,76 +69,76 @@ GameView(GameManager &gm)
           winView(gm)
     {
     }
-    const AuctionView& getAuctionView() const{
+    AuctionView& getAuctionView(){
         return auctionView;
     }
 
-    const BankruptView& getBankruptView() const {
+    BankruptView& getBankruptView() {
         return bankruptView;
     }
 
-    const BoardView& getBoardView() const {
+    BoardView& getBoardView() {
         return boardView;
     }
 
-    const BuildView& getBuildView() const {
+    BuildView& getBuildView() {
         return buildView;
     }
 
-    const BuyView& getBuyView() const {
+    BuyView& getBuyView() {
         return buyView;
     }
 
-    const CardView& getCardView() const {
+    CardView& getCardView() {
         return cardView;
     }
 
     
-    const DiceView& getDiceView() const {
+    DiceView& getDiceView() {
         return diceView;
     }
 
-    const DropSkillCardView& getDropSkillCardView() const {
+    DropSkillCardView& getDropSkillCardView() {
         return dropSkillCardView;
     }
 
-    const FestivalView& getFestivalView() const {
+    FestivalView& getFestivalView() {
         return festivalView;
     }
 
-    const LoadView& getLoadView() const {
+    LoadView& getLoadView() {
         return loadView;
     }
 
-    const MainMenuView& getMainMenuView() const {
+    MainMenuView& getMainMenuView() {
         return mainMenuView;
     }
 
-    const MortgageView& getMortgageView() const {
+    MortgageView& getMortgageView() {
         return mortgageView;
     }
 
-    const PropertyView& getPropertyView() const {
+    PropertyView& getPropertyView() {
         return propertyView;
     }
 
-    const SaveView& getSaveView() const {
+    SaveView& getSaveView() {
         return saveView;
     }
 
-    const UnmortgageView& getUnmortgageView() const {
+    UnmortgageView& getUnmortgageView() {
         return unmortgageView;
     }
 
-    const UseSkillCardView& getUseSkillCardView() const {
+    UseSkillCardView& getUseSkillCardView() {
         return useSkillCardView;
     }
 
-    const WinView& getWinView() const {
+    WinView& getWinView() {
         return winView;
     }
 
-    const LogView& getLogView() const{
+    LogView& getLogView() {
         return logView;
     }
     void InputNextCommand();

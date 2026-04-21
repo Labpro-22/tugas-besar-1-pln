@@ -1,13 +1,14 @@
 #pragma once
-#include "core/GameManager.hpp"
-
+class GameManager;
+#include "views/PropertyView.hpp"
+#include "models/property/Property.hpp"
+#define FORMAT_SPACE 30
 class BuyView
 {
 private:
     GameManager& gameManager;
 public:
     BuyView(GameManager& gm) : gameManager(gm){}
-    void outputProperty(Property& pr) const;
-    void outputBuyStatus(bool bought) const;
+    bool promptBuyProperty(Property& pr);
 };
 
