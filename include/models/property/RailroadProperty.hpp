@@ -1,16 +1,16 @@
 #pragma once
 
 #include "Property.hpp"
-#include <vector>
+#include <map>
 #include <string>
 
 class RailroadProperty: public Property {
     public:
-        RailroadProperty(const std::string& code,const std::string& name,const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, std::vector<long long> rentPrice);
+        RailroadProperty(const std::string& code,const std::string& name,const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, std::map<int, long long> rentPrice);
 
         long long calculateRent() noexcept override;
 
-        PropertyType getPropertyType() const noexcept override;
+        std::string getPropertyType() const noexcept override;
 
         long long calculateSellValue() const override;
 
@@ -20,5 +20,5 @@ class RailroadProperty: public Property {
 
         
     private: 
-        std::vector<long long> rent;
+        std::map<int, long long>rent;
 };

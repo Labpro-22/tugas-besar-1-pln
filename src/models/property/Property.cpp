@@ -1,6 +1,11 @@
 #include "models/property/Property.hpp"
+#include "models/player/Player.hpp"
 
-Property::Property(const std::string& code,const std::string& name, const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration): code(code), name(name), color(color), owner(nullptr), state(BANK), price(price), mortgageValue(mortgageValue), festivalMultiplier(festivalMultiplier), festivalDuration(festivalDuration) {}
+Property::Property(const std::string& code, const std::string& name, const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration)
+    : code(code), name(name), color(color), 
+      owner(nullptr), state(BANK), 
+      price(price), mortgageValue(mortgageValue), 
+      festivalMultiplier(festivalMultiplier), festivalDuration(festivalDuration) {}
 
 std::string Property::getName() const noexcept {
     return name;
