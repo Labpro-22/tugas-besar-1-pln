@@ -1,5 +1,5 @@
 #pragma once
-#include "core/GameManager.hpp"
+class GameManager;
 
 class MainMenuView
 {

@@ -1,5 +1,5 @@
 #pragma once
-#include "core/GameManager.hpp"
+class GameManager;
 
 class SaveView
 {
@@ -9,6 +9,6 @@ public:
     SaveView(GameManager& gm) : gameManager(gm) {}
     void outputSaving() const;
     int promptOverwriteSaveFile(std::string path) const;
-    void outputSaveStatus(bool success) const;
+    void outputSaveStatus(bool success, std::string path) const;
 };
 

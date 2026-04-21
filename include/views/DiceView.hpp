@@ -1,5 +1,8 @@
 #pragma once
-#include "core/GameManager.hpp"
+#include <thread>
+#include <chrono>
+
+class GameManager;
 
 class DiceView
 {
@@ -8,6 +11,5 @@ private:
 public:
     DiceView(GameManager& gm) : gameManager(gm) {}
     void outputRollDice() const;
-    void outputRolledDice(int value1, int value2) const;
     void outputSetDice(int value1, int value2) const;
 };
