@@ -11,5 +11,11 @@ private:
 
 public:
     TransactionLog(int turn, std::string username, std::string action, std::string details);
-    std::string toString();
+
+    int getTurn() const;
+    std::string getUsername() const;
+    std::string getAction() const;
+    std::string getDetails() const;
+
+    std::string toString() const;
 };
