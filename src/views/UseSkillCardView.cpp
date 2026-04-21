@@ -28,29 +28,30 @@ int UseSkillCardView::promptChooseCardToUse(const std::vector<SkillCard*>& cards
 
 void UseSkillCardView::processAndPlayCard(SkillCard* card, Player& player, GameManager& gm) {
     std::cout << "\n--- Menggunakan Kartu ---\n";
-
-    // TeleportCard
-    if (auto* teleport = dynamic_cast<TeleportCard*>(card)) {
-        int pos;
-        std::cout << "Pilih ID petak tujuan (0 - 39): ";
-        std::cin >> pos;
-        teleport->setTargetPosition(pos);
-    }
-    // LassoCard
-    else if (auto* lasso = dynamic_cast<LassoCard*>(card)) {
-        std::string name;
-        std::cout << "Masukkan nama pemain lawan yang ingin ditarik: ";
-        std::cin >> name;
-        Player* targetP = gm.getPlayerByName(name);
-        lasso->setTargetPlayer(targetP);
-    }
-    // DemolitionCard 
-    else if (auto* demo = dynamic_cast<DemolitionCard*>(card)) {
-        int tileId;
-        std::cout << "Masukkan ID petak properti yang ingin dihancurkan: ";
-        std::cin >> tileId;
-        demo->setTargetTileId(tileId);
-    }
+    card->prepareUse(*this, gm);
+    card->takeEffect(player, gm);
+}
     
     card->takeEffect(player, gm);
+}
+
+int UseSkillCardView::askForTargetPosition() {
+    int pos;
+    std::cout << "Pilih ID petak tujuan (0 - 39): ";
+    std::cin >> pos;
+    return pos;
+}
+
+Player* UseSkillCardView::askForTargetPlayer(GameManager& gm) {
+    std::string name;
+    std::cout << "Masukkan nama pemain lawan yang ingin ditarik: ";
+    std::cin >> name;
+    return gm.getPlayerByName(name);
+}
+
+int UseSkillCardView::askForDemolitionTileId() {
+    int tileId;
+    std::cout << "Masukkan ID petak properti yang ingin dihancurkan: ";
+    std::cin >> tileId;
+    return tileId;
 }
