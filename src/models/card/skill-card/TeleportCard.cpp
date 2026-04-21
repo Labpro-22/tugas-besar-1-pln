@@ -14,3 +14,7 @@ void TeleportCard::takeEffect(Player& p, GameManager& gm) {
         targetPosition = -1; 
     }
 }
+
+void TeleportCard::prepareUse(UseSkillCardView& view, GameManager& gm) {
+    this->setTargetPosition(view.askForTargetPosition());
+}

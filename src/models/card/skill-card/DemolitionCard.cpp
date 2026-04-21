@@ -1,4 +1,5 @@
 #include "models/card/skill-card/DemolitionCard.hpp"
+#include "DemolitionCard.hpp"
 
 DemolitionCard::DemolitionCard(const std::string& message) : SkillCard(message) {}
 
@@ -18,4 +19,8 @@ void DemolitionCard::takeEffect(Player& p, GameManager& gm) {
         }
     }
     targetTileId = -1;
+}
+
+void DemolitionCard::prepareUse(UseSkillCardView& view, GameManager& gm) {
+    this->setTargetTileId(view.askForDemolitionTileId());
 }
