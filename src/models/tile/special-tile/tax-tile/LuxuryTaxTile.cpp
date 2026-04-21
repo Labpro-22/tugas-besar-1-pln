@@ -2,6 +2,6 @@
 
 void LuxuryTaxTile::onLanded(Player& p, GameManager& gm) {
     const Config& config = gm.getConfig();
-    long long luxuryTax = config.getLuxuryTax();
+    long long luxuryTax = config.luxuryFlatTax;
     p.payTax(luxuryTax);
 }  

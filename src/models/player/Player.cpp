@@ -115,7 +115,7 @@ void Player::payRent(Property* pr) {
     long long rent = pr->calculateRent();
     Player* owner = pr->getOwner();
     
-    if (pr->getPropertyType() == PropertyType::UTILITY){
+    if (pr->getPropertyType() == "UTILITY"){
         rent *= (lastRoll.first + lastRoll.second);
     }
 
@@ -184,13 +184,13 @@ void Player::addProperty(Property* pr) {
     properties.push_back(pr);
     switch (pr->getPropertyType())
     {
-        case PropertyType::STREET:
+        case "STREET":
             streetPropertyCount++;
             break;
-        case PropertyType::RAILROAD:
+        case "RAILROAD":
             railroadPropertyCount++;
             break;
-        case PropertyType::UTILITY:
+        case "UTILITY":
             utilityPropertyCount++;
             break;
         default:
@@ -206,13 +206,13 @@ void Player::removeProperty(Property* pr) {
     }
     switch (pr->getPropertyType())
     {
-        case PropertyType::STREET:
+        case "STREET":
             streetPropertyCount--;
             break;
-        case PropertyType::RAILROAD:
+        case "PRAILROAD":
             railroadPropertyCount--;
             break;
-        case PropertyType::UTILITY:
+        case "UTILITY":
             utilityPropertyCount--;
             break;
         default:
@@ -221,7 +221,7 @@ void Player::removeProperty(Property* pr) {
 }
 
 void Player::buyProperty(Property* pr) {
-    if (pr->getPropertyType() == PropertyType::STREET){
+    if (pr->getPropertyType() == "STREET"){
         long long price = pr->getPrice();
         if (money < price)
             throw InsufficientFundsException(

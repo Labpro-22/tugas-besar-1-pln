@@ -1,6 +1,6 @@
 #pragma once
-#include "core/GameManager.hpp"
-
+#include "models/card/skill-card/SkillCard.hpp"
+class GameManager;
 class UseSkillCardView
 {
 private:

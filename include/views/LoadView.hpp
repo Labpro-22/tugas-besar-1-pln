@@ -1,5 +1,5 @@
 #pragma once
-#include "core/GameManager.hpp"
+class GameManager;
 
 class LoadView
 {
@@ -8,6 +8,6 @@ private:
 public:
     LoadView(GameManager& gm) : gameManager(gm) {}
     void outputLoading() const;
-    void outputLoadStatus(bool success) const;
+    void outputLoadStatus(std::string pathFile, bool fileFound, bool fileNotCorrupted) const;
 };
 
