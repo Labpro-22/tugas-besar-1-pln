@@ -96,3 +96,7 @@ long long StreetProperty::calculateAssetValue() const {
 
     return sellValue;
 }
+
+std::array<long long, 6> StreetProperty::getRentPrice() const noexcept {
+    return {rentPrice[0], rentPrice[1], rentPrice[2], rentPrice[3], rentPrice[4], rentPrice[5]};
+}

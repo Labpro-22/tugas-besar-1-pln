@@ -21,3 +21,7 @@ long long UtilityProperty::calculateSellValue() const {
 long long UtilityProperty::calculateAssetValue() const {
     return getPrice();
 }
+
+std::vector<long long> UtilityProperty::getRentMultiplier() const noexcept {
+    return rentMultiplier;
+}
