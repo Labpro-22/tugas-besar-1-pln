@@ -15,5 +15,5 @@ private:
     static void loadMisc(Config& config, std::filesystem::path path);
 
 public:
-    static Config loadConfig(std::filesystem::path path);
+    static Config loadConfig(std::string path = "default/");
 };
