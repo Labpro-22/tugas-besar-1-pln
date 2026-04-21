@@ -1,10 +1,10 @@
-#include "include/models/card/community-chest-card/PayMoneyToPlayersCard.hpp"
+#include "models/card/community-chest-card/PayMoneyToPlayersCard.hpp"
 #include <iostream>
 
-PayMoneyCardToPlayersCard::PayMoneyCardToPlayersCard(const std::string& message, int amount) 
+PayMoneyToPlayersCard::PayMoneyToPlayersCard(const std::string& message, int amount) 
     : CommunityChestCard(message), amount(amount) {}
 
-void PayMoneyCard::takeEffect(Player& p, GameManager& gm) {
+void PayMoneyToPlayersCard::takeEffect(Player& p, GameManager& gm) {
     p.payTax(amount);
-    std::cout << "Membayar denda sebesar " << amount << " ke Bank.\n";
+    message = "Anda membayar denda sebesar " + std::to_string(amount) + " ke Bank.";
 }

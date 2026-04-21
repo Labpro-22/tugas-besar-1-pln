@@ -1,4 +1,4 @@
-#include "include/models/effect/PlayerEffect.hpp"
+#include "models/effect/PlayerEffect.hpp"
 
 PlayerEffect::PlayerEffect(const std::string& name, bool isOneTimeUse, int duration, int value)
     : name(name), isOneTimeUse(isOneTimeUse), duration(duration), value(value) {}

@@ -1,6 +1,6 @@
 #pragma once
-#include "include/models/card/Card.hpp"
-#include "include/models/Player.hpp"
+#include "models/card/Card.hpp"
+#include "models/Player.hpp"
 
 // TODO : message attribute
 class ChanceCard : public Card {

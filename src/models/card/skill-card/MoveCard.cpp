@@ -1,4 +1,4 @@
-#include "include/models/card/skill-card/MoveCard.hpp"
+#include "models/card/skill-card/MoveCard.hpp"
 #include <random>
 
 MoveCard::MoveCard(const std::string& message, int amount) 
@@ -6,7 +6,7 @@ MoveCard::MoveCard(const std::string& message, int amount)
 
 void MoveCard::takeEffect(Player& p, GameManager& gm) {
     if (p.getPiece() != nullptr) {
-        std::cout << "Maju " << amount << " langkah.\n";
+        message = "Maju " + std::to_string(amount) + " langkah.";
         p.getPiece()->goForward(amount);
         int currentPos = p.getPiece()->getPosition();
         gm.getBoard()->getTile(currentPos)->onLanded(&p, &gm);
