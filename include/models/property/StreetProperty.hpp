@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Property.hpp"
+#include <array>
 
 class StreetProperty: public Property {
     public:
@@ -31,6 +32,8 @@ class StreetProperty: public Property {
         long long calculateSellValue() const override;
 
         long long calculateAssetValue() const override;
+
+        std::array<long long, 6> getRentPrice() const noexcept;
 
     private:
         int houseCount;
