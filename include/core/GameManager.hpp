@@ -19,10 +19,6 @@
 #include "utils/log/TransactionLogger.hpp"
 #include "views/GameView.hpp"
 
-template <typename T>
-class CardDeck<T> {
-};
-
 class GameManager {
 private:
     bool running;
@@ -61,6 +57,9 @@ public:
     Bank &getBank();
     std::vector<Player> &getPlayers();
     TransactionLogger &getLogger();
+    CardDeck<ChanceCard> &getChanceCardDeck();
+    CardDeck<CommunityChestCard> &getCommunityChestCardDeck();
+    CardDeck<SkillCard> &getSkillCardDeck();
 
     void processMainMenu();
     void processNewGame();

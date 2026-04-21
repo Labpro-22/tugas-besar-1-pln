@@ -41,7 +41,7 @@ bool GameManager::isRunning() const
 
 bool GameManager::isGameEnded() const
 {
-    return playerLeaderboard.size() == players.size() - 1 || turn >= config.maxTurn;
+    return turn >= config.maxTurn;
 }
 
 void GameManager::initGame()
@@ -95,6 +95,9 @@ Board &GameManager::getBoard() { return board; }
 Bank &GameManager::getBank() { return bank; }
 std::vector<Player> &GameManager::getPlayers() { return players; }
 TransactionLogger &GameManager::getLogger() { return logger; }
+CardDeck<ChanceCard> &GameManager::getChanceCardDeck() { return chanceCardDeck; }
+CardDeck<CommunityChestCard> &GameManager::getCommunityChestCardDeck() { return communityChestCardDeck; }
+CardDeck<SkillCard> &GameManager::getSkillCardDeck() { return skillCardDeck; }
 
 // Game action
 void GameManager::processMainMenu()
@@ -131,7 +134,6 @@ void GameManager::processNewGame()
 }
 void GameManager::processLoadGame()
 {
-    
 }
 void GameManager::processSaveGame()
 {
@@ -228,8 +230,10 @@ void GameManager::processUseSkillCard()
     Player &player = getCurrentPlayer();
 
     UseSkillCardView &view = gameView.getUseSkillCardView();
+    CardView &cardView = gameView.getCardView();
 
     int skillIndex = view.promptChooseSkillCard(player.getSkillCards());
+    cardView.outputCard(*player.getSkillCards()[skillIndex]);
     player.useSkillCard(skillIndex);
 }
 void GameManager::processDropSkillCard()
@@ -254,10 +258,11 @@ void GameManager::processPrintLogs()
     }
 }
 
-void GameManager::processWin() {
-    Player* winner = nullptr;
-    vector<Player*> remainingPlayer;
-    for (Player& player: players) {
+void GameManager::processWin()
+{
+    Player *winner = nullptr;
+    std::vector<Player *> remainingPlayer;
+    for (Player &player : players) {
         if (!player.isBankrupt()) {
             remainingPlayer.push_back(&player);
             if (winner == nullptr || winner->calculateTotalWealth() < player.calculateTotalWealth()) {
@@ -265,9 +270,9 @@ void GameManager::processWin() {
             }
         }
     }
-    
+
     WinView view = gameView.getWinView();
     view.outputWinner(winner, remainingPlayer);
-    
+
     playing = false;
 }
