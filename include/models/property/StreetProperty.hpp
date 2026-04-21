@@ -27,7 +27,7 @@ class StreetProperty: public Property {
 
         void removeBuilding();
 
-        PropertyType getPropertyType() const noexcept override;
+        std::string getPropertyType() const noexcept override;
 
         long long calculateSellValue() const override;
 

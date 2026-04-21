@@ -1,6 +1,7 @@
 #include "models/property/UtilityProperty.hpp"
+#include "models/player/Player.hpp"
 
-UtilityProperty::UtilityProperty(const std::string& code, const std::string& name, const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, std::vector<long long> rentMul): Property(code, name, color, price, mortgageValue, festivalMultiplier, festivalDuration) {
+UtilityProperty::UtilityProperty(const std::string& code, const std::string& name, const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, std::map<int, long long> rentMul): Property(code, name, color, price, mortgageValue, festivalMultiplier, festivalDuration) {
     rentMultiplier = rentMul;
 }
 

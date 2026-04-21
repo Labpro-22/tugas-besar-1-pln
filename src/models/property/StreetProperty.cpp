@@ -1,4 +1,5 @@
 #include "models/property/StreetProperty.hpp"
+#include "models/player/Player.hpp"
 
 StreetProperty::StreetProperty(const std::string& code, const std::string& name, const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, long long housePrice, long long hotelPrice, long long rent[6]): Property(code, name, color, price, mortgageValue, festivalMultiplier, festivalDuration), housePrice(housePrice), hotelPrice(hotelPrice), houseCount(0) {
     for (int i = 0; i < 6; i++) {
