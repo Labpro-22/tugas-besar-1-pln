@@ -9,4 +9,5 @@ class SkillCard : public Card {
 public:
     SkillCard(const std::string& message) : Card(message) {}
     virtual void prepareUse(UseSkillCardView& view, GameManager& gm) {}
+    virtual std::string getType() const = 0;
 };
