@@ -151,7 +151,3 @@ void Bank::collectMoneyFromAll(std::vector<Player> &players, long long amount)
         player.payTax(amount);
     }
 }
-
-void Bank::startAuction(Property &property)
-{
-}
