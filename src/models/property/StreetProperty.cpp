@@ -67,8 +67,8 @@ void StreetProperty::removeBuilding() {
     }
 }
 
-PropertyType StreetProperty::getPropertyType() const noexcept {
-    return PropertyType::STREET;
+std::string StreetProperty::getPropertyType() const noexcept {
+    return "STREET";
 }
 
 long long StreetProperty::calculateSellValue() const {

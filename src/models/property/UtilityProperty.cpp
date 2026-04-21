@@ -10,8 +10,8 @@ long long UtilityProperty::calculateRent() noexcept {
     return getFestivalDuration() != 0 ? getFestivalMultiplier() * rentMultiplier[owner->getUtilityPropertyCount()] : rentMultiplier[owner->getUtilityPropertyCount()]; 
 }
 
-PropertyType UtilityProperty::getPropertyType() const noexcept {
-    return PropertyType::UTILITY;
+std::string UtilityProperty::getPropertyType() const noexcept {
+    return "UTILITY";
 }
 
 long long UtilityProperty::calculateSellValue() const {

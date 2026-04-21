@@ -12,11 +12,11 @@ typedef enum {
     MORTGAGED
 } PropertyState;
 
-enum class PropertyType {
-    STREET,
-    RAILROAD,
-    UTILITY
-};
+// enum class PropertyType {
+//     STREET,
+//     RAILROAD,
+//     UTILITY
+// };
 
 class Property {
     public:
@@ -54,7 +54,7 @@ class Property {
 
         bool isMortgaged() const noexcept;
 
-        virtual PropertyType getPropertyType() const noexcept = 0;
+        virtual std::string getPropertyType() const noexcept = 0;
 
         virtual long long calculateSellValue() const {
             return price;
