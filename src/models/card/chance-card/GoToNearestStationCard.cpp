@@ -1,5 +1,5 @@
-#include "GoToNearestStationCard.hpp"
-#include "include/models/PlayerPiece.hpp"
+#include "models/card/chance-card/GoToNearestStationCard.hpp"
+#include "models/PlayerPiece.hpp"
 
 GoToNearestStationCard::GoToNearestStationCard(const std::string& message) 
     : ChanceCard(message) {}
@@ -11,7 +11,7 @@ void GoToNearestStationCard::takeEffect(Player& p, GameManager& gm) {
         int targetStation = (((currentPos + 5) / 10) * 10 + 5) % 40;
         
         p.getPiece()->setPosition(targetStation);
-        std::cout << "Anda berpindah ke stasiun terdekat di petak " << targetStation << "!\n";
+        message = "Anda berpindah ke stasiun terdekat di petak " + std::to_string(targetStation) + "!";
         
         gm.getBoard()->getTile(targetStation)->onLanded(&p, &gm);
     }

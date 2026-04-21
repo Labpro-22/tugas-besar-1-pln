@@ -1,4 +1,4 @@
-#include "include/models/card/Card.hpp"
+#include "models/card/Card.hpp"
 
 Card::Card(const std::string& message) : message(message) {}
 

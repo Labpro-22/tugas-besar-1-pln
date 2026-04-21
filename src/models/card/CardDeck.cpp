@@ -1,5 +1,5 @@
-#include "include/models/card/CardDeck.hpp"
-#include "include/models/card/Card.hpp"
+#include "models/card/CardDeck.hpp"
+#include "models/card/Card.hpp"
 #include <algorithm>
 #include <random>
 

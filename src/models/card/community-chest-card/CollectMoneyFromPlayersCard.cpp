@@ -1,4 +1,4 @@
-#include "include/models/card/community-chest-card/CollectMoneyFromPlayersCard.hpp"
+#include "models/card/community-chest-card/CollectMoneyFromPlayersCard.hpp"
 #include <iostream>
 
 CollectMoneyFromPlayersCard::CollectMoneyFromPlayersCard(const std::string& message, int amount) 
@@ -16,5 +16,5 @@ void CollectMoneyFromPlayersCard::takeEffect(Player& p, GameManager& gm) {
     }
     
     p.receiveMoney(totalCollected);
-    std::cout << "Mengumpulkan total " << totalCollected << " dari pemain lain.\n";
+    message = "Anda mengumpulkan total " + std::to_string(totalCollected) + " dari pemain lain.";
 }
