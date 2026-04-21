@@ -1,13 +1,15 @@
 #pragma once
-#include "core/GameManager.hpp"
-
+#include "models/property/Property.hpp"
+class GameManager;
+#include <map>
+#define FORMAT_SPACE 20
 class BuildView
 {
 private:
     GameManager& gameManager;
 public:
     BuildView(GameManager& gm) : gameManager(gm) {}
-    int promptChooseProperty(std::vector<Property*> pr) const;
-    void outputBuildStatus(bool success) const;
+    StreetProperty* promptChooseProperty(std::vector<Property*> pr) const;
+    void outputBuildStatus(bool success, StreetProperty* pr) const;
 };
 

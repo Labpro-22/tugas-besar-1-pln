@@ -1,5 +1,7 @@
 #pragma once
-#include "core/GameManager.hpp"
+#include "models/property/Property.hpp"
+#include "models/player/Player.hpp"
+class GameManager;
 
 class AuctionView
 {

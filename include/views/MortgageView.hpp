@@ -1,5 +1,9 @@
 #pragma once
-#include "core/GameManager.hpp"
+#include <vector>
+#include "models/property/Property.hpp"
+#include <map>
+#define FORMAT_SPACE_20(a) 20-(a)
+class GameManager;
 
 class MortgageView
 {
@@ -7,6 +11,7 @@ private:
     GameManager& gameManager;
 public:
     MortgageView(GameManager& gm) : gameManager(gm) {}
-    int promptChooseProperty(std::vector<Property*> pr) const;
-    void outputMortgageStatus(bool success) const;
+    Property* promptChooseProperty(std::vector<Property*> pr) const;
+    void outputMortgageStatus(bool success, Property &pr) const;
+    bool sellAllBuildings(std::vector<Property*> colorGroupProperty);
 };
