@@ -8,3 +8,7 @@ void DiscountCard::takeEffect(Player& p, GameManager& gm) {
     p.addEffect(PlayerEffect("DISCOUNT", false, 1, percentage));
     message = "Diskon " + std::to_string(percentage) + "% aktif untuk 1 putaran!";
 }
+
+std::string DiscountCard::getType() const override {
+    return "DISCOUNT"; 
+}

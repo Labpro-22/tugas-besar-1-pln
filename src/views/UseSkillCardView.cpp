@@ -31,9 +31,6 @@ void UseSkillCardView::processAndPlayCard(SkillCard* card, Player& player, GameM
     card->prepareUse(*this, gm);
     card->takeEffect(player, gm);
 }
-    
-    card->takeEffect(player, gm);
-}
 
 int UseSkillCardView::askForTargetPosition() {
     int pos;
