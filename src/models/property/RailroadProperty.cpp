@@ -30,3 +30,7 @@ long long RailroadProperty::calculateSellValue() const {
 long long RailroadProperty::calculateAssetValue() const {
     return getPrice();
 }
+
+std::vector<long long> RailroadProperty::getRent() const noexcept {
+    return rent;
+}
