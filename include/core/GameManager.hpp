@@ -17,12 +17,15 @@
 #include "utils/config/Config.hpp"
 #include "utils/config/ConfigLoader.hpp"
 #include "utils/log/TransactionLogger.hpp"
+#include "utils/save-load/SaveData.hpp"
+#include "utils/save-load/SaveFileHandler.hpp"
 #include "views/GameView.hpp"
 
 class GameManager {
 private:
     bool running;
     bool playing;
+    bool startOfTheTurn;
     Config config;
     GameView gameView;
     int turn;
@@ -63,7 +66,6 @@ public:
 
     void processMainMenu();
     void processNewGame();
-    void processLoadGame();
     void processSaveGame();
     void processLoadGame();
     void processRollDice();
