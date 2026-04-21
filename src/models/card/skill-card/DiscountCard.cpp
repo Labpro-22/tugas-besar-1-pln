@@ -1,4 +1,6 @@
 #include "models/card/skill-card/DiscountCard.hpp"
+#include "models/player/Player.hpp"
+#include "core/GameManager.hpp"
 #include <random>
 
 DiscountCard::DiscountCard(const std::string& message, int percentage) 
@@ -9,6 +11,6 @@ void DiscountCard::takeEffect(Player& p, GameManager& gm) {
     message = "Diskon " + std::to_string(percentage) + "% aktif untuk 1 putaran!";
 }
 
-std::string DiscountCard::getType() const override {
-    return "DISCOUNT"; 
+std::string DiscountCard::getType() const {
+    return "DiscountCard"; 
 }

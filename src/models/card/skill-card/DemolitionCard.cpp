@@ -1,4 +1,7 @@
 #include "models/card/skill-card/DemolitionCard.hpp"
+#include "models/player/Player.hpp"
+#include "models/tile/PropertyTile.hpp"
+#include "core/GameManager.hpp"
 
 DemolitionCard::DemolitionCard(const std::string& message) : SkillCard(message) {}
 
@@ -8,8 +11,8 @@ void DemolitionCard::setTargetTileId(int id) {
 
 void DemolitionCard::takeEffect(Player& p, GameManager& gm) {
     // TODO : adjust size
-    if (targetTileId >= 0 && targetTileId < 40) {
-        Tile* tile = gm.getBoard()->getTile(targetTileId);
+    if (targetTileId >= 0 && targetTileId < gm.getBoard().getTileCount()) {
+        Tile* tile = gm.getBoard().getTile(targetTileId);
         if (auto* propTile = dynamic_cast<PropertyTile*>(tile)) {
             if (propTile->getProperty() != nullptr) {
                 propTile->getProperty()->resetOwnerAsBank();
@@ -24,6 +27,6 @@ void DemolitionCard::prepareUse(UseSkillCardView& view, GameManager& gm) {
     this->setTargetTileId(view.askForDemolitionTileId());
 }
 
-std::string DemolitionCard::getType() {
-    return "DEMOLITION";
+std::string DemolitionCard::getType() const {
+    return "DemolitionCard";
 }
