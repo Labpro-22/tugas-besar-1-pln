@@ -2,9 +2,9 @@
 
 #include "models/tile/Tile.hpp"
 
-class TaxTile: virtual public Tile {
+class TaxTile: virtual public SpecialTile {
     public:
-        using Tile::Tile;
+        using SpecialTile::SpecialTile;
 
         void onLanded(Player& p, GameManager& gm) override {}
         
