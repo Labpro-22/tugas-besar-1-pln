@@ -1,8 +1,9 @@
 #pragma once
 
-#include <vector>
 #include <map>
+#include <vector>
 
+#include "utils/config/ActionConfig.hpp"
 #include "utils/config/PropertyConfig.hpp"
 
 class Config {
@@ -11,6 +12,7 @@ public:
     int playerCount;
     int tileCount;
     std::map<int, std::string> tileCodeSequence;
+    std::vector<ActionTileConfig> actionTiles;
     std::vector<PropertyConfig> properties;
     std::map<int, long long> railroadRent;
     std::map<int, long long> utilityRent;
