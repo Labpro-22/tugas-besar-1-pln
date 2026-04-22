@@ -22,22 +22,19 @@ Board::Board(int tileCount, const std::vector<int>& tileIDSequence, const Config
 
     tiles.resize(tileCount, nullptr);
 
-    int maxRailroad = 0;
-    for (const auto& pair : config.railroadRent) {
-        if (pair.first > maxRailroad) maxRailroad = pair.first;
-    }
-
-    int maxUtility = 0;
-    for (const auto& pair : config.utilityRent) {
-        if (pair.first > maxUtility) maxUtility = pair.first;
-    }
-
     std::map<int, PropertyConfig> propMap;
     for (const auto& p : config.properties) {
         propMap[p.id] = p;
     }
 
+    std::map<int, ActionTileConfig> actionMap;
+    for (const auto& a : config.actionTiles) {
+        actionMap[a.id] = a;
+    }
+
     for (int i = 0; i < tileCount; ++i) {
+        if (i >= (int)tileIDSequence.size()) break;
+
         int id = tileIDSequence[i];
         Tile* newTile = nullptr;
 
@@ -58,43 +55,46 @@ Board::Board(int tileCount, const std::vector<int>& tileIDSequence, const Config
                 prop = new UtilityProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, config.utilityRent);
             }
 
-            newTile = new PropertyTile(prop);
-            
-            mapTilesCodeColor[conf.code] = conf.color;
-            mapTilesColorCount[conf.color]++;
+            if (prop) {
+                newTile = new PropertyTile(prop);
+                mapTilesCodeColor[conf.code] = conf.color;
+                mapTilesColorCount[conf.color]++;
+            }
         } 
-        else {
-            switch (id) {
-                case 0:   
-                    newTile = new StartTile("Petak Mulai", "GO", config.goSalary); 
-                    break;
-                case 101: 
-                    newTile = new CommunityChestTile("Dana Umum", "DNU"); 
-                    break;
-                case 102: 
-                    newTile = new ChanceCardTile("Kesempatan", "KSP"); 
-                    break;
-                case 103: 
-                    newTile = new IncomeTaxTile("Pajak Penghasilan", "PPH", config.incomeFlatTax, config.incomePercentageTax); 
-                    break;
-                case 104: 
-                    newTile = new LuxuryTaxTile("Pajak Barang Mewah", "PBM", config.luxuryFlatTax); 
-                    break;
-                case 105: 
-                    newTile = new FestiveTile("Festival", "FES"); 
-                    break;
-                case 106: 
-                    newTile = new JailTile("Penjara", "PEN"); 
-                    break;
-                case 107: 
-                    newTile = new FreeParkingTile("Bebas Parkir", "BBP"); 
-                    break;
-                case 108: 
-                    newTile = new GoToJailTile("Petak Pergi ke Penjara", "PPJ"); 
-                    break;
-                default:
-                    newTile = nullptr;
-                // Still don't know how to set this. Can I just, if not found in propMap I will assign it randomly, tho it depends on the tileIDSequence 
+        else if (actionMap.find(id) != actionMap.end()) {
+            ActionTileConfig aConf = actionMap[id];
+            
+            if (aConf.code == "GO") {
+                newTile = new StartTile(aConf.name, aConf.code, config.goSalary);
+            } 
+            else if (aConf.code == "DNU") {
+                newTile = new CommunityChestTile(aConf.name, aConf.code);
+            } 
+            else if (aConf.code == "KSP") {
+                newTile = new ChanceCardTile(aConf.name, aConf.code);
+            } 
+            else if (aConf.code == "PPH") {
+                newTile = new IncomeTaxTile(aConf.name, aConf.code, config.incomeFlatTax, config.incomePercentageTax);
+            } 
+            else if (aConf.code == "PBM") {
+                newTile = new LuxuryTaxTile(aConf.name, aConf.code, config.luxuryFlatTax);
+            } 
+            else if (aConf.code == "FES") {
+                newTile = new FestiveTile(aConf.name, aConf.code);
+            } 
+            else if (aConf.code == "PEN") {
+                newTile = new JailTile(aConf.name, aConf.code);
+            } 
+            else if (aConf.code == "BBP") {
+                newTile = new FreeParkingTile(aConf.name, aConf.code);
+            } 
+            else if (aConf.code == "PPJ") {
+                newTile = new GoToJailTile(aConf.name, aConf.code);
+            }
+
+            if (newTile) {
+                mapTilesCodeColor[aConf.code] = aConf.color;
+                mapTilesColorCount[aConf.color]++;
             }
         }
 
