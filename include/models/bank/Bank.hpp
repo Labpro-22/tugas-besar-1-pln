@@ -7,6 +7,7 @@
 #include "models/property/StreetProperty.hpp"
 #include "models/property/RailroadProperty.hpp"
 #include "models/property/UtilityProperty.hpp"
+#include "utils/save-load/PropertySaveData.hpp"
 
 class Bank {
 private:

@@ -34,11 +34,15 @@ private:
     std::queue<Player *> playerQueue;
     Bank bank;
     TransactionLogger logger;
-    CardDeck<ChanceCard> chanceCardDeck;
-    CardDeck<CommunityChestCard> communityChestCardDeck;
-    CardDeck<SkillCard> skillCardDeck;
 
-    // main game runner
+    std::vector<ChanceCard> chanceCards;
+    std::vector<CommunityChestCard> communityChestCards;
+    std::vector<SkillCard> skillCards;
+    CardDeck<ChanceCard*> chanceCardDeck;
+    CardDeck<CommunityChestCard*> communityChestCardDeck;
+    CardDeck<SkillCard*> skillCardDeck;
+
+    // Main game runner
     void gameLoop();
     bool isRunning() const;
     bool isGameEnded() const;
@@ -60,9 +64,9 @@ public:
     Bank &getBank();
     std::vector<Player> &getPlayers();
     TransactionLogger &getLogger();
-    CardDeck<ChanceCard> &getChanceCardDeck();
-    CardDeck<CommunityChestCard> &getCommunityChestCardDeck();
-    CardDeck<SkillCard> &getSkillCardDeck();
+    CardDeck<ChanceCard*> &getChanceCardDeck();
+    CardDeck<CommunityChestCard*> &getCommunityChestCardDeck();
+    CardDeck<SkillCard*> &getSkillCardDeck();
 
     void processMainMenu();
     void processNewGame();
@@ -71,12 +75,14 @@ public:
     void processRollDice();
     void processSetDice(int value1, int value2);
     void processBuyProperty();
+    void processBuyProperty(Player& player, Property* property);
+    void processAuctionProperty(Property* property);
     void processMortgageProperty();
     void processUnmortgageProperty();
     void processBuild();
     void processUseSkillCard();
     void processDropSkillCard();
     void processLiquidation();
-    void processPrintLogs();
+    void processLiquidation(Player& player);
     void processWin();
 };

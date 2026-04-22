@@ -9,7 +9,7 @@ private:
     int position;
 
 public:
-    PlayerPiece(Board* board, int startPosition);
+    PlayerPiece(int startPosition);
 
     void setPosition(int pos);
     int getPosition() const;

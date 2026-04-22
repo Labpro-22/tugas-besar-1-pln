@@ -7,6 +7,7 @@
 class ConfigLoader {
 private:
     ConfigLoader() = default;
+    static void loadTile(Config& config, std::filesystem::path path);
     static void loadProperty(Config& config, std::filesystem::path path);
     static void loadRailroad(Config& config, std::filesystem::path path);
     static void loadUtility(Config& config, std::filesystem::path path);

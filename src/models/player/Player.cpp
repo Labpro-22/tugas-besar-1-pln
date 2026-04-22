@@ -1,15 +1,16 @@
-#include "include/models/player/Player.hpp"
+#include "models/player/Player.hpp"
+#include "core/GameManager.hpp"
 
-Player::Player(const std::string& username, long long initialMoney, Board* board) :
+Player::Player(const std::string& username, long long initialMoney) :
     username(username), money(initialMoney), state(PlayerState::ACTIVE),
     properties(), streetPropertyCount(0), railroadPropertyCount(0),
-    utilityPropertyCount(0), skillCards(), piece(board, 0),
+    utilityPropertyCount(0), skillCards(), piece(0),
     doubleRollCounter(0), getOutOfJailCardCount(0), jailTurns(0) {}
 Player::Player( const std::string& username, long long money, PlayerState state, const std::vector<Property*>& properties,
-                const std::vector<SkillCard*>& skillCards, int getOutOfJailCardCount, int jailTurns, int position, Board* board) : 
+                const std::vector<SkillCard*>& skillCards, int getOutOfJailCardCount, int jailTurns, int position) : 
     username(username), money(money), state(state),
     properties(), streetPropertyCount(0), railroadPropertyCount(0), 
-    utilityPropertyCount(0), skillCards(skillCards), piece(board, position),
+    utilityPropertyCount(0), skillCards(skillCards), piece(position),
     doubleRollCounter(0), getOutOfJailCardCount(getOutOfJailCardCount), jailTurns(jailTurns) 
     {
         for (Property* pr : properties) {
@@ -23,6 +24,7 @@ PlayerState Player::getState() const { return state; }
 PlayerPiece& Player::getPiece() { return piece; }
 const std::vector<Property*>& Player::getProperties() const{ return properties; }
 const std::vector<SkillCard*>& Player::getSkillCards() const{ return skillCards; }
+const std::vector<SkillCard*>& Player::getEffects() const{ return effects; }
 int Player::getStreetPropertyCount() const { return streetPropertyCount; }
 int Player::getRailroadPropertyCount() const { return railroadPropertyCount; }
 int Player::getUtilityPropertyCount() const { return utilityPropertyCount; }
@@ -182,19 +184,12 @@ bool Player::isBankrupt() const {
 
 void Player::addProperty(Property* pr) {
     properties.push_back(pr);
-    switch (pr->getPropertyType())
-    {
-        case "STREET":
-            streetPropertyCount++;
-            break;
-        case "RAILROAD":
-            railroadPropertyCount++;
-            break;
-        case "UTILITY":
-            utilityPropertyCount++;
-            break;
-        default:
-            break;
+    if (pr->getPropertyType() == "STREET") {
+        streetPropertyCount++;
+    } else if (pr->getPropertyType() == "RAILROAD") {
+        railroadPropertyCount++;
+    } else if (pr->getPropertyType() == "UTILITY") {
+        utilityPropertyCount++;
     }
     pr->setOwner(this);
 }
@@ -204,19 +199,12 @@ void Player::removeProperty(Property* pr) {
     if (it != properties.end()) {
         properties.erase(it);
     }
-    switch (pr->getPropertyType())
-    {
-        case "STREET":
-            streetPropertyCount--;
-            break;
-        case "PRAILROAD":
-            railroadPropertyCount--;
-            break;
-        case "UTILITY":
-            utilityPropertyCount--;
-            break;
-        default:
-            break;
+    if (pr->getPropertyType() == "STREET") {
+        streetPropertyCount--;
+    } else if (pr->getPropertyType() == "RAILROAD") {
+        railroadPropertyCount--;
+    } else if (pr->getPropertyType() == "UTILITY") {
+        utilityPropertyCount--;
     }
 }
 
@@ -315,13 +303,13 @@ void Player::addSkillCard(SkillCard* card) {
     skillCards.push_back(card);
 }
 
-void Player::useSkillCard(int index) {
+void Player::useSkillCard(int index, GameManager& gm) {
     if (index < 0 || index >= static_cast<int>(skillCards.size()))
         throw InvalidCardIndexException(
             "Indeks kartu " + std::to_string(index) + " tidak valid.");
 
     SkillCard* card = skillCards[index];
-    card->takeEffect(this);
+    card->takeEffect(*this, gm);
 
     skillCards.erase(skillCards.begin() + index);
 }
@@ -343,7 +331,6 @@ void Player::goToJail(){
     state = PlayerState::JAILED;
     jailTurns = 0;
     doubleRollCounter = 0;
-    // piece.setPosition(board.getTilePosition("PEN")); 
 }
 
 void Player::useGetOutOfJailCard() {
@@ -364,7 +351,6 @@ void Player::rollToGetOutOfJail() {
 
     if (lastRoll.first == lastRoll.second) {
         getOutOfJail();
-        piece.goForward(lastRoll.first + lastRoll.second);
     }
 
     return;
@@ -374,11 +360,10 @@ void Player::setDiceToGetOutOfJail(int value1, int value2) {
     if (state != PlayerState::JAILED)
         throw InJailException("Pemain tidak sedang di penjara.");
 
-    lastRoll = {value1, value2}
+    lastRoll = {value1, value2};
 
     if (lastRoll.first == lastRoll.second) {
         getOutOfJail();
-        piece.goForward(lastRoll.first + lastRoll.second);
     }
 }
 
@@ -407,5 +392,11 @@ void Player::onNextTurn() {
         jailTurns++;
     }
 
-    // counter efek kartu?
+    for (int i = 0; i < effects.size(); i++) {
+        effects[i].decrementDuration();
+        if (effects[i].isExpired()) {
+            effects.erase(effects.begin() + i);
+            i--;
+        }
+    }
 }

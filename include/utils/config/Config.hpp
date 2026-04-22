@@ -9,6 +9,8 @@ class Config {
 public:
     int maxTurn;
     int playerCount;
+    int tileCount;
+    std::map<int, std::string> tileCodeSequence;
     std::vector<PropertyConfig> properties;
     std::map<int, long long> railroadRent;
     std::map<int, long long> utilityRent;
