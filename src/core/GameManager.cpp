@@ -135,7 +135,7 @@ void GameManager::processNewGame()
     std::vector<std::string> usernames = mainMenuView.promptUsernames();
     players.clear();
     for (std::string &username : usernames) {
-        players.push_back(Player{username, config.initialMoney, &board});
+        players.push_back(Player{username, config.initialMoney});
     }
     std::shuffle(players.begin(), players.end(), std::default_random_engine{time(0)});
     std::vector<Player *> playerPointer;
@@ -504,10 +504,9 @@ void GameManager::processUnmortgageProperty()
 {
     Player &player = getCurrentPlayer();
     UnmortgageView &view = gameView.getUnmortgageView();
-    int propertyIndex = view.promptChooseProperty(player.getProperties());
-    if (propertyIndex == 0) return;
+    Property* property = view.promptChooseProperty(player.getProperties());
+    if (property == nullptr) return;
 
-    Property *property = player.getProperties()[propertyIndex];
     StreetProperty *street = dynamic_cast<StreetProperty *>(property);
     if (street != nullptr && (street->getHouseCount() > 0 || street->hasHotel())) {
         street->removeBuilding();
@@ -553,12 +552,11 @@ void GameManager::processUseSkillCard()
     UseSkillCardView &view = gameView.getUseSkillCardView();
     CardView &cardView = gameView.getCardView();
 
-    int skillIndex = view.promptChooseSkillCard(player.getSkillCards());
+    int skillIndex = view.promptChooseCardToUse(player.getSkillCards());
     try {
-
         SkillCard *card = player.getSkillCards()[skillIndex - 1];
         cardView.outputCard(*card);
-        player.useSkillCard(skillIndex);
+        player.useSkillCard(skillIndex, *this);
         logger.log(turn, player.getUsername(), "USE_CARD",
                    card->getType() + " dipakai. " + card->getMessage());
     }
