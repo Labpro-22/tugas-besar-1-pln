@@ -1,5 +1,5 @@
 #include "views/TaxView.hpp"
-
+#include "core/GameManager.hpp"
 int TaxView::promptIncomeTax(long long flat, double percentage ) const{
 
     int input;

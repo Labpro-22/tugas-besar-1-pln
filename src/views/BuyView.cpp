@@ -1,5 +1,5 @@
 #include "core/GameManager.hpp"
-#include "views/BuyView.hpp";
+#include "views/BuyView.hpp"
 
 bool BuyView::promptBuyProperty(Property& pr){
     Property *p = &pr;

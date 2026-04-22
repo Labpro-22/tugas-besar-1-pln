@@ -2,7 +2,6 @@
 #include "models/property/Property.hpp"
 class GameManager;
 #include <map>
-#define FORMAT_SPACE 20
 class BuildView
 {
 private:

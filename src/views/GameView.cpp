@@ -25,6 +25,7 @@ void GameView::InputNextCommand(){
     }
     if(command == "CETAK_PROPERTI"){
         propertyView.outputPlayerProperties();
+    }
     if(command == "GADAI"){
         gameManager.processMortgageProperty();
     }

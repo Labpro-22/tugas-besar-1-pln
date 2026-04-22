@@ -1,5 +1,5 @@
 #include "core/GameManager.hpp"
-#include "LogView.hpp"
+#include "views/LogView.hpp"
 
 void LogView::printLogView()const{
     std::cout << "=== Log Transaksi Penuh ===\n\n";

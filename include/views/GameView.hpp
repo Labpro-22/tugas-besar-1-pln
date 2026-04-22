@@ -28,7 +28,6 @@ class GameView
 {
 private:
     GameManager &gameManager;
-
     AuctionView auctionView;
     BankruptView bankruptView;
     BoardView boardView;

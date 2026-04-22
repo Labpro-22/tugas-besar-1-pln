@@ -2,8 +2,6 @@
 #include <vector>
 #include "models/property/Property.hpp"
 #include <map>
-#define FORMAT_SPACE_20(a) 20-(a)
-#define FORMAT_SPACE_10(a) 10-(a)
 class GameManager;
 
 class MortgageView
