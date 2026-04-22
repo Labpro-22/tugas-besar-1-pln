@@ -7,6 +7,7 @@ private:
     GameManager& gameManager;
 public:
     MainMenuView(GameManager& gm) : gameManager(gm) {}
-    int promptNewOrLoadGame() const;
+    int promptNewGameOrLoadGame() ;
+    std::vector<std::string> promptUsernames();
 };
 

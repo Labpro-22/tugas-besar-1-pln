@@ -11,5 +11,6 @@ public:
     AuctionView(GameManager& gm) : gameManager(gm) {}
     void outputProperty(Property& pr) const;
     long long promptBidOrPass(Player& p) const;
+    void outputAuctionStatus(Player& p, long long lastBid, Property &pr) const;
 };
 
