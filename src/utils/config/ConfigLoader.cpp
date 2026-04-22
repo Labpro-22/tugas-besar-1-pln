@@ -16,7 +16,7 @@ Config ConfigLoader::loadConfig(std::string path)
 
     Config config;
 
-    std::filesystem::path tilePath = path + "tile.txt";
+    std::filesystem::path actionTilePath = path + "aksi.txt";
     std::filesystem::path propertyPath = path + "property.txt";
     std::filesystem::path railroadPath = path + "railroad.txt";
     std::filesystem::path utilityPath = path + "utility.txt";
@@ -24,7 +24,7 @@ Config ConfigLoader::loadConfig(std::string path)
     std::filesystem::path specialPath = path + "special.txt";
     std::filesystem::path miscPath = path + "misc.txt";
 
-    loadTile(config, tilePath);
+    loadActionTile(config, actionTilePath);
     loadProperty(config, propertyPath);
     loadRailroad(config, railroadPath);
     loadUtility(config, utilityPath);
@@ -57,41 +57,43 @@ Config ConfigLoader::loadConfig(std::string path)
     return config;
 }
 
-void ConfigLoader::loadProperty(Config &config, std::filesystem::path path)
+void ConfigLoader::loadActionTile(Config &config, std::filesystem::path path)
 {
     std::ifstream in(path);
     if (!in.is_open()) {
         throw ConfigFileNotFoundException(path.string());
     }
 
-    // TILE COUNT
-    // TILE_INDEX TILE_CODE
+    // ID KODE NAMA JENIS WARNA
     int line = 0;
     std::string buffer;
-    if (std::getline(in, buffer)) {
-        line++;
-        std::stringstream bufferStream(buffer);
-        if (!(bufferStream << config.tileCount)) {
-            throw ConfigFileFormatException("TILE_COUNT", path.string(), 1, line);
-        }
-    }
     while (std::getline(in, buffer)) {
         line++;
         int col = 0;
 
-        PropertyConfig property;
+        ActionTileConfig actionTile;
         std::stringstream bufferStream(buffer);
-        int index;
-        std::string code;
         col++;
-        if (!(bufferStream << index)) {
+        if (!(bufferStream << actionTile.id)) {
             throw ConfigFileFormatException("ID", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream << code)) {
+        if (!(bufferStream << actionTile.code)) {
             throw ConfigFileFormatException("KODE", path.string(), col, line);
         }
-        config.tileCodeSequence[index] = code;
+        col++;
+        if (!(bufferStream << actionTile.name)) {
+            throw ConfigFileFormatException("NAMA", path.string(), col, line);
+        }
+        col++;
+        if (!(bufferStream << actionTile.color)) {
+            throw ConfigFileFormatException("JENIS", path.string(), col, line);
+        }
+        col++;
+        if (!(bufferStream << actionTile.color)) {
+            throw ConfigFileFormatException("WARNA", path.string(), col, line);
+        }
+        config.actionTiles.push_back(actionTile);
     }
 }
 
@@ -158,6 +160,7 @@ void ConfigLoader::loadProperty(Config &config, std::filesystem::path path)
         config.properties.push_back(property);
     }
 }
+
 void ConfigLoader::loadRailroad(Config &config, std::filesystem::path path)
 {
     std::ifstream in(path);
