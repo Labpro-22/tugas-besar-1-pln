@@ -27,14 +27,14 @@ class Player
 public:
     Player(const std::string& username, long long initialMoney, Board* board);
     Player( const std::string& username, long long money, PlayerState state, const std::vector<Property*>& properties, 
-            const std::vector<SkillCard*>& skillCards , int getOutOfJailCardCount, int jailTurns, int position, Board* board);
+            const std::vector<SkillCard>& skillCards , int getOutOfJailCardCount, int jailTurns, int position);
 
     PlayerPiece& getPiece();
     long long getMoney() const;
     PlayerState getState() const;
     const std::string& getUsername() const;
     const std::vector<Property*>& getProperties() const;
-    const std::vector<SkillCard*>& getSkillCards() const;
+    const std::vector<SkillCard>& getSkillCards() const;
     int getStreetPropertyCount() const;
     int getRailroadPropertyCount() const;
     int getUtilityPropertyCount() const;
@@ -62,7 +62,7 @@ public:
     bool isPropertySetComplete(const std::string& color, const Board& board) const;
     void buildOnProperty(StreetProperty* pr);
     void sellBuilding(StreetProperty* pr);
-    void addSkillCard(SkillCard* card);
+    void addSkillCard(SkillCard card);
     void useSkillCard(int index);
     void dropSkillCard(int index);
     bool isJailed() const;
@@ -83,7 +83,7 @@ private:
     int streetPropertyCount;
     int railroadPropertyCount;
     int utilityPropertyCount;
-    std::vector<SkillCard*> skillCards;
+    std::vector<SkillCard> skillCards;
     PlayerPiece piece;
     int doubleRollCounter;
     int getOutOfJailCardCount;
