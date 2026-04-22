@@ -4,7 +4,7 @@
 
 class IncomeTaxTile: public TaxTile {
     public:
-        IncomeTaxTile(const std::string& name, const std::string& code, long long incomeFlatTax, long long incomePercentageTax): Tile(name, code), TaxTile(name, code), incomeFlatTax(incomeFlatTax), incomePercentageTax(incomePercentageTax) {}
+        IncomeTaxTile(const std::string& name, const std::string& code, long long incomeFlatTax, long long incomePercentageTax): Tile(name, code), SpecialTile(code,name), TaxTile(name, code), incomeFlatTax(incomeFlatTax), incomePercentageTax(incomePercentageTax) {}
 
         void onLanded(Player& p, GameManager& gm) override;
 
