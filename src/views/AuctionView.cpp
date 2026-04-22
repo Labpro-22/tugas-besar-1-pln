@@ -1,6 +1,7 @@
 
 #include "views/AuctionView.hpp"
 #include "core/GameManager.hpp"
+#include "models/player/Player.hpp"
 #include <sstream>
 void AuctionView::outputProperty(Property &pr) const{
     std::cout << "Properti "<< pr.getName() << "(" << pr.getCode() << ")" << "akan dilelang!\n\n";

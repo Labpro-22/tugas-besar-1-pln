@@ -1,8 +1,6 @@
 #pragma once
 #include <map>
 #include "models/property/Property.hpp"
-#define FORMAT_SPACE_20(a) 20-(a)
-#define FORMAT_SPACE_10(a) 10-(a)
 class GameManager;
 class UnmortgageView
 {

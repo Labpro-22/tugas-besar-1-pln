@@ -1,6 +1,6 @@
 #include "core/GameManager.hpp"
-#include "MortgageView.hpp"
-
+#include "views/MortgageView.hpp"
+#define SPACE 30
 Property* MortgageView::promptChooseProperty(std::vector<Property*> pr) const{
     std::cout<<"=== Properti yang Dapat Digadaikan ===\n";
     auto it = std::find_if(pr.begin(), pr.end(),
@@ -18,8 +18,7 @@ Property* MortgageView::promptChooseProperty(std::vector<Property*> pr) const{
         for(auto p : pr){
             if(!p->isMortgaged()){
                 indeks[idx] = i;
-                std::cout << idx++ << ". " << p->getName() << 
-                " (" << p->getCode() << ")" + FORMAT_SPACE_20(p->getCode().size() + p->getName().size())*' '
+                std::cout << idx++ << ". " << std::setw(SPACE) << p->getName() +  " (" + p->getCode() + ")"
                 << "[" << p->getColor() << "] Nilai Gadai: M" << p->getMortgageValue()<< "\n"; 
                 
             }
@@ -59,7 +58,7 @@ bool MortgageView::sellAllBuildings(std::vector<StreetProperty*>colorGroupProper
     std::cout << "Daftar bangunan di color group [" << colorGroupProperty[0]->getColor() << "]:\n";
     int i = 1;
     for(auto sp : colorGroupProperty){
-        std::cout << i << ". " << sp->getName() << " (" << sp->getCode() << ")" << FORMAT_SPACE_20(sp->getName().size())*' ' << " - ";
+        std::cout << i << ". " << std::setw(SPACE) << sp->getName() + " (" + sp->getCode() + ")"  << " - ";
         if(sp->hasHotel()){
             std::cout << "Hotel -> Nilai jual bangunan : M" << sp->calculateSellValue() << "\n";
         }

@@ -2,7 +2,7 @@
 class GameManager;
 #include "views/PropertyView.hpp"
 #include "models/property/Property.hpp"
-#define FORMAT_SPACE 30
+
 class BuyView
 {
 private:

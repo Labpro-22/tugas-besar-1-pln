@@ -1,5 +1,5 @@
 #include "core/GameManager.hpp"
-#include "WinView.hpp"
+#include "views/WinView.hpp"
 
 void WinView::outputWinner(Player* winner, std::vector<Player*> remaining)  const{
     if(remaining.size() > 1){
