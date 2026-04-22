@@ -155,3 +155,33 @@ void PropertyView::outputPlayerProperties() const{
         std::cout << "\nTotal kekayaan properti: M" << totalAsset << "\n\n";
     }
 }
+
+void PropertyView::outputRent(Property &pr)const{
+    if(pr.isMortgaged()){
+        std::cout<<"Properti ini sedang digadaikan [M]. Tidak ada sewa yang dikenakan.\n\n";
+    }
+    else{
+        int width = pr.getOwner()->getUsername().length() + 15;
+        long long money = gameManager.getCurrentPlayer().getMoney(), rent = pr.calculateRent();
+        std::cout << std::setw(width) << "Kondisi" << ": ";
+        if(auto sp = dynamic_cast<StreetProperty*>(&pr)){
+            std::cout << sp->getHouseCount() << " rumah\n"; 
+        }
+        else if(auto up = dynamic_cast<UtilityProperty*>(&pr)){
+            std::cout << up->getOwner()->getUtilityPropertyCount() << " Properti Utility dimiliki\n";
+        }
+        else if(auto rp = dynamic_cast<RailroadProperty*>(&pr)){
+            std::cout << up->getOwner()->getUtilityPropertyCount() << " Properti Railroad dimiliki\n";
+        }
+        std::cout << std::setw(width) << "Sewa" << ": M" << rent << "\n\n";
+        std::cout << std::setw(width) << "Uang kamu" << ": M" << money;
+
+        if(money >= rent){
+            std::cout << " -> M" << money -rent <<"\n";
+            std::cout << std::setw(width) << ("Uang Pemain "+ pr.getOwner()->getUsername()) << ": M" << pr.getOwner()->getMoney() << "  -> M" << pr.getOwner()->getMoney() + rent << "\n\n";
+        }
+        else{
+            std::cout << "Kamu tidak mampu membayar sewa penuh! (M" << rent << ")Uang kamu saat ini: " << money << "\n\n";
+        }
+    }
+}
