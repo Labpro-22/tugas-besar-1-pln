@@ -13,5 +13,6 @@ public:
     PropertyView(GameManager& gm) : gameManager(gm) {}
     void outputProperty() const;
     void outputPlayerProperties() const;
+    void outputRent(Property &pr)const;
 };
 

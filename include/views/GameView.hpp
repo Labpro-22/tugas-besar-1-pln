@@ -19,6 +19,8 @@
 #include "UseSkillCardView.hpp"
 #include "WinView.hpp"
 #include "LogView.hpp"
+#include "TaxView.hpp"
+#include "JailView.hpp"
 
 
 
@@ -36,12 +38,14 @@ private:
     DiceView diceView;
     DropSkillCardView dropSkillCardView;
     FestivalView festivalView;
+    JailView jailView;
     LoadView loadView;
     LogView logView;
     MainMenuView mainMenuView;
     MortgageView mortgageView;
     PropertyView propertyView;
     SaveView saveView;
+    TaxView taxView;
     UnmortgageView unmortgageView;
     UseSkillCardView useSkillCardView;
     WinView winView;
@@ -58,12 +62,14 @@ GameView(GameManager &gm)
           diceView(gm),
           dropSkillCardView(gm),
           festivalView(gm),
+          jailView(gm),
           loadView(gm),
           logView(gm),
           mainMenuView(gm),
           mortgageView(gm),
           propertyView(gm),
           saveView(gm),
+          taxView(gm),
           unmortgageView(gm),
           useSkillCardView(gm),
           winView(gm)
@@ -140,6 +146,12 @@ GameView(GameManager &gm)
 
     LogView& getLogView() {
         return logView;
+    }
+    TaxView& getTaxView(){
+        return taxView;
+    }
+    JailView& getJailView(){
+        return jailView;
     }
     void InputNextCommand();
 };
