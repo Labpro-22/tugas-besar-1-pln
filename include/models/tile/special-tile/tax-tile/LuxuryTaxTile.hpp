@@ -4,5 +4,12 @@
 
 class LuxuryTaxTile: public TaxTile {
     public:
-        void onLanded(Player& p, GameManager& gm) override;  
+        LuxuryTaxTile(const std::string& name, const std::string& code, long long luxuryFlatTax): Tile(name, code), TaxTile(name, code), luxuryFlatTax(luxuryFlatTax) {}
+
+        void onLanded(Player& p, GameManager& gm) override;
+        
+        void onPassBy(Player& p, GameManager& gm) override {}
+        
+    private:
+        long long luxuryFlatTax;
 };

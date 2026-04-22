@@ -16,7 +16,7 @@ class RailroadProperty: public Property {
 
         long long calculateAssetValue() const override;
 
-        std::vector<long long> getRent() const noexcept;
+        std::map<int, long long> getRent() const noexcept;
 
         
     private: 
