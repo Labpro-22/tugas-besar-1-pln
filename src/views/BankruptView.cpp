@@ -7,7 +7,6 @@ void BankruptView::outputPotentialWealth(Player &p, long long debt) const{
     std::cout<<"Kekurangan      : M" << debt - p.getMoney() << "\n";
     std::cout<<"Estimasi dana maksimum dari likuidasi:\n";
     for(auto p: p.getProperties()){
-        long double liquidateBuilding = 0;
         if(!p->isMortgaged()){
             std::cout << "\tJual" << p->getName() << " (" << p->getCode() << ")\t[" << p->getColor() << "]\t -> M" ;
             wealth += p->calculateSellValue();
@@ -71,7 +70,7 @@ std::pair<std::string, Property*> BankruptView::promptLiquidation(std::vector<Pr
     while(true){
         std::cout << "Pilih aksi (0 jika sudah cukup): ";
         std::cin >>input;
-        if(input <= propertyIdx.size()){
+        if(input <= (int)propertyIdx.size()){
             Property* p = pr[propertyIdx[input]];
             if(input < sell){
                 std::cout << p->getName() << " terjual ke Bank. Kamu menerima M" << p->calculateSellValue();

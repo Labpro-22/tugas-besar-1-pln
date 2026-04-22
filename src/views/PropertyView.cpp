@@ -47,14 +47,14 @@ void PropertyView::outputProperty() const{
         }
         else if(auto rp = dynamic_cast<RailroadProperty*>(pr)){
             std::vector<long long> rent = rp->getRent();
-            for(int i = 0; i < rent.size(); i++){
+            for(int i = 0; i < (int)rent.size(); i++){
                 std::cout << "|" << std::setw(COLON_WIDTH) << (" Sewa (" + std::to_string(i) + " Railroad dimiliki)") << std::setw(WIDTH-COLON_WIDTH) <<
                 (": M" + std::to_string(rent[i])) << "|\n";
             }
         }
         else if(auto up = dynamic_cast<UtilityProperty*>(pr)){
             std::vector<long long> rent = up->getRentMultiplier();
-            for(int i = 0; i < rent.size(); i++){
+            for(int i = 0; i < (int)rent.size(); i++){
                 std::cout << "|" << std::setw(COLON_WIDTH) << (" Sewa (" + std::to_string(i) + " Utility dimiliki)") << std::setw(WIDTH-COLON_WIDTH) <<
                 (": " + std::to_string(rent[i])) << "|\n|" << std::setw(WIDTH) << std::right<<  " kali lipat jumlah hasil lemparan dadu|" << "\n";
             }
@@ -171,7 +171,7 @@ void PropertyView::outputRent(Property &pr)const{
             std::cout << up->getOwner()->getUtilityPropertyCount() << " Properti Utility dimiliki\n";
         }
         else if(auto rp = dynamic_cast<RailroadProperty*>(&pr)){
-            std::cout << up->getOwner()->getUtilityPropertyCount() << " Properti Railroad dimiliki\n";
+            std::cout << rp->getOwner()->getRailroadPropertyCount() << " Properti Railroad dimiliki\n";
         }
         std::cout << std::setw(width) << "Sewa" << ": M" << rent << "\n\n";
         std::cout << std::setw(width) << "Uang kamu" << ": M" << money;

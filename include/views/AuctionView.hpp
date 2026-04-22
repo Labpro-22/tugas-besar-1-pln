@@ -1,6 +1,6 @@
 #pragma once
 #include "models/property/Property.hpp"
-#include "models/player/Player.hpp"
+class Player;
 class GameManager;
 
 class AuctionView

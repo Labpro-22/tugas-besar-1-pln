@@ -1,6 +1,7 @@
 #include "core/GameManager.hpp"
 #include "views/UnmortgageView.hpp"
-
+#define SPACE 30
+#define SPACE_2 20
 Property* UnmortgageView::promptChooseProperty(std::vector<Property*> pr) const{
     std::cout<<"=== Properti yang Sedang Digadaikan ===\n";
     auto it = std::find_if(pr.begin(), pr.end(),
@@ -17,9 +18,8 @@ Property* UnmortgageView::promptChooseProperty(std::vector<Property*> pr) const{
         for(auto p : pr){
             if(p->isMortgaged()){
                 indeks[idx] = i;
-                std::cout << idx++ << ". " << p->getName() << 
-                " (" << p->getCode() << ")" + FORMAT_SPACE_20(p->getCode().size() + p->getName().size())*' '
-                << "[" << p->getColor() << "]" << FORMAT_SPACE_10(p->getColor().size())*' '<<  "Harga Tebus: M" << p->getPrice()<< "\n"; 
+                std::cout << idx++ << ". " << std::setw(SPACE)<<p->getName() + 
+                " (" + p->getCode() + ")" << std::setw(SPACE_2) <<  "[" + p->getColor() + "]" << "[M]  " <<  "Harga Tebus: M" << p->getPrice()<< "\n"; 
             }
             i++;
         }
@@ -39,6 +39,7 @@ Property* UnmortgageView::promptChooseProperty(std::vector<Property*> pr) const{
             }
         }
     }
+    return nullptr;
 
 }
 
