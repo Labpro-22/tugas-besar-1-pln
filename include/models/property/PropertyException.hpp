@@ -5,7 +5,7 @@ class PropertyException : public std::exception {
     protected:
         std::string errorMessage;
     public:
-        explicit PropertyException(const std::string& msg) : errorMessage(msg) {}
+        explicit PropertyException(const std::string& msg) : errorMessage("[Property] " + msg) {}
         const char* what() const noexcept override { 
             return errorMessage.c_str(); 
         }

@@ -1,0 +1,15 @@
+ShieldCard
+ShieldCard
+MoveCard
+MoveCard
+MoveCard
+MoveCard
+TeleportCard
+TeleportCard
+DiscountCard
+DiscountCard
+DiscountCard
+LassoCard
+LassoCard
+DemolitionCard
+DemolitionCard
