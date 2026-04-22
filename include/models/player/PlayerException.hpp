@@ -8,7 +8,7 @@ private:
     std::string errorMessage;
 
 public:
-    PlayerException(const std::string& errorMessage) : errorMessage(errorMessage) {}
+    PlayerException(const std::string& errorMessage) : errorMessage("[Player] " + errorMessage) {}
 
     const char* what() const noexcept override {
         return errorMessage.c_str();
