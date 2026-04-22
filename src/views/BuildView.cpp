@@ -1,5 +1,6 @@
 #include "core/GameManager.hpp"
 #include "views/BuildView.hpp"
+#define SPACE 30
 StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const{
 
     //bool cek apakah ada setidaknya satu set color group
@@ -8,11 +9,11 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
     std::map<std::string, std::vector<StreetProperty*>> colorGroup;
     //Filter streetproperty dari property
     std::vector<StreetProperty*> streetpr;
-    std::copy_if(pr.begin(), pr.end(), std::back_inserter(streetpr),
-        [](Property* p) {
-            return dynamic_cast<StreetProperty*>(p) != nullptr;
+    for(auto p : pr){
+        if(auto sp = dynamic_cast<StreetProperty*>(p)){
+            streetpr.push_back(sp);
         }
-    );
+    }
     //insert ke map colorGroup
     for(auto prop : streetpr){
         if(gameManager.getCurrentPlayer().isPropertySetComplete(prop->getColor(),gameManager.getBoard())){
@@ -36,7 +37,7 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
             std::string s = "a. ";
             colors.push_back(color);
             for(const auto &p : prop){
-                std::cout<<"\t" << s << p->getName() << " (" << p->getCode() << ")" << (FORMAT_SPACE-p->getName().size()) * (' ') << ": ";
+                std::cout<<"\t" << std::setw(SPACE) <<  s + p->getName() + " (" + p->getCode() + ")" << ": ";
                 if(p->getHouseCount() < 4){
                     std::cout<<p->getHouseCount() << " rumah (Harga rumah: M" << p->getHousePrice() << ")\n";
                 }
@@ -54,7 +55,7 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
         std::cout << "Pilih nomor color group (0 untuk batal): ";
         int inputIdx;
         std::cin >> inputIdx;
-        if(inputIdx = 0)return nullptr;
+        if(inputIdx == 0)return nullptr;
         std::cout<<"\nCColor group [" << colors[idx-1] << "] :\n";
         idx = 1;
         std::vector<StreetProperty*> validBuildings;
@@ -69,7 +70,7 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
             if(p->getHouseCount() == minHouse)validBuildings.push_back(p);
         } 
         for(auto p  : validBuildings){
-            std::cout<< idx << ". " << p->getName() << " (" << p->getCode() << ")" << (FORMAT_SPACE-p->getName().size()) * (' ') << ": ";
+            std::cout<< idx << std::setw(SPACE) << ". " + p->getName() + " (" + p->getCode() + ")" << ": ";
             if(p->canBuildHouse(1)){
                 std::cout<<p->getHouseCount() << " rumah (Harga rumah: M" << p->getHousePrice() << ")\n";
             }
@@ -83,7 +84,7 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
         }
         std::cout << "Pilih nomor properti (0 untuk batal): ";
         std::cin >> inputIdx;
-        if(inputIdx = 0)return nullptr;
+        if(inputIdx == 0)return nullptr;
 
         StreetProperty* toBuild = validBuildings[inputIdx];
         if(toBuild->hasHotel()){
@@ -91,14 +92,18 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
             return nullptr;
         } 
         if(toBuild->canBuildHotel()){
-            std::cout<<"Upgrade " << toBuild->getName() << " ke hotel? Biaya: M" << toBuild->getHotelPrice() << " (y/n): ";
-            char yayOrNay;
+            std::string yayOrNay;
             while(std::cin >> yayOrNay){
                 std::cout<<"Upgrade " << toBuild->getName() << " ke hotel? Biaya: M" << toBuild->getHotelPrice() << " (y/n): ";
-                if(yayOrNay = 'y')break;
-                if(yayOrNay = 'n'){
+                if(yayOrNay == "y"){
+                    std::cout << "\n\n";
+                    break;
+                }
+                if(yayOrNay == "n"){
+                    std::cout << "\n\n";
                     return nullptr;
                 } 
+                std::cout << "\nMasukan tidak valid!\n";
             }
         }
         return toBuild;

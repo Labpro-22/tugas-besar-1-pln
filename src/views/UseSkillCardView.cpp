@@ -48,7 +48,7 @@ Player* UseSkillCardView::askForTargetPlayer(GameManager& gm) {
         std::cout << "Masukkan nama pemain lawan yang ingin ditarik (0 untuk batal): ";
         std::cin >> name;
         if(name == "0")return nullptr;
-        for(auto p : gm.getPlayers()){
+        for(auto &p : gm.getPlayers()){
             if(p.getUsername() == name)return &p;
         }
         std::cout<<"\nTidak ada player dengan nama " << name << "!\n";

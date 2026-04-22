@@ -49,12 +49,13 @@ bool BuyView::promptBuyProperty(Property& pr){
             std::cout << "\nInput tidak valid! Apakah kamu ingin membeli properti ini seharga M" << sp->getPrice() << "? (y/n): ";
         }
     }
-    else if(auto up = dynamic_cast<UtilityProperty*>(p)){
-        std::cout<<"Belum ada yang menginjaknya duluan, " << p->getName() << " kini menjadi milikmu!\n\n";
-        return true;
-    }
-    else if(auto rp =  dynamic_cast<RailroadProperty*>(p)){
-        std::cout<<"Belum ada yang menginjaknya duluan, stasiun ini kini menjadi milikmu!\n\n";
+    else {
+        if(p->getPropertyType() == "UTILITY"){
+            std::cout<<"Belum ada yang menginjaknya duluan, " << p->getName() << " kini menjadi milikmu!\n\n";
+        }
+        else if(p->getPropertyType() == "RAILROAD"){
+            std::cout<<"Belum ada yang menginjaknya duluan, stasiun ini kini menjadi milikmu!\n\n";
+        }
         return true;
     }
 }
