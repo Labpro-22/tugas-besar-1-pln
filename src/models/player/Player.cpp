@@ -24,7 +24,7 @@ PlayerState Player::getState() const { return state; }
 PlayerPiece& Player::getPiece() { return piece; }
 const std::vector<Property*>& Player::getProperties() const{ return properties; }
 const std::vector<SkillCard*>& Player::getSkillCards() const{ return skillCards; }
-const std::vector<SkillCard*>& Player::getEffects() const{ return effects; }
+const std::vector<PlayerEffect>& Player::getEffects() const{ return effects; }
 int Player::getStreetPropertyCount() const { return streetPropertyCount; }
 int Player::getRailroadPropertyCount() const { return railroadPropertyCount; }
 int Player::getUtilityPropertyCount() const { return utilityPropertyCount; }
@@ -114,11 +114,18 @@ void Player::giveMoney(Player* recipient, long long amount) {
 }
 
 void Player::payRent(Property* pr) {
+    if (hasEffect("SHIELD")) return;
+
     long long rent = pr->calculateRent();
     Player* owner = pr->getOwner();
     
     if (pr->getPropertyType() == "UTILITY"){
         rent *= (lastRoll.first + lastRoll.second);
+    }
+
+    if (hasEffect("DISCOUNT")) {
+        int disc = getEffectValue("DISCOUNT");
+        rent = rent * (100 - disc) / 100;
     }
 
     if (money < rent) {
@@ -132,6 +139,12 @@ void Player::payRent(Property* pr) {
 }
 
 void Player::payTax(long long amount) {
+    if (hasEffect("SHIELD")) return;
+    if (hasEffect("DISCOUNT")) {
+        int disc = getEffectValue("DISCOUNT");
+        amount = amount * (100 - disc) / 100;
+    }
+
     if (money < amount) {
         throw InsufficientFundsException(
             "Pemain " + username + " tidak mampu membayar pajak M" +
@@ -166,7 +179,7 @@ void Player::bankruptByPlayer(Player* creditor) {
     money = 0;
 
     for (Property* pr : properties) {
-        addProperty(pr);
+        creditor->addProperty(pr);
     }
 
     properties.clear();
@@ -328,6 +341,7 @@ bool Player::isJailed() const {
 
 
 void Player::goToJail(){
+    if (hasEffect("SHIELD")) return;
     state = PlayerState::JAILED;
     jailTurns = 0;
     doubleRollCounter = 0;
@@ -381,6 +395,24 @@ void Player::payFineToGetOutOfJail(long long fine) {
 void Player::getOutOfJail() {
     state = PlayerState::ACTIVE;
     jailTurns = 0;
+}
+
+void Player::addEffect(PlayerEffect effect) {
+    effects.push_back(effect);
+}
+
+bool Player::hasEffect(const std::string& name) const {
+    for (const PlayerEffect& e : activeEffects) {
+        if (e.getName() == name && !e.isExpired()) return true;
+    }
+    return false;
+}
+
+int Player::getEffectValue(const std::string& name) const {
+    for (const PlayerEffect& e : activeEffects) {
+        if (e.getName() == name && !e.isExpired()) return e.getValue();
+    }
+    return 0;
 }
 
 void Player::onNextTurn() {

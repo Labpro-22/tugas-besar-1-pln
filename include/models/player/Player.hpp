@@ -78,6 +78,8 @@ public:
     void payFineToGetOutOfJail(long long fine);
     void getOutOfJail();
     void addEffect(PlayerEffect effect);
+    bool hasEffect(const std::string& name) const;
+    int getEffectValue(const std::string& name) const;
     void onNextTurn();
 
 private:
