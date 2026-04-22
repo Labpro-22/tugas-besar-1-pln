@@ -1,8 +1,9 @@
 #include "views/DropSkillCardView.hpp"
+#include "core/GameManager.hpp"
 #include "models/card/skill-card/SkillCard.hpp"
 #include <iostream>
 
-int DropSkillCardView::promptChooseCardToDrop(const std::vector<SkillCard*>& cards) {
+int DropSkillCardView::promptChooseSkillCard(const std::vector<SkillCard*>& cards) {
     std::cout << "\n[Warning] Tangan Anda penuh! (Maksimal 3 Kartu)\n";
     std::cout << "Pilih kartu yang ingin dibuang untuk memberi ruang:\n";
     

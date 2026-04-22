@@ -6,7 +6,8 @@ class UseSkillCardView
 private:
     GameManager& gameManager;
 public:
-    int promptChooseCardToUse(const std::vector<SkillCard*>& cards);
+    UseSkillCardView(GameManager &gm) : gameManager(gm){}
+    int promptChooseSkillCard(const std::vector<SkillCard*>& cards);
     void processAndPlayCard(SkillCard* card, Player& player, GameManager& gm);
 
     int askForTargetPosition();
