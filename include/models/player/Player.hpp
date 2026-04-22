@@ -1,6 +1,7 @@
 #pragma once
 
 #include "models/player/PlayerException.hpp"
+#include "models/effect/PlayerEffect.hpp"
 #include "models/property/Property.hpp"
 #include "models/property/StreetProperty.hpp"
 #include "models/property/RailroadProperty.hpp"
@@ -16,6 +17,8 @@
 #include <algorithm>
 #include <map>
 
+class GameManager;
+
 enum class PlayerState {
   ACTIVE,
   JAILED,
@@ -25,16 +28,17 @@ enum class PlayerState {
 class Player
 {
 public:
-    Player(const std::string& username, long long initialMoney, Board* board);
+    Player(const std::string& username, long long initialMoney);
     Player( const std::string& username, long long money, PlayerState state, const std::vector<Property*>& properties, 
-            const std::vector<SkillCard>& skillCards , int getOutOfJailCardCount, int jailTurns, int position);
+            const std::vector<SkillCard*>& skillCards , int getOutOfJailCardCount, int jailTurns, int position);
 
     PlayerPiece& getPiece();
     long long getMoney() const;
     PlayerState getState() const;
     const std::string& getUsername() const;
     const std::vector<Property*>& getProperties() const;
-    const std::vector<SkillCard>& getSkillCards() const;
+    const std::vector<SkillCard*>& getSkillCards() const;
+    const std::vector<PlayerEffect>& getEffects() const;
     int getStreetPropertyCount() const;
     int getRailroadPropertyCount() const;
     int getUtilityPropertyCount() const;
@@ -62,8 +66,8 @@ public:
     bool isPropertySetComplete(const std::string& color, const Board& board) const;
     void buildOnProperty(StreetProperty* pr);
     void sellBuilding(StreetProperty* pr);
-    void addSkillCard(SkillCard card);
-    void useSkillCard(int index);
+    void addSkillCard(SkillCard* card);
+    void useSkillCard(int index, GameManager& gm);
     void dropSkillCard(int index);
     bool isJailed() const;
     void goToJail();
@@ -73,6 +77,7 @@ public:
     void setDiceToGetOutOfJail(int value1, int value2);
     void payFineToGetOutOfJail(long long fine);
     void getOutOfJail();
+    void addEffect(PlayerEffect effect);
     void onNextTurn();
 
 private:
@@ -83,7 +88,8 @@ private:
     int streetPropertyCount;
     int railroadPropertyCount;
     int utilityPropertyCount;
-    std::vector<SkillCard> skillCards;
+    std::vector<SkillCard*> skillCards;
+    std::vector<PlayerEffect> effects;
     PlayerPiece piece;
     int doubleRollCounter;
     int getOutOfJailCardCount;
