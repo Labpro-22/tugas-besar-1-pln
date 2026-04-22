@@ -10,5 +10,5 @@ private:
     GameManager& gameManager;
 public:
     CardView(GameManager& gm) : gameManager(gm) {}
-    void outputTakeCard(Card &card) const;
+    void outputCard(Card &card) const;
 };

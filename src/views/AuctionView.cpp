@@ -20,7 +20,7 @@ long long AuctionView::promptBidOrPass(Player &p) const {
         ss >> command;
 
         if (command == "PASS") {
-            return -1;
+            return 0;
         } 
         else if (command == "BID") {
             long long bid;
@@ -32,8 +32,11 @@ long long AuctionView::promptBidOrPass(Player &p) const {
         std::cout << "Aksi Invalid!\n";
     }
 }
-void AuctionView::outputAuctionStatus(Player &p, long long lastBid, Property& pr) const{
-    std::cout << "Pemenang: Pemain " << p.getUsername() << "\n";
+void AuctionView::outputWinner(Player *p, Property *pr, long long lastBid) const{
+    std::cout << "Pemenang: Pemain " << p->getUsername() << "\n";
     std::cout << "Harga akhir: M" << lastBid << "\n";
-    std::cout << "Properti " << pr.getName() << " (" << pr.getCode() << ") kini dimiliki Pemain " << p.getUsername() << ".\n";
+    std::cout << "Properti " << pr->getName() << " (" << pr->getCode() << ") kini dimiliki Pemain " << p->getUsername() << ".\n";
+}
+void AuctionView::outputNoBid(Property* pr)const{
+    std::cout << pr->getName() <<" tidak dimiliki oleh siapapun!\n\n";
 }

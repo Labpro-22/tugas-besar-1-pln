@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 
-int UseSkillCardView::promptChooseSkillCard(const std::vector<SkillCard*>& cards) {
+int UseSkillCardView::promptChooseCardToUse(const std::vector<SkillCard*>& cards) {
     if (cards.empty()) {
         std::cout << "Anda tidak memiliki Skill Card.\n";
         return -1;

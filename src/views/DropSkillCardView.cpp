@@ -18,11 +18,7 @@ int DropSkillCardView::promptChooseSkillCard(const std::vector<SkillCard*>& card
     return choice - 1; 
 }
 
-void DropSkillCardView::showDropResult(bool success) {
-    if (success) {
-        std::cout << "Kartu berhasil dibuang dari tangan.\n";
-    } else {
-        std::cout << "Input tidak valid. Gagal membuang kartu.\n";
-    }
-}
+void DropSkillCardView::outputDropSkillCardStatus(SkillCard &card) {
+    std::cout << card.getType() <<" telah dibuang. Sekarang kamu memiliki 3 kartu di tangan.\n\n";
+}   
 

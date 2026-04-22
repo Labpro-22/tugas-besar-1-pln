@@ -1,7 +1,7 @@
 #include "core/GameManager.hpp"
 #include "views/CardView.hpp"
 
-void CardView::outputTakeCard(Card& card) const{
+void CardView::outputCard(Card& card) const{
     std::cout <<"Mengambil kartu";
     for (int i = 0; i < 3; i++) {
         std::cout << ".";
