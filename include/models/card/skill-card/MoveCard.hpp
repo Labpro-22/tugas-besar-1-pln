@@ -8,5 +8,5 @@ private:
 public:
     MoveCard(const std::string& message, int amount);
     void takeEffect(Player& p, GameManager& gm) override;
-    std::string getType() override;
+    std::string getType() const override;
 };
