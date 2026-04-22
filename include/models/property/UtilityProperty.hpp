@@ -15,7 +15,7 @@ class UtilityProperty: public Property {
 
         long long calculateAssetValue() const override;
 
-        std::vector<long long> getRentMultiplier() const noexcept;
+        std::map<int, long long> getRentMultiplier() const noexcept;
         
     private:
         std::map<int, long long> rentMultiplier;

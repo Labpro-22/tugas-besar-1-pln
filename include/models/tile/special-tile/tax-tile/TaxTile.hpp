@@ -4,5 +4,9 @@
 
 class TaxTile: virtual public Tile {
     public:
-        void onLanded(Player& p, GameManager& gm) override;  
+        using Tile::Tile;
+
+        void onLanded(Player& p, GameManager& gm) override {}
+        
+        void onPassBy(Player& p, GameManager& gm) override {}
 };

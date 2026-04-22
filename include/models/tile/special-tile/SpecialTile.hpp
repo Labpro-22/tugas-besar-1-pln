@@ -2,7 +2,7 @@
 
 #include "../Tile.hpp"
 
-class SpecialTile: public Tile {
+class SpecialTile: virtual public Tile {
     public:
         using Tile::Tile;
 

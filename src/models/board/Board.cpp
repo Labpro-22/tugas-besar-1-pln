@@ -27,19 +27,9 @@ Board::Board(int tileCount, const std::vector<int>& tileIDSequence, const Config
         if (pair.first > maxRailroad) maxRailroad = pair.first;
     }
 
-    std::vector<long long> railRentVec(maxRailroad + 1, 0);
-    for (const auto& pair : config.railroadRent) {
-        railRentVec[pair.first] = pair.second;
-    }
-
     int maxUtility = 0;
     for (const auto& pair : config.utilityRent) {
         if (pair.first > maxUtility) maxUtility = pair.first;
-    }
-
-    std::vector<long long> utilRentVec(maxUtility + 1, 0);
-    for (const auto& pair : config.utilityRent) {
-        utilRentVec[pair.first] = pair.second;
     }
 
     std::map<int, PropertyConfig> propMap;
@@ -49,7 +39,6 @@ Board::Board(int tileCount, const std::vector<int>& tileIDSequence, const Config
 
     for (int i = 0; i < tileCount; ++i) {
         int id = tileIDSequence[i];
-        // std::vector<std::string> tileCodeSequence = {""};
         Tile* newTile = nullptr;
 
         if (propMap.find(id) != propMap.end()) {
@@ -63,10 +52,10 @@ Board::Board(int tileCount, const std::vector<int>& tileIDSequence, const Config
                 prop = new StreetProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, conf.housePrice, conf.hotelPrice, conf.rent);
             } 
             else if (conf.type == "RAILROAD") {
-                prop = new RailroadProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, railRentVec);
+                prop = new RailroadProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, config.railroadRent);
             } 
             else if (conf.type == "UTILITY") {
-                prop = new UtilityProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, utilRentVec);
+                prop = new UtilityProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, config.utilityRent);
             }
 
             newTile = new PropertyTile(prop);
