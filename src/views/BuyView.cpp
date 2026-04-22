@@ -41,14 +41,12 @@ bool BuyView::promptBuyProperty(Property& pr){
         while(true){
             std::cin >> yayOrNay;
             if(yayOrNay == "y"){
-                std::cout <<  pr.getName() << " kini menjadi milikmu!\nUang tersisa: M" << gameManager.getCurrentPlayer().getMoney() - pr.getPrice() << "\n\n";
                 return true;
             }
             if(yayOrNay == "n"){
-                std::cout << "\n\n";
                 return false;
             }
-            std::cout << "Input tidak valid! Apakah kamu ingin membeli properti ini seharga M" << sp->getPrice() << "? (y/n): ";
+            std::cout << "\nInput tidak valid! Apakah kamu ingin membeli properti ini seharga M" << sp->getPrice() << "? (y/n): ";
         }
     }
     else if(auto up = dynamic_cast<UtilityProperty*>(p)){
@@ -58,5 +56,19 @@ bool BuyView::promptBuyProperty(Property& pr){
     else if(auto rp =  dynamic_cast<RailroadProperty*>(p)){
         std::cout<<"Belum ada yang menginjaknya duluan, stasiun ini kini menjadi milikmu!\n\n";
         return true;
+    }
+}
+
+void BuyView::outputBuyStatus(bool success, Property* pr)const{
+    if(success){
+        std::cout << pr->getName() <<  " kini menjadi milikmu!\nUang tersisa: M" << gameManager.getCurrentPlayer().getMoney() << "\n\n";
+    }
+    else{
+        std::cout << "Properti ini akan masuk ke sistem lelang";
+        for (int i = 0; i < 3; i++) {
+            std::cout << ".";
+            std::cout.flush(); 
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        }
     }
 }

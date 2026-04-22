@@ -10,6 +10,6 @@ private:
 public:
     DropSkillCardView(GameManager& gm) : gameManager(gm) {}
     int promptChooseSkillCard(const std::vector<SkillCard*>& card);
-    void showDropResult(bool success);
+    void outputDropSkillCardStatus(SkillCard &card);
 };
 

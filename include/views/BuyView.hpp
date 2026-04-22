@@ -10,5 +10,6 @@ private:
 public:
     BuyView(GameManager& gm) : gameManager(gm){}
     bool promptBuyProperty(Property& pr);
+    void outputBuyStatus(bool success, Property* pr)const;
 };
 
