@@ -8,6 +8,6 @@ class Tile;
 class SkillCard : public Card {
 public:
     SkillCard(const std::string& message) : Card(message) {}
-    virtual void prepareUse(UseSkillCardView& view, GameManager& gm) {}
+    virtual void prepareUse(UseSkillCardView& view, GameManager& gm) = 0;
     virtual std::string getType() const = 0;
 };
