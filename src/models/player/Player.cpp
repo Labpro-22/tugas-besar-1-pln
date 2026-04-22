@@ -6,7 +6,7 @@ Player::Player(const std::string& username, long long initialMoney) :
     utilityPropertyCount(0), skillCards(), piece(0),
     doubleRollCounter(0), getOutOfJailCardCount(0), jailTurns(0) {}
 Player::Player( const std::string& username, long long money, PlayerState state, const std::vector<Property*>& properties,
-                const std::vector<SkillCard>& skillCards, int getOutOfJailCardCount, int jailTurns, int position) : 
+                const std::vector<SkillCard*>& skillCards, int getOutOfJailCardCount, int jailTurns, int position) : 
     username(username), money(money), state(state),
     properties(), streetPropertyCount(0), railroadPropertyCount(0), 
     utilityPropertyCount(0), skillCards(skillCards), piece(position),
@@ -22,7 +22,7 @@ long long Player::getMoney() const { return money; }
 PlayerState Player::getState() const { return state; }
 PlayerPiece& Player::getPiece() { return piece; }
 const std::vector<Property*>& Player::getProperties() const{ return properties; }
-const std::vector<SkillCard>& Player::getSkillCards() const{ return skillCards; }
+const std::vector<SkillCard*>& Player::getSkillCards() const{ return skillCards; }
 int Player::getStreetPropertyCount() const { return streetPropertyCount; }
 int Player::getRailroadPropertyCount() const { return railroadPropertyCount; }
 int Player::getUtilityPropertyCount() const { return utilityPropertyCount; }
@@ -307,7 +307,7 @@ void Player::sellBuilding(StreetProperty* pr) {
     pr->removeBuilding();
 }
 
-void Player::addSkillCard(SkillCard card) {
+void Player::addSkillCard(SkillCard* card) {
     if (skillCards.size() >= 4) {
         throw FullHandException(
             "Pemain " + username + " sudah memiliki 4 kartu. Harus buang 1.");
