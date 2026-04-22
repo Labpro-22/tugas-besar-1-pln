@@ -4,7 +4,9 @@
 
 class JailTile: public SpecialTile {
     public:
-        void onLanded(Player& p, GameManager& gm) override;
+        using SpecialTile::SpecialTile;
+
+        void onLanded(Player& p, GameManager& gm) override {}
     
-        void onPassBy(Player& p, GameManager& gm) override;
+        void onPassBy(Player& p, GameManager& gm) override {}
 };

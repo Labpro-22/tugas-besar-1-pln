@@ -5,5 +5,9 @@
 
 class CommunityChestTile: public CardTile {
     public:
-        void onLanded(Player& p, GameManager& gm) override;  
+        using CardTile::CardTile;
+
+        void onLanded(Player& p, GameManager& gm) override;
+        
+        void onPassBy(Player& p, GameManager& gm) override {}
 };
