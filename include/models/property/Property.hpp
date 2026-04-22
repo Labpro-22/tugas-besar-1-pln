@@ -2,9 +2,9 @@
 
 
 #include "PropertyException.hpp"
-#include "models/player/Player.hpp"
 #include <string>
 
+class Player;
 
 typedef enum {
     BANK,

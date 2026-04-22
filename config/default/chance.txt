@@ -1,0 +1,5 @@
+GOTOJAIL Anda menabrak driver ojol. Anda masuk penjara.
+GETOUTOFJAIL Dapet orang dalam. Gunakan kartu ini untuk keluar dari penjara.
+FORCEDMOVE -4 Anda diculik om-om. Mundur 4 langkah.
+FORCEDMOVE 10 Nyasar karena salah naik kereta. Maju 10 langkah.
+GOTONEARESTSTATION Gerak ke stasiun terdekat.
