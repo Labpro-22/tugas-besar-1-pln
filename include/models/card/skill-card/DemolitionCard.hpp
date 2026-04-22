@@ -10,5 +10,5 @@ public:
     void setTargetTileId(int id);
     void takeEffect(Player& p, GameManager& gm) override;
     void prepareUse(UseSkillCardView &view, GameManager &gm) override;
-    std::string getType() override;
+    std::string getType() const override;
 };
