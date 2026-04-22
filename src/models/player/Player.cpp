@@ -24,7 +24,7 @@ PlayerState Player::getState() const { return state; }
 PlayerPiece& Player::getPiece() { return piece; }
 const std::vector<Property*>& Player::getProperties() const{ return properties; }
 const std::vector<SkillCard*>& Player::getSkillCards() const{ return skillCards; }
-const std::vector<SkillCard*>& Player::getEffects() const{ return effects; }
+const std::vector<PlayerEffect>& Player::getEffects() const{ return effects; }
 int Player::getStreetPropertyCount() const { return streetPropertyCount; }
 int Player::getRailroadPropertyCount() const { return railroadPropertyCount; }
 int Player::getUtilityPropertyCount() const { return utilityPropertyCount; }
@@ -114,11 +114,17 @@ void Player::giveMoney(Player* recipient, long long amount) {
 }
 
 void Player::payRent(Property* pr) {
+    if (hasEffect("SHIELD")) return;
+
     long long rent = pr->calculateRent();
     Player* owner = pr->getOwner();
     
     if (pr->getPropertyType() == "UTILITY"){
         rent *= (lastRoll.first + lastRoll.second);
+    }
+
+    if (hasEffect("DISCOUNT")) {
+        rent = rent * (100 - getEffectValue("DISCOUNT")) / 100;
     }
 
     if (money < rent) {
@@ -132,6 +138,11 @@ void Player::payRent(Property* pr) {
 }
 
 void Player::payTax(long long amount) {
+    if (hasEffect("SHIELD")) return;
+    if (hasEffect("DISCOUNT")) {
+        amount = amount * (100 - getEffectValue("DISCOUNT")) / 100;
+    }
+
     if (money < amount) {
         throw InsufficientFundsException(
             "Pemain " + username + " tidak mampu membayar pajak M" +
@@ -166,7 +177,7 @@ void Player::bankruptByPlayer(Player* creditor) {
     money = 0;
 
     for (Property* pr : properties) {
-        addProperty(pr);
+        creditor->addProperty(pr);
     }
 
     properties.clear();
@@ -211,6 +222,9 @@ void Player::removeProperty(Property* pr) {
 void Player::buyProperty(Property* pr) {
     if (pr->getPropertyType() == "STREET"){
         long long price = pr->getPrice();
+        if (hasEffect("DISCOUNT")) {
+            price = price * (100 - getEffectValue("DISCOUNT")) / 100;
+        }
         if (money < price)
             throw InsufficientFundsException(
                 "Uang tidak cukup untuk membeli properti seharga M" +
@@ -221,6 +235,9 @@ void Player::buyProperty(Property* pr) {
 }
 
 void Player::buyProperty(Property* pr, long long bid) {
+    if (hasEffect("DISCOUNT")) {
+        bid = bid * (100 - getEffectValue("DISCOUNT")) / 100;
+    }
     if (money < bid)
         throw InsufficientFundsException(
             "Uang tidak cukup untuk bid M" + std::to_string(bid));
@@ -242,6 +259,9 @@ void Player::mortgageProperty(Property* pr) {
 
 void Player::unmortgageProperty(Property* pr) {
     long long redeemPrice = pr->getPrice();
+    if (hasEffect("DISCOUNT")) {
+        redeemPrice = redeemPrice * (100 - getEffectValue("DISCOUNT")) / 100;
+    }
     if (money < redeemPrice)
         throw InsufficientFundsException(
             "Uang tidak cukup untuk menebus. Harga: M" +
@@ -266,6 +286,9 @@ bool Player::isPropertySetComplete(const std::string& color, const Board& board)
 void Player::buildOnProperty(StreetProperty* pr) {
     if (pr->getHouseCount() == 4) {
         long long hotelPrice = pr->getHotelPrice();
+        if (hasEffect("DISCOUNT")) {
+            hotelPrice = hotelPrice * (100 - getEffectValue("DISCOUNT")) / 100;
+        }
         if (money < hotelPrice){
             throw InsufficientFundsException( "Uang tidak cukup untuk hotel. Harga: M" + std::to_string(hotelPrice));
             }
@@ -273,6 +296,9 @@ void Player::buildOnProperty(StreetProperty* pr) {
         pr->buildHotel();
     } else {
         long long housePrice = pr->getHousePrice();
+        if (hasEffect("DISCOUNT")) {
+            housePrice = housePrice * (100 - getEffectValue("DISCOUNT")) / 100;
+        }
         if (money < housePrice)
             throw InsufficientFundsException(
                 "Uang tidak cukup untuk rumah. Harga: M" +
@@ -328,6 +354,7 @@ bool Player::isJailed() const {
 
 
 void Player::goToJail(){
+    if (hasEffect("SHIELD")) return;
     state = PlayerState::JAILED;
     jailTurns = 0;
     doubleRollCounter = 0;
@@ -371,6 +398,10 @@ void Player::payFineToGetOutOfJail(long long fine) {
     if (state != PlayerState::JAILED)
         throw InJailException("Pemain tidak sedang di penjara.");
 
+    if (hasEffect("DISCOUNT")) {
+        fine = fine * (100 - getEffectValue("DISCOUNT")) / 100;
+    }
+
     if (money < fine)
         throw InsufficientFundsException(
             "Uang tidak cukup untuk bayar denda M" + std::to_string(fine));
@@ -383,6 +414,24 @@ void Player::getOutOfJail() {
     jailTurns = 0;
 }
 
+void Player::addEffect(PlayerEffect effect) {
+    effects.push_back(effect);
+}
+
+bool Player::hasEffect(const std::string& name) const {
+    for (const PlayerEffect& e : effects) {
+        if (e.getName() == name && !e.isExpired()) return true;
+    }
+    return false;
+}
+
+int Player::getEffectValue(const std::string& name) const {
+    for (const PlayerEffect& e : effects) {
+        if (e.getName() == name && !e.isExpired()) return e.getValue();
+    }
+    return 0;
+}
+
 void Player::onNextTurn() {
     for (Property* pr : properties) {
         pr->onNextTurn();
@@ -392,11 +441,12 @@ void Player::onNextTurn() {
         jailTurns++;
     }
 
-    for (int i = 0; i < effects.size(); i++) {
-        effects[i].decrementDuration();
-        if (effects[i].isExpired()) {
-            effects.erase(effects.begin() + i);
-            i--;
-        }
+    for (PlayerEffect& e : effects) {
+        e.decrementDuration();
     }
+    effects.erase(
+        std::remove_if(effects.begin(), effects.end(),
+            [](const PlayerEffect& e) { return e.isExpired(); }),
+        effects.end()
+    );
 }
