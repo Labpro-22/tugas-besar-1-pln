@@ -3,11 +3,12 @@
 
 class LassoCard : public SkillCard {
 private:
-    Player* targetPlayer = nullptr;
+    Player *targetPlayer = nullptr;
+
 public:
-    LassoCard(const std::string& message);
-    void setTargetPlayer(Player* p);
-    void takeEffect(Player& p, GameManager& gm) override;
+    LassoCard(const std::string &message);
+    void setTargetPlayer(Player *p);
+    void takeEffect(Player &p, GameManager &gm) override;
     void prepareUse(UseSkillCardView &view, GameManager &gm) override;
-    std::string getType() const override;
+    std::string getCardType() const override;
 };

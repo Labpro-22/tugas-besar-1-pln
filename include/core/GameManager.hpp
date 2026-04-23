@@ -13,8 +13,8 @@
 #include "models/player/Player.hpp"
 #include "models/player/PlayerPiece.hpp"
 #include "models/property/Property.hpp"
-#include "models/tile/Tile.hpp"
 #include "models/tile/PropertyTile.hpp"
+#include "models/tile/Tile.hpp"
 #include "utils/config/Config.hpp"
 #include "utils/config/ConfigLoader.hpp"
 #include "utils/log/TransactionLogger.hpp"
@@ -36,12 +36,12 @@ private:
     Bank bank;
     TransactionLogger logger;
 
-    std::vector<ChanceCard> chanceCards;
-    std::vector<CommunityChestCard> communityChestCards;
-    std::vector<SkillCard> skillCards;
-    CardDeck<ChanceCard*> chanceCardDeck;
-    CardDeck<CommunityChestCard*> communityChestCardDeck;
-    CardDeck<SkillCard*> skillCardDeck;
+    std::vector<ChanceCard *> chanceCards;
+    std::vector<CommunityChestCard *> communityChestCards;
+    std::vector<SkillCard *> skillCards;
+    CardDeck<ChanceCard *> chanceCardDeck;
+    CardDeck<CommunityChestCard *> communityChestCardDeck;
+    CardDeck<SkillCard *> skillCardDeck;
 
     // Main game runner
     void gameLoop();
@@ -53,6 +53,7 @@ private:
 
 public:
     GameManager();
+    ~GameManager();
 
     // Main game runner
     void runGame();
@@ -65,9 +66,9 @@ public:
     Bank &getBank();
     std::vector<Player> &getPlayers();
     TransactionLogger &getLogger();
-    CardDeck<ChanceCard*> &getChanceCardDeck();
-    CardDeck<CommunityChestCard*> &getCommunityChestCardDeck();
-    CardDeck<SkillCard*> &getSkillCardDeck();
+    CardDeck<ChanceCard *> &getChanceCardDeck();
+    CardDeck<CommunityChestCard *> &getCommunityChestCardDeck();
+    CardDeck<SkillCard *> &getSkillCardDeck();
 
     void processMainMenu();
     void processNewGame();
@@ -76,17 +77,17 @@ public:
     void processRollDice();
     void processSetDice(int value1, int value2);
     void processBuyProperty();
-    void processBuyProperty(Player& player, Property* property);
-    void processAuctionProperty(Property* property);
+    void processBuyProperty(Player &player, Property *property);
+    void processAuctionProperty(Property *property);
     void processMortgageProperty();
     void processUnmortgageProperty();
     void processBuild();
     void processUseSkillCard();
     void processDropSkillCard();
     void processLiquidation();
-    void processLiquidation(Player& player);
-    void processOtherPlayerLiquidation(Player& other);
-    void processOtherPlayerLiquidation(Player& other, Player& creditor);
+    void processLiquidation(Player &player);
+    void processOtherPlayerLiquidation(Player &other);
+    void processOtherPlayerLiquidation(Player &other, Player &creditor);
     void processWin();
     void processPayRent();
     void processGoTile();

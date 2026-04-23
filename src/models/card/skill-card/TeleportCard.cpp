@@ -21,6 +21,6 @@ void TeleportCard::prepareUse(UseSkillCardView& view, GameManager& gm) {
     this->setTargetPosition(view.askForTargetPosition());
 }
 
-std::string TeleportCard::getType() const {
+std::string TeleportCard::getCardType() const {
     return "TeleportCard"; 
 }

@@ -36,13 +36,13 @@ std::vector<std::string> MainMenuView::promptUsernames(){
     std::string line;
     while (true) {
         std::cout << CYAN << "Masukkan jumlah pemain (2-4): " << RESET;
-        std::getline(std::cin, line);
-        if (line.empty()) {
-            std::cout << RED << "Input tidak boleh kosong!\n" <<RESET;
-            continue;
-        }
-        std::stringstream ss(line);
-        if (!(ss >> n) || !(ss.eof()) || n < 2 || n > 4) {
+        // std::getline(std::cin, line);
+        // if (line.empty()) {
+        //     std::cout << RED << "Input tidak boleh kosong!\n" <<RESET;
+        //     continue;
+        // }
+        // std::stringstream ss(line);
+        if (!(std::cin >> n) || n < 2 || n > 4) {
             std::cout << RED << "Input tidak valid! Harus antara 2 sampai 4.\n" << RESET;
             continue;
         }
@@ -55,7 +55,7 @@ std::vector<std::string> MainMenuView::promptUsernames(){
 
     for (int i = 0; i < n; i++) {
         while (true) {
-            std::cout << CYAN << "Masukkan username pemain " << (i + 1) << "(Maks. panjang nama = 8 karakter): " << RESET;
+            std::cout << CYAN << "Masukkan username pemain " << (i + 1) << " (Maks. panjang nama = 8 karakter): " << RESET;
             std::getline(std::cin, name);
 
             if (name.empty()) {
@@ -67,7 +67,7 @@ std::vector<std::string> MainMenuView::promptUsernames(){
                 std::cout << RED << "Username sudah digunakan! Pilih nama lain.\n" << RESET;
                 continue;
             }
-            if(name.length() >8){
+            if(name.length() > 8){
                 std::cout <<RED<<"Panjang username lebih dari 8! Pilih nama lain!\n" << RESET;
                 continue;
             }
@@ -76,8 +76,12 @@ std::vector<std::string> MainMenuView::promptUsernames(){
         }
     }
     std::cout << "\n" << BOLD << YELLOW << "Daftar Pemain:\n" << RESET;
-    for (int i = 0; i < names.size(); i++) {
+    for (int i = 0; i < (int) names.size(); i++) {
         std::cout << GREEN << i + 1 << ". " << names[i] << RESET << "\n";
     }
     return names;
+}
+
+void MainMenuView::outputCurrentPlayer() {
+    std::cout << "Giliran pemain " << gameManager.getCurrentPlayer().getUsername() << "\n";
 }

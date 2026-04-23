@@ -13,7 +13,7 @@ void CollectMoneyFromPlayersCard::takeEffect(Player& p, GameManager& gm) {
 
     for (Player& other : allPlayers) {
         if (other.getUsername() != p.getUsername()) {
-            bool canPay = other.giveMoney(p,amount);
+            bool canPay = other.giveMoney(p, amount);
         }
     }
 }

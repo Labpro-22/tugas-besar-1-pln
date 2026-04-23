@@ -13,6 +13,6 @@ void MoveCard::takeEffect(Player& p, GameManager& gm) {
     gm.getBoard().getTile(currentPos)->onLanded(p, gm);
 }
 
-std::string MoveCard::getType() const {
+std::string MoveCard::getCardType() const {
     return "MoveCard"; 
 }
