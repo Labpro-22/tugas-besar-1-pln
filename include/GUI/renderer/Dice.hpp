@@ -2,9 +2,9 @@
 #include <SFML/Graphics.hpp>
 #include "IGuiState.hpp"
 
-class DiceWidget {
+class Dice {
 public:
-    DiceWidget(const sf::Font& font);
+    Dice(const sf::Font& font);
     void update(float dt);
     void draw(sf::RenderWindow& win, float x, float y, const DiceInfo& dice);
 

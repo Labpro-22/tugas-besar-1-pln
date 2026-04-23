@@ -16,14 +16,14 @@ static const std::vector<std::pair<float,float>> PIP_POS[7] = {
     {{0.25f,0.25f},{0.75f,0.25f},{0.25f,0.5f},{0.75f,0.5f},{0.25f,0.75f},{0.75f,0.75f}},
 };
 
-DiceWidget::DiceWidget(const sf::Font& f) : m_font(f) {}
+Dice::Dice(const sf::Font& f) : m_font(f) {}
 
-void DiceWidget::update(float dt) {
+void Dice::update(float dt) {
     m_spinAngle+= dt * 720.f;
     if (m_spinAngle > 360.f) m_spinAngle -= 360.f;
 }
 
-void DiceWidget::draw(sf::RenderWindow& win, float x, float y,
+void Dice::draw(sf::RenderWindow& win, float x, float y,
                       const DiceInfo& dice) {
     float gap  = 12.f;
     float dieW = (float)DICE_SZ;
@@ -47,7 +47,7 @@ void DiceWidget::draw(sf::RenderWindow& win, float x, float y,
     }
 }
 
-void DiceWidget::drawDie(sf::RenderWindow& win, float x, float y,
+void Dice::drawDie(sf::RenderWindow& win, float x, float y,
                           int face, bool spinning, float spinAngle) {
     float sz  = (float)DICE_SZ;
     float pad = sz * 0.12f;
