@@ -93,14 +93,13 @@ long long Player::calculateTotalWealth() const {
 void Player::receiveMoney(long long amount) {
     money += amount;
 }
-void Player::giveMoney(Player& recipient, long long amount) {
-    if (money < amount)
-        throw InsufficientFundsException(
-            "Pemain " + username + " tidak punya cukup uang (M" +
-            std::to_string(money) + ") untuk memberi M" + std::to_string(amount));
-
+bool Player::giveMoney(Player& recipient, long long amount) {
+    if (hasEffect("SHIELD")) return true;
     money -= amount;
     recipient.receiveMoney(amount);
+    if (money < 0) return false;
+
+    return true;
 }
 
 bool Player::payRent(Property* pr) {
@@ -116,28 +115,28 @@ bool Player::payRent(Property* pr) {
     if (hasEffect("DISCOUNT")) {
         rent = rent * (100 - getEffectValue("DISCOUNT")) / 100;
     }
-
-    if (money < rent) {
+    
+    money -= rent;
+    if (money < 0) {
         return false;
     }
     
-    money -= rent;
     owner->receiveMoney(rent);
     return true;
 }
 
-void Player::payTax(long long amount) {
-    if (hasEffect("SHIELD")) return;
+bool Player::payTax(long long amount) {
+    if (hasEffect("SHIELD")) return true;
     if (hasEffect("DISCOUNT")) {
         amount = amount * (100 - getEffectValue("DISCOUNT")) / 100;
     }
-
-    if (money < amount) {
-        throw InsufficientFundsException(
-            "Pemain " + username + " tidak mampu membayar pajak M" +
-            std::to_string(amount));
-    }
+    
     money -= amount;
+
+    if (money < 0) {
+        return false;
+    }
+    return true;
 }
 
 void Player::bankruptByBank() {
@@ -440,4 +439,8 @@ void Player::onNextTurn() {
 
 int Player::getGetOutOfJailCardCount() const {
     return getOutOfJailCardCount;
+}
+
+void Player::setMoney(long long amount) {
+    money = amount;
 }

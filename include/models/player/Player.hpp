@@ -50,9 +50,10 @@ public:
 
     long long calculateTotalWealth() const;
     void receiveMoney(long long amount);
-    void giveMoney(Player* recipient, long long amount);
+    bool giveMoney(Player& recipient, long long amount);
+    void setMoney(long long amount);
     bool payRent(Property* pr);
-    void payTax(long long amount);
+    bool payTax(long long amount);
 
     void bankruptByBank();
     void bankruptByPlayer(Player* creditor);
