@@ -1,10 +1,12 @@
 #include "models/card/CardDeck.hpp"
 #include "models/card/Card.hpp"
+#include "models/card/CardDeckException.hpp"
 #include <algorithm>
 #include <random>
 
 template <typename T>
-T CardDeck<T>::drawCard() {
+T CardDeck<T>::drawCard()
+{
     if (cards.empty()) {
         if (drawnCards.empty()) {
             throw CardDeckException("Deck kosong dan tidak ada kartu untuk di-reshuffle.");
@@ -15,23 +17,26 @@ T CardDeck<T>::drawCard() {
     T drawn = cards.back();
     cards.pop_back();
     drawnCards.push_back(drawn);
-    
+
     return drawn;
 }
 
 template <typename T>
-void CardDeck<T>::addCard(T card) {
+void CardDeck<T>::addCard(T card)
+{
     cards.push_back(card);
 }
 
 template <typename T>
-void CardDeck<T>::clearDeck() {
+void CardDeck<T>::clearDeck()
+{
     cards.clear();
     drawnCards.clear();
 }
 
 template <typename T>
-void CardDeck<T>::reshuffle() {
+void CardDeck<T>::reshuffle()
+{
     if (drawnCards.empty()) return;
 
     cards.insert(cards.end(), drawnCards.begin(), drawnCards.end());
@@ -43,17 +48,20 @@ void CardDeck<T>::reshuffle() {
 }
 
 template <typename T>
-size_t CardDeck<T>::getSize() const {
+size_t CardDeck<T>::getSize() const
+{
     return cards.size();
 }
 
 template <typename T>
-std::vector<T> CardDeck<T>::getCards() const {
+std::vector<T> CardDeck<T>::getCards() const
+{
     return cards;
 }
 
 template <typename T>
-T CardDeck<T>::removeCardAt(int index) {
+T CardDeck<T>::removeCardAt(int index)
+{
     if (index < 0 || index >= static_cast<int>(cards.size())) {
         throw CardDeckException("Indeks kartu tidak valid.");
     }

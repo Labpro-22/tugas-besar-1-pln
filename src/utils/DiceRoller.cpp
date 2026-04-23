@@ -1,6 +1,4 @@
-#pragma once
-
-#include "core/DiceRoller.hpp"
+#include "utils/DiceRoller.hpp"
 
 std::random_device DiceRoller::rd_;
 std::mt19937 DiceRoller::rng_{rd_()};

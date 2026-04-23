@@ -1,4 +1,6 @@
 #include "models/tile/PropertyTile.hpp"
+#include "models/player/Player.hpp"
+#include "core/GameManager.hpp"
 
 PropertyTile::PropertyTile(Property* p) : Tile(p->getName(), p->getCode()), property(p) {}
 
@@ -14,8 +16,7 @@ void PropertyTile::onLanded(Player& p, GameManager& gm) {
             gm.processBuyProperty();
         }
         else {
-            Bank bank = gm.getBank();
-            bank.startAuction(*property);
+            gm.processAuctionProperty(property);
         }
     }
     else if (owner != &p) {

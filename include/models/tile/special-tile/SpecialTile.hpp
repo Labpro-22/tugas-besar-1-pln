@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Tile.hpp"
+#include "models/tile/Tile.hpp"
 
 class SpecialTile: virtual public Tile {
     public:
