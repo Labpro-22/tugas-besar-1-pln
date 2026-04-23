@@ -16,7 +16,7 @@
 #include "models/player/PlayerPiece.hpp"
 #include "utils/config/Config.hpp"
 
-Board::Board(int tileCount, const Config& config, const std::vector<Player*>& players) : playersList(players) {
+Board::Board(int tileCount, const Config& config, const std::vector<Player*>& players, const std::vector<PropertySaveData>& propertyData) : playersList(players) {
     
     this->width = static_cast<int>(std::ceil((tileCount + 4.0) / 4.0));
     this->height = static_cast<int>(std::floor((tileCount + 4.0) / 4.0));
@@ -24,8 +24,12 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
     tiles.resize(tileCount, nullptr);
 
     std::map<int, PropertyConfig> propMap;
+    std::map<std::string, PropertySaveData> propDataMap;
     for (const auto& p : config.properties) {
         propMap[p.id] = p;
+    }
+    for (const auto& p : propertyData) {
+        propDataMap[p.code] = p;
     }
 
     std::map<int, ActionTileConfig> actionMap;
@@ -45,19 +49,69 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
             int initialFestDur = 0;
 
             if (conf.type == "STREET") {
-                prop = new StreetProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, conf.housePrice, conf.hotelPrice, conf.rent);
+                if (propDataMap.count(conf.code)) {
+                    PropertySaveData data = propDataMap[conf.code];
+                    StreetProperty* property = new StreetProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, 
+                                                                  data.festivalMultiplier, data.festivalDuration, conf.housePrice, conf.hotelPrice, conf.rent);
+                    if (data.hasHotel) {
+                        property->buildHouse(4);
+                        property->buildHotel();
+                    }
+                    else {
+                        property->buildHouse(data.houseCount);
+                    }
+                    auto player = std::find_if(players.begin(), players.end(), [data](Player &p) {
+                        return p.getUsername() == data.owner;
+                    });
+                    if (player != players.end()) {
+                        (*player)->addProperty(property);
+                    }
+                    prop = property;
+                }
+                else {
+                    prop = new StreetProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, conf.housePrice, conf.hotelPrice, conf.rent);
+                }
             } 
             else if (conf.type == "RAILROAD") {
-                prop = new RailroadProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, config.railroadRent);
+                if (propDataMap.count(conf.code)) {
+                    PropertySaveData data = propDataMap[conf.code];
+                    RailroadProperty* property = new RailroadProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, 
+                                                                      data.festivalMultiplier, data.festivalDuration, config.railroadRent);
+                    auto player = std::find_if(players.begin(), players.end(), [data](Player &p) {
+                        return p.getUsername() == data.owner;
+                    });
+                    if (player != players.end()) {
+                        (*player)->addProperty(property);
+                    }
+                    prop = property;
+                }
+                else {
+                    prop = new RailroadProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, config.railroadRent);
+                }
             } 
             else if (conf.type == "UTILITY") {
-                prop = new UtilityProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, config.utilityRent);
+                if (propDataMap.count(conf.code)) {
+                    PropertySaveData data = propDataMap[conf.code];
+                    UtilityProperty* property = new UtilityProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, 
+                                                                      data.festivalMultiplier, data.festivalDuration, config.utilityRent);
+                    auto player = std::find_if(players.begin(), players.end(), [data](Player &p) {
+                        return p.getUsername() == data.owner;
+                    });
+                    if (player != players.end()) {
+                        (*player)->addProperty(property);
+                    }
+                    prop = property;
+                }
+                else {
+                    prop = new UtilityProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, config.utilityRent);
+                }
             }
 
             if (prop) {
                 newTile = new PropertyTile(prop);
                 mapTilesCodeColor[conf.code] = conf.color;
                 mapTilesColorCount[conf.color]++;
+                propertyList.push_back(prop);
             }
         } 
         else if (actionMap.find(id) != actionMap.end()) {
@@ -115,6 +169,7 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
 
 Board::~Board() {
     for (Tile* t : tiles) delete t;
+    for (Property* p : propertyList) delete p;
 }
 
 int Board::getWidth() const noexcept { 
@@ -178,4 +233,8 @@ const std::map<std::string, std::string>& Board::getMapTilesCodeColor() const no
 
 const std::map<std::string, int>& Board::getMapTilesColorCount() const noexcept { 
     return mapTilesColorCount; 
+}
+
+const std::vector<Property*>& Board::getPropertyList() const noexcept {
+    return propertyList;
 }

@@ -6,17 +6,13 @@ Player::Player(const std::string& username, long long initialMoney) :
     properties(), streetPropertyCount(0), railroadPropertyCount(0),
     utilityPropertyCount(0), skillCards(), piece(0),
     doubleRollCounter(0), getOutOfJailCardCount(0), jailTurns(0) {}
-Player::Player( const std::string& username, long long money, PlayerState state, const std::vector<Property*>& properties,
-                const std::vector<SkillCard*>& skillCards, int getOutOfJailCardCount, int jailTurns, int position) : 
+Player::Player( const std::string& username, long long money, PlayerState state,
+                const std::vector<SkillCard*>& skillCards, int getOutOfJailCardCount, int jailTurns) : 
     username(username), money(money), state(state),
     properties(), streetPropertyCount(0), railroadPropertyCount(0), 
-    utilityPropertyCount(0), skillCards(skillCards), piece(position),
+    utilityPropertyCount(0), skillCards(skillCards), piece(0),
     doubleRollCounter(0), getOutOfJailCardCount(getOutOfJailCardCount), jailTurns(jailTurns) 
-    {
-        for (Property* pr : properties) {
-            addProperty(pr);
-        }
-    }
+    { }
 
 const std::string& Player::getUsername() const { return username; }
 long long Player::getMoney() const { return money; }
@@ -399,6 +395,10 @@ void Player::payFineToGetOutOfJail(long long fine) {
 void Player::getOutOfJail() {
     state = PlayerState::ACTIVE;
     jailTurns = 0;
+}
+
+int Player::getJailTurns() {
+    return jailTurns;
 }
 
 void Player::addEffect(PlayerEffect effect) {

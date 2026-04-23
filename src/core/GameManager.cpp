@@ -42,56 +42,65 @@ GameManager::GameManager()
     // Load chance card
     for (CardConfig card : config.chanceCards) {
         if (card.type == "GOTOJAIL") {
-            chanceCardDeck.addCard(new GoToJailCard(card.message));
+            chanceCards.push_back(GoToJailCard(card.message));
         }
         else if (card.type == "GETOUTOFJAIL") {
-            chanceCardDeck.addCard(new GetOutOfJailCard(card.message));
+            chanceCards.push_back(GetOutOfJailCard(card.message));
         }
         else if (card.type == "FORCEDMOVE") {
-            chanceCardDeck.addCard(new ForcedMoveCard(card.message, card.value));
+            chanceCards.push_back(ForcedMoveCard(card.message, card.value));
         }
         else if (card.type == "GOTONEARESTSTATION") {
-            chanceCardDeck.addCard(new GoToNearestStationCard(card.message));
+            chanceCards.push_back(GoToNearestStationCard(card.message));
         }
+    }
+    for (ChanceCard &card : chanceCards) {
+        chanceCardDeck.addCard(&card);
     }
 
     // Load community-chest card
     for (CardConfig card : config.communityChestCards) {
         if (card.type == "PAY") {
-            communityChestCardDeck.addCard(new PayMoneyCard(card.message, card.value));
+            communityChestCards.push_back(PayMoneyCard(card.message, card.value));
         }
         else if (card.type == "PAYALL") {
-            communityChestCardDeck.addCard(new PayMoneyToPlayersCard(card.message, card.value));
+            communityChestCards.push_back(PayMoneyToPlayersCard(card.message, card.value));
         }
         else if (card.type == "COLLECT") {
-            communityChestCardDeck.addCard(new CollectMoneyCard(card.message, card.value));
+            communityChestCards.push_back(CollectMoneyCard(card.message, card.value));
         }
         else if (card.type == "COLLECTALL") {
-            communityChestCardDeck.addCard(new CollectMoneyFromPlayersCard(card.message, card.value));
+            communityChestCards.push_back(CollectMoneyFromPlayersCard(card.message, card.value));
         }
+    }
+    for (CommunityChestCard &card : communityChestCards) {
+        communityChestCardDeck.addCard(&card);
     }
 
     // Load skill card
     DiceRoller::roll();
-    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    skillCards.push_back(MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
     DiceRoller::roll();
-    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    skillCards.push_back(MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
     DiceRoller::roll();
-    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    skillCards.push_back(MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
     DiceRoller::roll();
-    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    skillCards.push_back(MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
     DiceRoller::roll();
-    skillCardDeck.addCard(new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
+    skillCards.push_back(DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
     DiceRoller::roll();
-    skillCardDeck.addCard(new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
+    skillCards.push_back(DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
     DiceRoller::roll();
-    skillCardDeck.addCard(new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
-    skillCardDeck.addCard(new ShieldCard(""));
-    skillCardDeck.addCard(new ShieldCard(""));
-    skillCardDeck.addCard(new LassoCard(""));
-    skillCardDeck.addCard(new LassoCard(""));
-    skillCardDeck.addCard(new DemolitionCard(""));
-    skillCardDeck.addCard(new DemolitionCard(""));
+    skillCards.push_back(DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
+    skillCards.push_back(ShieldCard(""));
+    skillCards.push_back(ShieldCard(""));
+    skillCards.push_back(LassoCard(""));
+    skillCards.push_back(LassoCard(""));
+    skillCards.push_back(DemolitionCard(""));
+    skillCards.push_back(DemolitionCard(""));
+    for (SkillCard &card : skillCards) {
+        skillCardDeck.addCard(&card);
+    }
 }
 
 // Game runner
@@ -222,7 +231,7 @@ void GameManager::processNewGame()
     }
 
     // Create board
-    board = Board((int)(config.actionTiles.size() + config.properties.size()), config, playerPointer);
+    board = Board{(int)(config.actionTiles.size() + config.properties.size()), config, playerPointer};
 
     // Create bank
     bank = Bank(config.initialMoney, config);
@@ -245,6 +254,77 @@ void GameManager::processLoadGame()
     view.outputLoading();
     try {
         SaveData saveData = SaveFileHandler::loadGame(saveFileName);
+        turn = saveData.turn;
+        config.maxTurn = saveData.maxTurn;
+        players.clear();
+
+        for (PlayerSaveData &playerData : saveData.players) {
+            std::vector<SkillCard *> playerCards;
+            for (SkillCardSaveData &cardData : playerData.skillCards) {
+                if (cardData.type == "DiscountCard") {
+                    skillCards.push_back(DiscountCard("", cardData.value));
+                    playerCards.push_back(&skillCards.back());
+                }
+                else if (cardData.type == "LassoCard") {
+                    skillCards.push_back(LassoCard(""));
+                    playerCards.push_back(&skillCards.back());
+                }
+                else if (cardData.type == "MoveCard") {
+                    skillCards.push_back(MoveCard("", cardData.value));
+                    playerCards.push_back(&skillCards.back());
+                }
+                else if (cardData.type == "TeleportCard") {
+                    skillCards.push_back(TeleportCard(""));
+                    playerCards.push_back(&skillCards.back());
+                }
+                if (cardData.type == "DemolitionCard") {
+                    skillCards.push_back(DemolitionCard(""));
+                    playerCards.push_back(&skillCards.back());
+                }
+                if (cardData.type == "ShieldCard") {
+                    skillCards.push_back(ShieldCard(""));
+                    playerCards.push_back(&skillCards.back());
+                }
+            }
+            players.push_back(Player{
+                playerData.username,
+                playerData.money,
+                playerData.status == "ACTIVE"   ? PlayerState::ACTIVE
+                : playerData.status == "JAILED" ? PlayerState::JAILED
+                                                : PlayerState::BANKRUPT,
+                playerCards,
+                playerData.getOutOfJailCardCount,
+                playerData.jailTurns});
+            Player &player = players.back();
+            player.getPiece().setPosition(board.getTilePosition(playerData.tileCodePosition));
+        }
+
+        std::map<std::string, int> playerOrder;
+        int i = 0;
+        for (std::string username : saveData.playerOrder) {
+            playerOrder[username] = i++;
+        }
+
+        std::sort(players.begin(), players.end(), [&](Player &p1, Player &p2) {
+            return playerOrder[p1.getUsername()] < playerOrder[p2.getUsername()];
+        });
+
+        for (SkillCard *card : skillCardDeck.getCards()) {
+            saveData.deckCards.push_back(card->getType());
+        }
+
+        bank = Bank{config.initialMoney, config, saveData.properties, players};
+
+        std::vector<Player *> playerPointer;
+        for (Player &player : players) {
+            playerPointer.push_back(&player);
+        }
+        board = Board{(int)(config.properties.size() + config.actionTiles.size()), config, playerPointer, saveData.properties};
+
+        logger.clear();
+        for (LogSaveData &logData : saveData.logs) {
+            logger.log(logData.turn, logData.username, logData.action, logData.details);
+        }
         view.outputLoadStatus(true);
     }
     catch (const SaveFileNotFoundException &e) {
@@ -290,6 +370,9 @@ void GameManager::processSaveGame(std::string fileName)
                     playerData.status = "UNKNOWN";
                     break;
             }
+            playerData.getOutOfJailCardCount = player.getGetOutOfJailCardCount();
+            playerData.jailTurns = player.getJailTurns();
+
             for (SkillCard *card : player.getSkillCards()) {
                 SkillCardSaveData cardData;
                 cardData.type = card->getType();
@@ -297,14 +380,12 @@ void GameManager::processSaveGame(std::string fileName)
                 cardData.value = 30;
                 playerData.skillCards.push_back(cardData);
             }
-
-            playerData.username = player.getUsername();
             saveData.players.push_back(playerData);
             saveData.playerOrder.push_back(player.getUsername());
         }
         saveData.currentPlayer = getCurrentPlayer().getUsername();
 
-        for (Property *property : bank.getProperties()) {
+        for (Property *property : board.getPropertyList()) {
             PropertySaveData propertyData;
             propertyData.code = property->getCode();
             propertyData.type = property->getPropertyType();
@@ -644,8 +725,17 @@ void GameManager::processUseSkillCard()
 
     int skillIndex = view.promptChooseCardToUse(player.getSkillCards());
     try {
-        SkillCard *card = player.getSkillCards()[skillIndex - 1];
+        SkillCard *card = player.getSkillCards()[skillIndex];
         cardView.outputCard(*card);
+        if (card->getType() == "DemolitionCard") {
+            card->prepareUse(gameView.getUseSkillCardView(), *this);
+        }
+        else if (card->getType() == "LassoCard") {
+            card->prepareUse(gameView.getUseSkillCardView(), *this);
+        }
+        else if (card->getType() == "TeleportCard") {
+            card->prepareUse(gameView.getUseSkillCardView(), *this);
+        }
         player.useSkillCard(skillIndex, *this);
         logger.log(turn, player.getUsername(), "USE_CARD",
                    card->getType() + " dipakai. " + card->getMessage());
@@ -653,10 +743,6 @@ void GameManager::processUseSkillCard()
     catch (const PlayerException &e) {
         std::cout << e.what() << std::endl;
     }
-    catch (...) {
-    }
-
-    // TODO: efek efek skill card
 }
 void GameManager::processDropSkillCard()
 {
@@ -666,8 +752,8 @@ void GameManager::processDropSkillCard()
 
     int skillIndex = view.promptChooseSkillCard(player.getSkillCards());
     try {
-        SkillCard *card = player.getSkillCards()[skillIndex - 1];
-        player.dropSkillCard(skillIndex - 1);
+        SkillCard *card = player.getSkillCards()[skillIndex];
+        player.dropSkillCard(skillIndex);
         view.outputDropSkillCardStatus(*card);
         logger.log(turn, player.getUsername(), "DROP_CARD",
                    card->getType() + " dibuang.");
