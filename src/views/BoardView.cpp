@@ -1,5 +1,6 @@
 #include "core/GameManager.hpp"
 #include "views/BoardView.hpp"
+#include "models/tile/PropertyTile.hpp"
 
 void BoardView::outputOnLanded()const{
     Player &p = gameManager.getCurrentPlayer();

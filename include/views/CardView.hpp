@@ -11,4 +11,5 @@ private:
 public:
     CardView(GameManager& gm) : gameManager(gm) {}
     void outputCard(Card &card) const;
+    void outputShielded() const;
 };
