@@ -95,4 +95,5 @@ public:
     void processPayIncomeTax();
     void processUseCommunityChestCard();
     void processUseChanceCard();
+    void processStartFestival();
 };
