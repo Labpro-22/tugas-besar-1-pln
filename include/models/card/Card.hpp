@@ -14,4 +14,5 @@ public:
     
     std::string getMessage() const;
     virtual void takeEffect(Player& p, GameManager& gm) = 0;
+    virtual std::string getCardType() const = 0;
 };

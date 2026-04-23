@@ -3,5 +3,5 @@
 #include "core/GameManager.hpp"
 
 void LuxuryTaxTile::onLanded(Player& p, GameManager& gm) {
-    p.payTax(luxuryFlatTax);
+    gm.processPayLuxuryTax();
 }  
