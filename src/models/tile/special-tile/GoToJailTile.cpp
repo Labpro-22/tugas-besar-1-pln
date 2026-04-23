@@ -3,6 +3,9 @@
 #include "core/GameManager.hpp"
 
 void GoToJailTile::onLanded(Player& p, GameManager& gm) {
-    p.goToJail();
-    p.getPiece().setPosition(gm.getBoard().getTilePosition("PEN"));
+    gm.processGoToJail();
+    if (!p.hasEffect("SHIELD")) {
+        p.goToJail();
+        p.getPiece().setPosition(gm.getBoard().getTilePosition("PEN"));
+    }
 }

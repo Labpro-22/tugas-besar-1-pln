@@ -14,6 +14,7 @@
 #include "models/player/PlayerPiece.hpp"
 #include "models/property/Property.hpp"
 #include "models/tile/Tile.hpp"
+#include "models/tile/PropertyTile.hpp"
 #include "utils/config/Config.hpp"
 #include "utils/config/ConfigLoader.hpp"
 #include "utils/log/TransactionLogger.hpp"
@@ -70,7 +71,7 @@ public:
 
     void processMainMenu();
     void processNewGame();
-    void processSaveGame(std::string filename);
+    void processSaveGame(std::string fileName);
     void processLoadGame();
     void processRollDice();
     void processSetDice(int value1, int value2);
@@ -84,6 +85,14 @@ public:
     void processDropSkillCard();
     void processLiquidation();
     void processLiquidation(Player& player);
+    void processOtherPlayerLiquidation(Player& other);
+    void processOtherPlayerLiquidation(Player& other, Player& creditor);
     void processWin();
     void processPayRent();
+    void processGoTile();
+    void processGoToJail();
+    void processPayLuxuryTax();
+    void processPayIncomeTax();
+    void processUseCommunityChestCard();
+    void processUseChanceCard();
 };
