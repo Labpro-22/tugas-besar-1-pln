@@ -10,6 +10,6 @@ public:
 
 private:
     void drawDie(sf::RenderWindow& win, float x, float y, int face, bool spinning, float spinAngle);
-    const sf::Font& m_font;
-    float m_spinAngle = 0.f;
+    const sf::Font& font;
+    float spinAngle = 0.f;
 };
