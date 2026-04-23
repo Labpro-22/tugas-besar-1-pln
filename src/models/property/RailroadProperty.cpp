@@ -10,7 +10,7 @@ RailroadProperty::RailroadProperty(const std::string& code, const std::string& n
     rent = rentPrice;
 }
 
-long long RailroadProperty::calculateRent() noexcept {
+long long RailroadProperty::calculateRent() const noexcept {
     if (owner == nullptr || isMortgaged()) return 0;
     
     int count = owner->getRailroadPropertyCount();
@@ -31,14 +31,24 @@ long long RailroadProperty::calculateRent() noexcept {
     return baseRent;
 }
 
-long long RailroadProperty::calculateSellValue() const {
-    return getPrice();
+long long RailroadProperty::calculateSellValue() const noexcept {
+    return getMortgageValue();
 }
 
-long long RailroadProperty::calculateAssetValue() const {
-    return getPrice();
+long long RailroadProperty::calculateAssetValue() const noexcept {
+    return getMortgageValue();
 }
 
 std::map<int, long long> RailroadProperty::getRent() const noexcept {
     return rent;
 }
+
+long long RailroadProperty::redemptionPrice() const noexcept {
+    return 2 * getMortgageValue();
+}
+
+
+void RailroadProperty::sellProperty() {
+    resetOwnerAsBank();
+}
+

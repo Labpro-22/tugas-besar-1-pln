@@ -7,7 +7,7 @@ class StreetProperty: public Property {
     public:
         StreetProperty(const std::string& code, const std::string& name, const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, long long housePrice, long long hotelPrice, long long rentPrice[6]);
 
-        long long calculateRent() noexcept override;
+        long long calculateRent() const noexcept override;
 
         int getHouseCount() const noexcept;
 
@@ -29,11 +29,15 @@ class StreetProperty: public Property {
 
         std::string getPropertyType() const noexcept override;
 
-        long long calculateSellValue() const override;
+        long long calculateSellValue() const noexcept override;
 
-        long long calculateAssetValue() const override;
+        long long calculateAssetValue() const noexcept override;
 
         std::array<long long, 6> getRentPrice() const noexcept;
+
+        long long redemptionPrice() const noexcept override;
+
+        void sellProperty() override;
 
     private:
         int houseCount;

@@ -42,7 +42,9 @@ class Property {
 
         void setMortgaged(bool mortgaged) noexcept;
 
-        virtual long long calculateRent() noexcept = 0;
+        virtual long long calculateRent() const noexcept = 0;
+
+        virtual long long redemptionPrice() const noexcept = 0;
         
         void startFestival();
 
@@ -56,16 +58,13 @@ class Property {
 
         virtual std::string getPropertyType() const noexcept = 0;
 
-        virtual long long calculateSellValue() const {
-            return price;
-        }
-
-        virtual long long calculateAssetValue() const {
-            return price;
-        }
+        virtual long long calculateSellValue() const noexcept;
+        
+        virtual long long calculateAssetValue() const noexcept;
 
         virtual ~Property() {}
-     
+
+        virtual void sellProperty();
 
     protected:
         Player *owner;
