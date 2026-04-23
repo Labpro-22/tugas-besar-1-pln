@@ -173,11 +173,9 @@ void GameManager::processLoadGame()
         view.outputLoadStatus(false);
     };
 }
-void GameManager::processSaveGame()
+void GameManager::processSaveGame(std::string fileName)
 {
     SaveView &view = gameView.getSaveView();
-    view.outputSaveNames();
-    std::string fileName = view.promptSaveName();
     if (std::filesystem::exists(fileName) && std::filesystem::is_regular_file(fileName)) {
         if (!view.promptOverwriteSaveFile(fileName)) {
             return;

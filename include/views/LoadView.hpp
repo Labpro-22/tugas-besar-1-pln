@@ -7,7 +7,9 @@ private:
     GameManager& gameManager;
 public:
     LoadView(GameManager& gm) : gameManager(gm) {}
+    void outputSaveNames()const;
     void outputLoading() const;
-    void outputLoadStatus(std::string pathFile, bool fileFound, bool fileNotCorrupted) const;
+    void outputLoadStatus(bool success) const;
+    std::string promptSaveName();
 };
 
