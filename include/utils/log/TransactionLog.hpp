@@ -19,3 +19,17 @@ public:
 
     std::string toString() const;
 };
+
+/*
+Lemparan dadu dan pergerakan bidak
+Pembelian properti (termasuk perolehan Railroad/Utility otomatis)
+Pembayaran sewa dan pajak
+Pembangunan dan penjualan bangunan
+Gadai dan tebus properti
+Penggunaan kartu kemampuan spesial
+Pengambilan kartu Kesempatan dan Dana Umum
+Setiap bid dan hasil akhir lelang
+Aktivasi dan penguatan efek festival
+Kebangkrutan dan pengambilalihan aset
+Save dan load permainan
+*/
