@@ -4,6 +4,23 @@
 
 #include "core/GameManager.hpp"
 #include "core/GameManagerException.hpp"
+#include "models/card/chance-card/ChanceCard.hpp"
+#include "models/card/chance-card/ForcedMoveCard.hpp"
+#include "models/card/chance-card/GetOutOfJailCard.hpp"
+#include "models/card/chance-card/GoToJailCard.hpp"
+#include "models/card/chance-card/GoToNearestStationCard.hpp"
+#include "models/card/community-chest-card/CollectMoneyCard.hpp"
+#include "models/card/community-chest-card/CollectMoneyFromPlayersCard.hpp"
+#include "models/card/community-chest-card/CommunityChestCard.hpp"
+#include "models/card/community-chest-card/PayMoneyCard.hpp"
+#include "models/card/community-chest-card/PayMoneyToPlayersCard.hpp"
+#include "models/card/skill-card/DemolitionCard.hpp"
+#include "models/card/skill-card/DiscountCard.hpp"
+#include "models/card/skill-card/LassoCard.hpp"
+#include "models/card/skill-card/MoveCard.hpp"
+#include "models/card/skill-card/ShieldCard.hpp"
+#include "models/card/skill-card/SkillCard.hpp"
+#include "models/card/skill-card/TeleportCard.hpp"
 #include "models/tile/PropertyTile.hpp"
 
 GameManager::GameManager()
@@ -20,7 +37,62 @@ GameManager::GameManager()
       logger{},
       chanceCardDeck{},
       communityChestCardDeck{},
-      skillCardDeck{} {}
+      skillCardDeck{}
+{
+    // Load chance card
+    for (CardConfig card : config.chanceCards) {
+        if (card.type == "GOTOJAIL") {
+            chanceCardDeck.addCard(new GoToJailCard(card.message));
+        }
+        else if (card.type == "GETOUTOFJAIL") {
+            chanceCardDeck.addCard(new GetOutOfJailCard(card.message));
+        }
+        else if (card.type == "FORCEDMOVE") {
+            chanceCardDeck.addCard(new ForcedMoveCard(card.message, card.value));
+        }
+        else if (card.type == "GOTONEARESTSTATION") {
+            chanceCardDeck.addCard(new GoToNearestStationCard(card.message));
+        }
+    }
+
+    // Load community-chest card
+    for (CardConfig card : config.communityChestCards) {
+        if (card.type == "PAY") {
+            communityChestCardDeck.addCard(new PayMoneyCard(card.message, card.value));
+        }
+        else if (card.type == "PAYALL") {
+            communityChestCardDeck.addCard(new PayMoneyToPlayersCard(card.message, card.value));
+        }
+        else if (card.type == "COLLECT") {
+            communityChestCardDeck.addCard(new CollectMoneyCard(card.message, card.value));
+        }
+        else if (card.type == "COLLECTALL") {
+            communityChestCardDeck.addCard(new CollectMoneyFromPlayersCard(card.message, card.value));
+        }
+    }
+
+    // Load skill card
+    DiceRoller::roll();
+    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    DiceRoller::roll();
+    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    DiceRoller::roll();
+    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    DiceRoller::roll();
+    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    DiceRoller::roll();
+    skillCardDeck.addCard(new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
+    DiceRoller::roll();
+    skillCardDeck.addCard(new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
+    DiceRoller::roll();
+    skillCardDeck.addCard(new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
+    skillCardDeck.addCard(new ShieldCard(""));
+    skillCardDeck.addCard(new ShieldCard(""));
+    skillCardDeck.addCard(new LassoCard(""));
+    skillCardDeck.addCard(new LassoCard(""));
+    skillCardDeck.addCard(new DemolitionCard(""));
+    skillCardDeck.addCard(new DemolitionCard(""));
+}
 
 // Game runner
 void GameManager::runGame()
@@ -90,6 +162,9 @@ void GameManager::nextTurn()
 
 void GameManager::nextPlayer()
 {
+    if (getCurrentPlayer().getMoney() < 0) {
+        processLiquidation();
+    }
     while (getCurrentPlayer().isBankrupt()) {
         playerQueue.pop();
     }
@@ -100,6 +175,9 @@ void GameManager::nextPlayer()
     Player &player = getCurrentPlayer();
     player.onNextTurn();
     player.addSkillCard(skillCardDeck.drawCard());
+    if (player.getMoney() < 0) {
+        processLiquidation();
+    }
     startOfTheTurn = true;
 }
 
@@ -159,20 +237,19 @@ void GameManager::processNewGame()
 void GameManager::processLoadGame()
 {
     LoadView &view = gameView.getLoadView();
-    if (!view.outputSaveFiles()) return;
-    std::string saveFileName = view.promptSaveFile();
+    std::string saveFileName = view.promptSaveName();
     view.outputLoading();
     try {
         SaveData saveData = SaveFileHandler::loadGame(saveFileName);
-        view.outputLoadStatus(saveFileName, true, true);
+        view.outputLoadStatus(true);
     }
     catch (const SaveFileNotFoundException &e) {
         std::cout << e.what() << std::endl;
-        view.outputLoadStatus(saveFileName, true, false);
+        view.outputLoadStatus(false);
     }
     catch (const SaveFileFormatException &e) {
         std::cout << e.what() << std::endl;
-        view.outputLoadStatus(saveFileName, false, true);
+        view.outputLoadStatus(false);
     };
 }
 void GameManager::processSaveGame(std::string fileName)
@@ -404,8 +481,13 @@ void GameManager::processBuyProperty()
 
     PropertyTile *tile = dynamic_cast<PropertyTile *>(piece.getCurrentTile());
     if (tile != nullptr) {
-        if (view.promptBuyProperty(*tile->getProperty())) {
-            processBuyProperty(player, tile->getProperty());
+        if (player.getMoney() >= tile->getProperty()->getPrice()) {
+            if (tile->getProperty()->getPropertyType() != "STREET" || view.promptBuyProperty(*tile->getProperty())) {
+                processBuyProperty(player, tile->getProperty());
+            }
+            else {
+                processAuctionProperty(tile->getProperty());
+            }
         }
         else {
             processAuctionProperty(tile->getProperty());
@@ -420,7 +502,7 @@ void GameManager::processBuyProperty(Player &player, Property *property)
         try {
             bool beli = player.buyProperty(property);
             if (!beli) {
-                bank.startAuction(property);
+                processAuctionProperty(property);
                 return;
             }
             logger.log(turn, player.getUsername(), "BELI",
@@ -667,16 +749,17 @@ void GameManager::processWin()
     playing = false;
 }
 
-void GameManager::processPayRent() {
-    BoardView& boardView = gameView.getBoardView();
+void GameManager::processPayRent()
+{
+    BoardView &boardView = gameView.getBoardView();
     boardView.outputOnLanded();
 
     Player &player = getCurrentPlayer();
     PlayerPiece &piece = player.getPiece();
 
     PropertyTile *tile = dynamic_cast<PropertyTile *>(piece.getCurrentTile());
-    Property* prop = tile->getProperty();
-    PropertyView& propView = gameView.getPropertyView();
+    Property *prop = tile->getProperty();
+    PropertyView &propView = gameView.getPropertyView();
     propView.outputRent(*prop);
     int pay = player.payRent(tile->getProperty());
     if (!pay) {
