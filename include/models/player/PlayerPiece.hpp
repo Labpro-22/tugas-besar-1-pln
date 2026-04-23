@@ -14,7 +14,8 @@ public:
     void setPosition(int pos);
     int getPosition() const;
     Tile* getCurrentTile() const;
-
+    void setBoard(Board* board);
+    
     void goForward(int tileCount);
     void goBackward(int tileCount);
 };

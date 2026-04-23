@@ -17,12 +17,11 @@ Tile* PlayerPiece::getCurrentTile() const {
 }
 
 void PlayerPiece::setBoard(Board* board) {
-    this.board = board;
+    this->board = board;
 }
 
 void PlayerPiece::goForward(int tileCount) {
     int boardSize = board->getTileCount();
-    int oldPosition = position;
     position = (position + tileCount) % boardSize;
 }
 
