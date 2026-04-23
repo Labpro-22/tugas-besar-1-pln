@@ -420,7 +420,7 @@ void GameManager::processBuyProperty(Player &player, Property *property)
         try {
             bool beli = player.buyProperty(property);
             if (!beli) {
-                bank.startAuction(property);
+                processAuctionProperty(property);
                 return;
             }
             logger.log(turn, player.getUsername(), "BELI",
@@ -620,6 +620,57 @@ void GameManager::processLiquidation()
         }
     }
 }
+void GameManager::processOtherPlayerLiquidation(Player& other)
+{
+    BankruptView &view = gameView.getBankruptView();
+
+    view.outputPotentialWealth(other, -other.getMoney());
+
+    if (other.calculateTotalWealth() >= -other.getMoney()) {
+        while (other.getMoney() < 0) {
+            auto chosenProperty = view.promptLiquidation(other.getProperties(), -other.getMoney());
+            if (chosenProperty.first == "Jual") {
+                other.sellProperty(chosenProperty.second);
+            }
+            else if (chosenProperty.first == "Gadai") {
+                other.mortgageProperty(chosenProperty.second);
+            }
+        }
+    }
+    else {
+        view.outputBankruptByBank(other);
+        std::vector<Property *> auctionedProperty = other.getProperties();
+        other.bankruptByBank();
+        for (Property *property : auctionedProperty) {
+            processAuctionProperty(property);
+        }
+    }
+}
+void GameManager::processOtherPlayerLiquidation(Player& other, Player& creditor)
+{
+    BankruptView &view = gameView.getBankruptView();
+
+    long long debt = -other.getMoney();
+    view.outputPotentialWealth(other, -other.getMoney());
+
+    if (other.calculateTotalWealth() >= -other.getMoney()) {
+        while (other.getMoney() < 0) {
+            auto chosenProperty = view.promptLiquidation(other.getProperties(), -other.getMoney());
+            if (chosenProperty.first == "Jual") {
+                other.sellProperty(chosenProperty.second);
+            }
+            else if (chosenProperty.first == "Gadai") {
+                other.mortgageProperty(chosenProperty.second);
+            }
+        }
+        view.outputDebtPaid(debt, &creditor);
+    }
+    else {
+        view.outputBankruptByPlayer(other, creditor);
+        std::vector<Property *> auctionedProperty = other.getProperties();
+        other.bankruptByPlayer(&creditor);
+    }
+}
 void GameManager::processLiquidation(Player &creditor)
 {
     Player &player = getCurrentPlayer();
@@ -678,8 +729,73 @@ void GameManager::processPayRent() {
     Property* prop = tile->getProperty();
     PropertyView& propView = gameView.getPropertyView();
     propView.outputRent(*prop);
+    if (prop->getState() == PropertyState::MORTGAGED) {
+        return;
+    }
     int pay = player.payRent(tile->getProperty());
     if (!pay) {
+        processLiquidation(*prop->getOwner());
+    }
+}
+
+void GameManager::processGoTile() {
+    BoardView& board = gameView.getBoardView();
+    board.outputOnPassByStart();
+}
+
+void GameManager::processGoToJail() {
+    JailView& jail = gameView.getJailView();
+    jail.outputGoToJail();
+}
+
+void GameManager::processPayLuxuryTax() {
+    TaxView& taxView = gameView.getTaxView();
+    taxView.outputLuxuryTax(config.luxuryFlatTax);
+
+    Player &player = getCurrentPlayer();
+    bool payTax = player.payTax(config.luxuryFlatTax);
+
+    if (!payTax) {
         processLiquidation();
     }
+}
+
+void GameManager::processPayIncomeTax() {
+    TaxView& taxView = gameView.getTaxView();
+    Player& p = getCurrentPlayer();
+    int input = taxView.promptIncomeTax(config.incomeFlatTax, config.incomePercentageTax);
+    long long amount;
+    if (input == 1) {
+        amount = config.incomeFlatTax;
+    }
+    else if (input == 2) {
+        amount = 0;
+        amount += p.calculateTotalWealth();
+        amount *= (config.incomePercentageTax / 100);
+    }
+    else {
+        return;
+    }
+    Player &player = getCurrentPlayer();
+    bool payTax = player.payTax(amount);
+    if (!payTax) {
+        processLiquidation();
+    }
+}
+
+void GameManager::processUseCommunityChestCard() {
+    CardView& cardView = gameView.getCardView();
+    CommunityChestCard* card = communityChestCardDeck.drawCard();
+    cardView.outputCard(*card);
+    Player& p = getCurrentPlayer();
+    if ((card->getCardType() == "PAYMONEYCARD" || card->getCardType() == "PAYMONEYTOPLAYERSCARD") && p.hasEffect("SHIELD")) {
+        if (p.hasEffect("SHIELD")) {
+            cardView.outputShielded();
+            return;
+        }
+    }
+    card->takeEffect(p, *this);
+}
+
+void GameManager::processUseChanceCard() {
 }
