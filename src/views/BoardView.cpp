@@ -34,8 +34,9 @@ void BoardView::outputOnLanded(Player &p)const{
     }
     std::cout << "!\n\n";
 }
+
 void BoardView::outputOnPassByStart()const{
     std::cout << "Kamu melewati GO.\n";
-    std::cout << "Kamu mendapatkan $200.\n";
+    std::cout << "Kamu mendapatkan M" << gameManager.getConfig().goSalary << '\n';
 }
 

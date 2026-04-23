@@ -85,4 +85,5 @@ public:
     void processLiquidation();
     void processLiquidation(Player& player);
     void processWin();
+    void processPayRent();
 };
