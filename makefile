@@ -3,6 +3,7 @@
 # Compiler settings
 CXX      := g++
 CXXFLAGS := -Wall -Wextra -std=c++17 -I include
+LDFLAGS  := -lsfml-graphics -lsfml-window -lsfml-system
 
 # Directories
 SRC_DIR     := src
@@ -32,7 +33,7 @@ directories:
 
 # Link object files to create executable
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 	@echo "Build successful! Executable is at $(TARGET)"
 
 # Compile source files into object files
