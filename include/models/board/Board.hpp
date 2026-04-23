@@ -6,7 +6,8 @@
 #include <exception>
 #include <cmath>
 
-#include "PropertySaveData.hpp"
+#include "models/property/Property.hpp"
+#include "utils/save-load/PropertySaveData.hpp"
 
 class Tile;
 class Player;

@@ -62,7 +62,7 @@ class Property {
         
         virtual long long calculateAssetValue() const noexcept = 0;
 
-        virtual ~Property() {}
+        virtual ~Property() = default;
 
         virtual void sellProperty() = 0;
 

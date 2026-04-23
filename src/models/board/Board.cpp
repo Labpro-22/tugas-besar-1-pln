@@ -1,3 +1,4 @@
+
 #include "models/board/Board.hpp"
 #include "models/tile/PropertyTile.hpp"
 #include "models/tile/special-tile/StartTile.hpp"
@@ -60,8 +61,8 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     else {
                         property->buildHouse(data.houseCount);
                     }
-                    auto player = std::find_if(players.begin(), players.end(), [data](Player &p) {
-                        return p.getUsername() == data.owner;
+                    auto player = std::find_if(players.begin(), players.end(), [data](Player *p) {
+                        return p->getUsername() == data.owner;
                     });
                     if (player != players.end()) {
                         (*player)->addProperty(property);
@@ -77,8 +78,8 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     PropertySaveData data = propDataMap[conf.code];
                     RailroadProperty* property = new RailroadProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, 
                                                                       data.festivalMultiplier, data.festivalDuration, config.railroadRent);
-                    auto player = std::find_if(players.begin(), players.end(), [data](Player &p) {
-                        return p.getUsername() == data.owner;
+                    auto player = std::find_if(players.begin(), players.end(), [data](Player *p) {
+                        return p->getUsername() == data.owner;
                     });
                     if (player != players.end()) {
                         (*player)->addProperty(property);
@@ -94,8 +95,8 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     PropertySaveData data = propDataMap[conf.code];
                     UtilityProperty* property = new UtilityProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, 
                                                                       data.festivalMultiplier, data.festivalDuration, config.utilityRent);
-                    auto player = std::find_if(players.begin(), players.end(), [data](Player &p) {
-                        return p.getUsername() == data.owner;
+                    auto player = std::find_if(players.begin(), players.end(), [data](Player *p) {
+                        return p->getUsername() == data.owner;
                     });
                     if (player != players.end()) {
                         (*player)->addProperty(property);

@@ -16,5 +16,6 @@ public:
     MainMenuView(GameManager& gm) : gameManager(gm) {}
     int promptNewGameOrLoadGame() ;
     std::vector<std::string> promptUsernames();
+    void outputCurrentPlayer();
 };
 
