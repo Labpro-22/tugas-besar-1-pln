@@ -111,9 +111,9 @@ Board &GameManager::getBoard() { return board; }
 Bank &GameManager::getBank() { return bank; }
 std::vector<Player> &GameManager::getPlayers() { return players; }
 TransactionLogger &GameManager::getLogger() { return logger; }
-CardDeck<ChanceCard*> &GameManager::getChanceCardDeck() { return chanceCardDeck; }
-CardDeck<CommunityChestCard*> &GameManager::getCommunityChestCardDeck() { return communityChestCardDeck; }
-CardDeck<SkillCard*> &GameManager::getSkillCardDeck() { return skillCardDeck; }
+CardDeck<ChanceCard *> &GameManager::getChanceCardDeck() { return chanceCardDeck; }
+CardDeck<CommunityChestCard *> &GameManager::getCommunityChestCardDeck() { return communityChestCardDeck; }
+CardDeck<SkillCard *> &GameManager::getSkillCardDeck() { return skillCardDeck; }
 
 // Game action
 void GameManager::processMainMenu()
@@ -137,7 +137,7 @@ void GameManager::processNewGame()
     for (std::string &username : usernames) {
         players.push_back(Player{username, config.initialMoney});
     }
-    std::shuffle(players.begin(), players.end(), std::default_random_engine{(long unsigned int) time(0)});
+    std::shuffle(players.begin(), players.end(), std::default_random_engine{(long unsigned int)time(0)});
     std::vector<Player *> playerPointer;
     for (Player &player : players) {
         playerPointer.push_back(&player);
@@ -224,7 +224,7 @@ void GameManager::processSaveGame()
         }
         saveData.currentPlayer = getCurrentPlayer().getUsername();
 
-        for (Property* property : bank.getProperties()) {
+        for (Property *property : bank.getProperties()) {
             PropertySaveData propertyData;
             propertyData.code = property->getCode();
             propertyData.type = property->getPropertyType();
@@ -505,7 +505,7 @@ void GameManager::processUnmortgageProperty()
 {
     Player &player = getCurrentPlayer();
     UnmortgageView &view = gameView.getUnmortgageView();
-    Property* property = view.promptChooseProperty(player.getProperties());
+    Property *property = view.promptChooseProperty(player.getProperties());
     if (property == nullptr) return;
 
     StreetProperty *street = dynamic_cast<StreetProperty *>(property);
@@ -594,6 +594,55 @@ void GameManager::processLiquidation()
     Player &player = getCurrentPlayer();
 
     BankruptView &view = gameView.getBankruptView();
+
+    view.outputPotentialWealth(player, -player.getMoney());
+
+    if (player.calculateTotalWealth() >= -player.getMoney()) {
+        while (player.getMoney() < 0) {
+            auto chosenProperty = view.promptLiquidation(player.getProperties(), -player.getMoney());
+            if (chosenProperty.first == "Jual") {
+                player.sellProperty(chosenProperty.second);
+            }
+            else if (chosenProperty.first == "Gadai") {
+                player.mortgageProperty(chosenProperty.second);
+            }
+        }
+    }
+    else {
+        view.outputBankruptByBank(player);
+        std::vector<Property *> auctionedProperty = player.getProperties();
+        player.bankruptByBank();
+        for (Property *property : auctionedProperty) {
+            processAuctionProperty(property);
+        }
+    }
+}
+void GameManager::processLiquidation(Player &creditor)
+{
+    Player &player = getCurrentPlayer();
+
+    BankruptView &view = gameView.getBankruptView();
+
+    long long debt = -player.getMoney();
+    view.outputPotentialWealth(player, -player.getMoney());
+
+    if (player.calculateTotalWealth() >= -player.getMoney()) {
+        while (player.getMoney() < 0) {
+            auto chosenProperty = view.promptLiquidation(player.getProperties(), -player.getMoney());
+            if (chosenProperty.first == "Jual") {
+                player.sellProperty(chosenProperty.second);
+            }
+            else if (chosenProperty.first == "Gadai") {
+                player.mortgageProperty(chosenProperty.second);
+            }
+        }
+        view.outputDebtPaid(debt, &creditor);
+    }
+    else {
+        view.outputBankruptByPlayer(player, creditor);
+        std::vector<Property *> auctionedProperty = player.getProperties();
+        player.bankruptByPlayer(&creditor);
+    }
 }
 
 void GameManager::processWin()
