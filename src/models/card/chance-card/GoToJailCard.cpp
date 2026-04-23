@@ -7,8 +7,11 @@
 GoToJailCard::GoToJailCard(const std::string& message) : ChanceCard(message) {}
 
 void GoToJailCard::takeEffect(Player& p, GameManager& gm) {
-    p.getPiece().setPosition(gm.getBoard().getTilePosition("PEN"));
-    p.goToJail();
+    if (!p.hasEffect("SHIELD")) {
+        p.getPiece().setPosition(gm.getBoard().getTilePosition("PEN"));
+        p.goToJail();
+    }
+    return;
 }
 
 std::string GoToJailCard::getCardType() const {
