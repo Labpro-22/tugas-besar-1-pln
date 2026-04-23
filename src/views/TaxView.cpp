@@ -1,7 +1,11 @@
 #include "views/TaxView.hpp"
 #include "core/GameManager.hpp"
 int TaxView::promptIncomeTax(long long flat, double percentage ) const{
-
+    Player& p = gameManager.getCurrentPlayer();
+    if (p.hasEffect("SHIELD")) {
+        std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu membayar pajak.\n";
+        return -1;
+    }
     int input;
     while(true){
         std::cout << "Pilih opsi pembayaran pajak:\n";
@@ -57,8 +61,13 @@ int TaxView::promptIncomeTax(long long flat, double percentage ) const{
     }
 }
 void TaxView::outputLuxuryTax(long long tax)const{
+    Player& p = gameManager.getCurrentPlayer();
+    if (p.hasEffect("SHIELD")) {
+        std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu membayar pajak.\n";
+        return;
+    }
     std::cout << "Pajak sebesar M" << tax << " langsung dipotong.\n";
-    long long money = gameManager.getCurrentPlayer().getMoney();
+    long long money = p.getMoney();
     if(money >= tax){
         std::cout << "Uang kamu: M" << money << " -> M" << money - tax << "\n\n";
     }

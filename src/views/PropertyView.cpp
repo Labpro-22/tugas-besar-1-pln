@@ -83,7 +83,7 @@ void PropertyView::outputProperty() const{
 }
 
 void PropertyView::outputPlayerProperties() const{
-    Player p = gameManager.getCurrentPlayer();
+    Player& p = gameManager.getCurrentPlayer();
     if(p.getProperties().empty()){
         std::cout << "Kamu belum memiliki properti apapun.\n\n";
     }
@@ -165,7 +165,7 @@ void PropertyView::outputRent(Property &pr)const{
         int width = pr.getOwner()->getUsername().length() + 15;
         Player& p = gameManager.getCurrentPlayer();
         if (p.hasEffect("SHIELD")) {
-            std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda.\n";
+            std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu membayar sewa.\n";
             return;
         }
         long long money = p.getMoney(), rent = pr.calculateRent();
