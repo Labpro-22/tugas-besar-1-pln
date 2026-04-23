@@ -164,6 +164,7 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
     for (Player* p : playersList) {
         if (p != nullptr) {
             pieces.push_back(&(p->getPiece()));
+            p->getPiece().setBoard(this);
         }
     }
 }
