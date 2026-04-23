@@ -13,5 +13,5 @@ void CardView::outputCard(Card& card) const{
 }
 
 void CardView::outputShielded() const {
-    std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu membayar sewa.\n";
+    std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu membayar.\n";
 }
