@@ -107,6 +107,6 @@ long long StreetProperty::redemptionPrice() const noexcept {
 }
 
 void StreetProperty::sellProperty() {
-    houseCount = 0;
+    removeBuilding();
     resetOwnerAsBank();
 }
