@@ -230,6 +230,10 @@ void GameManager::processNewGame()
     // Clear logger
     logger.clear();
 
+    chanceCardDeck.reshuffle();
+    communityChestCardDeck.reshuffle();
+    skillCardDeck.reshuffle();
+
     playing = true;
     initGame();
     nextTurn();
