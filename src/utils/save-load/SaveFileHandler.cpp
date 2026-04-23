@@ -21,7 +21,12 @@ void SaveFileHandler::savePlayer(SaveData &saveData, std::ofstream &out)
 {
     out << saveData.players.size() << "\n";
     for (PlayerSaveData &player : saveData.players) {
-        out << player.username << " " << player.money << " " << player.tileCodePosition << " " << player.status << "\n";
+        out << player.username << " "
+            << player.money << " "
+            << player.tileCodePosition << " "
+            << player.status << " "
+            << player.getOutOfJailCardCount << " "
+            << player.jailTurns << "\n";
         out << player.skillCards.size() << "\n";
         for (SkillCardSaveData &card : player.skillCards) {
             if (card.type == "DiscountCard") {
@@ -130,8 +135,12 @@ void SaveFileHandler::loadPlayer(SaveData &saveData, std::ifstream &in, std::fil
             throw SaveFileFormatException("POSISI_PETAK", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream >> player.status)) {
-            throw SaveFileFormatException("STATUS", path.string(), col, line);
+        if (!(bufferStream >> player.getOutOfJailCardCount)) {
+            player.getOutOfJailCardCount = 0;
+        }
+        col++;
+        if (!(bufferStream >> player.jailTurns)) {
+            player.jailTurns = 0;
         }
 
         int skillCardCount;
