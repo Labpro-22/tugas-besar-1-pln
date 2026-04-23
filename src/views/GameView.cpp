@@ -40,11 +40,6 @@ void GameView::InputNextCommand(){
         ss >> pathFile;
         gameManager.processSaveGame(pathFile);
     }
-    if(command == "MUAT"){
-        std::string pathFile;
-        ss >> pathFile;
-        gameManager.processLoadGame(pathFile);
-    }
     if(command == "GUNAKAN_KEMAMPUAN"){
         gameManager.processUseSkillCard();
     }

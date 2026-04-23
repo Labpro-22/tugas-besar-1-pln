@@ -25,6 +25,7 @@ int SaveView::promptOverwriteSaveFile(std::string path) const{
     }
     
 }
+
 void SaveView::outputSaveStatus(bool success, std::string path) const{
     if(success){
         std::cout << "Permainan berhasil disimpan ke: " << path << "\n\n";
