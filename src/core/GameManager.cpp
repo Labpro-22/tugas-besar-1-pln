@@ -979,4 +979,21 @@ void GameManager::processUseCommunityChestCard() {
 }
 
 void GameManager::processUseChanceCard() {
+    CardView& cardView = gameView.getCardView();
+    ChanceCard* card = chanceCardDeck.drawCard();
+    cardView.outputCard(*card);
+    Player& p = getCurrentPlayer();
+    if (card->getCardType() == "GOTOJAILCARD") {
+        processGoToJail();
+    }
+    card->takeEffect(p, *this);
+}
+
+void GameManager::processStartFestival() {
+    FestivalView& fesView = gameView.getFestivalView();
+    Player& p = getCurrentPlayer();
+    std::vector<Property*> properties = p.getProperties();
+    Property* prop = fesView.promptChooseProperty(properties);
+    prop->startFestival();
+    fesView.outputFestivalStatus(*prop);
 }

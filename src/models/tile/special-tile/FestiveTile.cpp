@@ -3,8 +3,5 @@
 #include "core/GameManager.hpp"
 
 void FestiveTile::onLanded(Player& p, GameManager& gm) {
-    // std::vector<Property*> properties = p.getProperties(); 
-    // for (Property* prop : p.getProperties()) {
-    //     prop->startFestival();
-    // }
+    gm.processStartFestival();
 }   

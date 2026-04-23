@@ -3,7 +3,5 @@
 #include "core/GameManager.hpp"
 
 void ChanceCardTile::onLanded(Player& p, GameManager& gm) {
-    CardDeck<ChanceCard*>& cards = gm.getChanceCardDeck();
-    ChanceCard* card = cards.drawCard();
-    card->takeEffect(p, gm);
+    gm.processUseChanceCard();
 }
