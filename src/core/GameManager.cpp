@@ -326,6 +326,14 @@ void GameManager::processLoadGame()
             logger.log(logData.turn, logData.username, logData.action, logData.details);
         }
         view.outputLoadStatus(true);
+        
+        chanceCardDeck.reshuffle();
+        communityChestCardDeck.reshuffle();
+        skillCardDeck.reshuffle();
+
+        playing = true;
+        initGame();
+        nextTurn();
     }
     catch (const SaveFileNotFoundException &e) {
         std::cout << e.what() << std::endl;
