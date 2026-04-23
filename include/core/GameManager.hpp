@@ -14,6 +14,7 @@
 #include "models/player/PlayerPiece.hpp"
 #include "models/property/Property.hpp"
 #include "models/tile/Tile.hpp"
+#include "models/tile/PropertyTile.hpp"
 #include "utils/config/Config.hpp"
 #include "utils/config/ConfigLoader.hpp"
 #include "utils/log/TransactionLogger.hpp"
@@ -71,7 +72,7 @@ public:
 
     void processMainMenu();
     void processNewGame();
-    void processSaveGame(std::string filename);
+    void processSaveGame(std::string fileName);
     void processLoadGame();
     void processRollDice();
     void processSetDice(int value1, int value2);
