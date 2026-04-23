@@ -103,8 +103,8 @@ void Player::giveMoney(Player* recipient, long long amount) {
     recipient->receiveMoney(amount);
 }
 
-void Player::payRent(Property* pr) {
-    if (hasEffect("SHIELD")) return;
+bool Player::payRent(Property* pr) {
+    if (hasEffect("SHIELD")) return true;
 
     long long rent = pr->calculateRent();
     Player* owner = pr->getOwner();
@@ -118,13 +118,12 @@ void Player::payRent(Property* pr) {
     }
 
     if (money < rent) {
-        throw InsufficientFundsException(
-            "Pemain " + username + " tidak mampu membayar sewa M" +
-            std::to_string(rent));
+        return false;
     }
     
     money -= rent;
     owner->receiveMoney(rent);
+    return true;
 }
 
 void Player::payTax(long long amount) {
@@ -209,19 +208,17 @@ void Player::removeProperty(Property* pr) {
     }
 }
 
-void Player::buyProperty(Property* pr) {
+bool Player::buyProperty(Property* pr) {
     if (pr->getPropertyType() == "STREET"){
         long long price = pr->getPrice();
         if (hasEffect("DISCOUNT")) {
             price = price * (100 - getEffectValue("DISCOUNT")) / 100;
         }
-        if (money < price)
-            throw InsufficientFundsException(
-                "Uang tidak cukup untuk membeli properti seharga M" +
-                std::to_string(price));
+        if (money < price) return false;
         money -= price;
     }
     addProperty(pr);
+    return true;
 }
 
 void Player::buyProperty(Property* pr, long long bid) {
@@ -439,4 +436,8 @@ void Player::onNextTurn() {
             [](const PlayerEffect& e) { return e.isExpired(); }),
         effects.end()
     );
+}
+
+int Player::getGetOutOfJailCardCount() const {
+    return getOutOfJailCardCount;
 }
