@@ -1,4 +1,6 @@
 #include "models/player/PlayerPiece.hpp"
+#include "models/board/Board.hpp"
+#include "models/tile/Tile.hpp"
 
 PlayerPiece::PlayerPiece(int startPosition)
     : position(startPosition), board(nullptr) {}

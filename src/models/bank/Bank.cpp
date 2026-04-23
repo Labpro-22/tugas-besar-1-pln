@@ -1,4 +1,5 @@
 #include "models/bank/Bank.hpp"
+
 #include <algorithm>
 #include <vector>
 
@@ -7,7 +8,7 @@ Bank::Bank(long long initialMoney, Config &config) : initialMoney{initialMoney}
     for (PropertyConfig &property : config.properties) {
         if (property.type == "STREET") {
             properties.push_back(
-                StreetProperty{
+                new StreetProperty{
                     property.code,
                     property.name,
                     property.color,
@@ -21,7 +22,7 @@ Bank::Bank(long long initialMoney, Config &config) : initialMoney{initialMoney}
         }
         else if (property.type == "RAILROAD") {
             properties.push_back(
-                RailroadProperty{
+                new RailroadProperty{
                     property.code,
                     property.name,
                     property.color,
@@ -33,7 +34,7 @@ Bank::Bank(long long initialMoney, Config &config) : initialMoney{initialMoney}
         }
         else if (property.type == "STREET") {
             properties.push_back(
-                UtilityProperty{
+                new UtilityProperty{
                     property.code,
                     property.name,
                     property.color,
@@ -52,7 +53,7 @@ Bank::Bank(long long initialMoney, Config &config, std::vector<PropertySaveData>
         for (PropertySaveData &propertyData : saveData) {
             if (propertyConfig.code != propertyData.code) continue;
             if (propertyConfig.type == "STREET") {
-                StreetProperty property{
+                StreetProperty *property = new StreetProperty{
                     propertyConfig.code,
                     propertyConfig.name,
                     propertyConfig.color,
@@ -64,22 +65,22 @@ Bank::Bank(long long initialMoney, Config &config, std::vector<PropertySaveData>
                     propertyConfig.hotelPrice,
                     propertyConfig.rent};
                 if (propertyData.hasHotel) {
-                    property.buildHouse(4);
-                    property.buildHotel();
+                    property->buildHouse(4);
+                    property->buildHotel();
                 }
                 else {
-                    property.buildHouse(propertyData.houseCount);
+                    property->buildHouse(propertyData.houseCount);
                 }
-                auto player = std::find(players.begin(), players.end(), [propertyData](Player &p) {
+                auto player = std::find_if(players.begin(), players.end(), [propertyData](Player &p) {
                     return p.getUsername() == propertyData.owner;
                 });
                 if (player != players.end()) {
-                    property.setOwner(player.base());
+                    property->setOwner(player.base());
                 }
                 properties.push_back(property);
             }
             else if (propertyConfig.type == "RAILROAD") {
-                RailroadProperty property{
+                RailroadProperty *property = new RailroadProperty{
                     propertyConfig.code,
                     propertyConfig.name,
                     propertyConfig.color,
@@ -88,16 +89,16 @@ Bank::Bank(long long initialMoney, Config &config, std::vector<PropertySaveData>
                     propertyData.festivalMultiplier,
                     propertyData.festivalDuration,
                     config.railroadRent};
-                auto player = std::find(players.begin(), players.end(), [propertyData](Player &p) {
+                auto player = std::find_if(players.begin(), players.end(), [propertyData](Player &p) {
                     return p.getUsername() == propertyData.owner;
                 });
                 if (player != players.end()) {
-                    property.setOwner(player.base());
+                    property->setOwner(&*player);
                 }
                 properties.push_back(property);
             }
             else if (propertyConfig.type == "Utility") {
-                UtilityProperty property{
+                UtilityProperty *property = new UtilityProperty{
                     propertyConfig.code,
                     propertyConfig.name,
                     propertyConfig.color,
@@ -106,11 +107,11 @@ Bank::Bank(long long initialMoney, Config &config, std::vector<PropertySaveData>
                     propertyData.festivalMultiplier,
                     propertyData.festivalDuration,
                     config.utilityRent};
-                auto player = std::find(players.begin(), players.end(), [propertyData](Player &p) {
+                auto player = std::find_if(players.begin(), players.end(), [propertyData](Player &p) {
                     return p.getUsername() == propertyData.owner;
                 });
                 if (player != players.end()) {
-                    property.setOwner(player.base());
+                    property->setOwner(player.base());
                 }
                 properties.push_back(property);
             }
@@ -118,7 +119,15 @@ Bank::Bank(long long initialMoney, Config &config, std::vector<PropertySaveData>
     }
 }
 
-std::vector<Property> &Bank::getProperties()
+Bank::~Bank()
+{
+    while (!properties.empty()) {
+        delete properties.back();
+        properties.pop_back();
+    }
+}
+
+std::vector<Property *> &Bank::getProperties()
 {
     return properties;
 }

@@ -16,12 +16,12 @@ public:
     }
 };
 
-class SaveFileNotFoundException : SaveFileException {
+class SaveFileNotFoundException : public SaveFileException {
 public:
     SaveFileNotFoundException(const std::string &path) : SaveFileException("File tidak ditemukan pada: " + path) {}
 };
 
-class SaveFileFormatException : SaveFileException {
+class SaveFileFormatException : public SaveFileException {
 public:
     SaveFileFormatException(const std::string &expected, const std::string &path, int col, int line)
         : SaveFileException("Error format input. Ekspektasi " + expected + " sebagai input ke-" + std::to_string(col) +

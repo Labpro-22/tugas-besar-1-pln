@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "utils/config/ActionConfig.hpp"
+#include "utils/config/CardConfig.hpp"
 #include "utils/config/PropertyConfig.hpp"
 
 class Config {
@@ -22,4 +23,6 @@ public:
     long long goSalary;
     long long jailFine;
     long long initialMoney;
+    std::vector<CardConfig> chanceCards;
+    std::vector<CardConfig> communityChestCards;
 };

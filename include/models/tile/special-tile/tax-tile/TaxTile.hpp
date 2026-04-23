@@ -1,6 +1,7 @@
 #pragma once
 
 #include "models/tile/Tile.hpp"
+#include "models/tile/special-tile/SpecialTile.hpp"
 
 class TaxTile: virtual public SpecialTile {
     public:

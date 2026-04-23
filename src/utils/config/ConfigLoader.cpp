@@ -302,3 +302,69 @@ void ConfigLoader::loadMisc(Config &config, std::filesystem::path path)
         throw ConfigFileFormatException("GO_SALARY", path.string(), 1, line);
     }
 }
+
+void ConfigLoader::loadChanceCard(Config &config, std::filesystem::path path)
+{
+    std::ifstream in(path);
+    if (!in.is_open()) {
+        throw ConfigFileNotFoundException(path.string());
+    }
+
+    // TIPE NILAI PESAN
+    int line = 0;
+    std::string buffer;
+    while (std::getline(in, buffer)) {
+        line++;
+        std::stringstream bufferStream(buffer);
+
+        CardConfig card;
+        int col = 0;
+        col++;
+        if (!(bufferStream >> card.type)) {
+            throw ConfigFileFormatException("TIPE", path.string(), col, line);
+        }
+        col++;
+        if (!(bufferStream >> card.value)) {
+            throw ConfigFileFormatException("NILAI", path.string(), col, line);
+        }
+        col++;
+        if (!(std::getline(bufferStream, card.message))) {
+            throw ConfigFileFormatException("PESAN", path.string(), col, line);
+        }
+
+        config.chanceCards.push_back(card);
+    }
+}
+
+void ConfigLoader::loadCommunityChestCard(Config &config, std::filesystem::path path)
+{
+    std::ifstream in(path);
+    if (!in.is_open()) {
+        throw ConfigFileNotFoundException(path.string());
+    }
+
+    // TIPE NILAI PESAN
+    int line = 0;
+    std::string buffer;
+    while (std::getline(in, buffer)) {
+        line++;
+        std::stringstream bufferStream(buffer);
+
+        CardConfig card;
+        int col = 0;
+        col++;
+        if (!(bufferStream >> card.type)) {
+            throw ConfigFileFormatException("TIPE", path.string(), col, line);
+        }
+        col++;
+        if (!(bufferStream >> card.value)) {
+            throw ConfigFileFormatException("NILAI", path.string(), col, line);
+        }
+        col++;
+        if (!(std::getline(bufferStream, card.message))) {
+            throw ConfigFileFormatException("PESAN", path.string(), col, line);
+        }
+
+        config.communityChestCards.push_back(card);
+    }
+}

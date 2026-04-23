@@ -1,4 +1,6 @@
 #include "models/tile/special-tile/StartTile.hpp"
+#include "models/player/Player.hpp"
+#include "core/GameManager.hpp"
 
 void StartTile::onLanded(Player& p, GameManager& gm) {
     Bank& bank = gm.getBank();

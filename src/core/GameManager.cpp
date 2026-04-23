@@ -4,6 +4,23 @@
 
 #include "core/GameManager.hpp"
 #include "core/GameManagerException.hpp"
+#include "models/card/chance-card/ChanceCard.hpp"
+#include "models/card/chance-card/ForcedMoveCard.hpp"
+#include "models/card/chance-card/GetOutOfJailCard.hpp"
+#include "models/card/chance-card/GoToJailCard.hpp"
+#include "models/card/chance-card/GoToNearestStationCard.hpp"
+#include "models/card/community-chest-card/CollectMoneyCard.hpp"
+#include "models/card/community-chest-card/CollectMoneyFromPlayersCard.hpp"
+#include "models/card/community-chest-card/CommunityChestCard.hpp"
+#include "models/card/community-chest-card/PayMoneyCard.hpp"
+#include "models/card/community-chest-card/PayMoneyToPlayersCard.hpp"
+#include "models/card/skill-card/DemolitionCard.hpp"
+#include "models/card/skill-card/DiscountCard.hpp"
+#include "models/card/skill-card/LassoCard.hpp"
+#include "models/card/skill-card/MoveCard.hpp"
+#include "models/card/skill-card/ShieldCard.hpp"
+#include "models/card/skill-card/SkillCard.hpp"
+#include "models/card/skill-card/TeleportCard.hpp"
 #include "models/tile/PropertyTile.hpp"
 
 GameManager::GameManager()
@@ -13,14 +30,69 @@ GameManager::GameManager()
       config{ConfigLoader::loadConfig()},
       gameView{*this},
       turn{0},
-      board{(int)config.properties.size(), {}, config, {}},
+      board{(int)(config.actionTiles.size() + config.properties.size()), config, {}},
       players{},
       playerQueue{},
       bank{config.initialMoney, config},
       logger{},
       chanceCardDeck{},
       communityChestCardDeck{},
-      skillCardDeck{} {}
+      skillCardDeck{}
+{
+    // Load chance card
+    for (CardConfig card : config.chanceCards) {
+        if (card.type == "GOTOJAIL") {
+            chanceCardDeck.addCard(new GoToJailCard(card.message));
+        }
+        else if (card.type == "GETOUTOFJAIL") {
+            chanceCardDeck.addCard(new GetOutOfJailCard(card.message));
+        }
+        else if (card.type == "FORCEDMOVE") {
+            chanceCardDeck.addCard(new ForcedMoveCard(card.message, card.value));
+        }
+        else if (card.type == "GOTONEARESTSTATION") {
+            chanceCardDeck.addCard(new GoToNearestStationCard(card.message));
+        }
+    }
+
+    // Load community-chest card
+    for (CardConfig card : config.communityChestCards) {
+        if (card.type == "PAY") {
+            communityChestCardDeck.addCard(new PayMoneyCard(card.message, card.value));
+        }
+        else if (card.type == "PAYALL") {
+            communityChestCardDeck.addCard(new PayMoneyToPlayersCard(card.message, card.value));
+        }
+        else if (card.type == "COLLECT") {
+            communityChestCardDeck.addCard(new CollectMoneyCard(card.message, card.value));
+        }
+        else if (card.type == "COLLECTALL") {
+            communityChestCardDeck.addCard(new CollectMoneyFromPlayersCard(card.message, card.value));
+        }
+    }
+
+    // Load skill card
+    DiceRoller::roll();
+    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    DiceRoller::roll();
+    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    DiceRoller::roll();
+    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    DiceRoller::roll();
+    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    DiceRoller::roll();
+    skillCardDeck.addCard(new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
+    DiceRoller::roll();
+    skillCardDeck.addCard(new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
+    DiceRoller::roll();
+    skillCardDeck.addCard(new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
+    skillCardDeck.addCard(new ShieldCard(""));
+    skillCardDeck.addCard(new ShieldCard(""));
+    skillCardDeck.addCard(new LassoCard(""));
+    skillCardDeck.addCard(new LassoCard(""));
+    skillCardDeck.addCard(new DemolitionCard(""));
+    skillCardDeck.addCard(new DemolitionCard(""));
+}
 
 // Game runner
 void GameManager::runGame()
@@ -90,6 +162,9 @@ void GameManager::nextTurn()
 
 void GameManager::nextPlayer()
 {
+    if (getCurrentPlayer().getMoney() < 0) {
+        processLiquidation();
+    }
     while (getCurrentPlayer().isBankrupt()) {
         playerQueue.pop();
     }
@@ -100,6 +175,9 @@ void GameManager::nextPlayer()
     Player &player = getCurrentPlayer();
     player.onNextTurn();
     player.addSkillCard(skillCardDeck.drawCard());
+    if (player.getMoney() < 0) {
+        processLiquidation();
+    }
     startOfTheTurn = true;
 }
 
@@ -111,9 +189,9 @@ Board &GameManager::getBoard() { return board; }
 Bank &GameManager::getBank() { return bank; }
 std::vector<Player> &GameManager::getPlayers() { return players; }
 TransactionLogger &GameManager::getLogger() { return logger; }
-CardDeck<ChanceCard*> &GameManager::getChanceCardDeck() { return chanceCardDeck; }
-CardDeck<CommunityChestCard*> &GameManager::getCommunityChestCardDeck() { return communityChestCardDeck; }
-CardDeck<SkillCard*> &GameManager::getSkillCardDeck() { return skillCardDeck; }
+CardDeck<ChanceCard *> &GameManager::getChanceCardDeck() { return chanceCardDeck; }
+CardDeck<CommunityChestCard *> &GameManager::getCommunityChestCardDeck() { return communityChestCardDeck; }
+CardDeck<SkillCard *> &GameManager::getSkillCardDeck() { return skillCardDeck; }
 
 // Game action
 void GameManager::processMainMenu()
@@ -137,22 +215,24 @@ void GameManager::processNewGame()
     for (std::string &username : usernames) {
         players.push_back(Player{username, config.initialMoney});
     }
-    std::shuffle(players.begin(), players.end(), std::default_random_engine{time(0)});
+    std::shuffle(players.begin(), players.end(), std::default_random_engine{(long unsigned int)time(0)});
     std::vector<Player *> playerPointer;
     for (Player &player : players) {
         playerPointer.push_back(&player);
     }
 
-    std::vector<int> tileID = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
-
     // Create board
-    board = Board(40, tileID, config, playerPointer);
+    board = Board((int)(config.actionTiles.size() + config.properties.size()), config, playerPointer);
 
     // Create bank
     bank = Bank(config.initialMoney, config);
 
     // Clear logger
     logger.clear();
+
+    chanceCardDeck.reshuffle();
+    communityChestCardDeck.reshuffle();
+    skillCardDeck.reshuffle();
 
     playing = true;
     initGame();
@@ -161,14 +241,17 @@ void GameManager::processNewGame()
 void GameManager::processLoadGame()
 {
     LoadView &view = gameView.getLoadView();
-    view.outputSaveNames(); // output semua nama save yang ada (tanpa extension)
     std::string saveFileName = view.promptSaveName();
     view.outputLoading();
     try {
         SaveData saveData = SaveFileHandler::loadGame(saveFileName);
         view.outputLoadStatus(true);
     }
-    catch (const SaveFileException &e) {
+    catch (const SaveFileNotFoundException &e) {
+        std::cout << e.what() << std::endl;
+        view.outputLoadStatus(false);
+    }
+    catch (const SaveFileFormatException &e) {
         std::cout << e.what() << std::endl;
         view.outputLoadStatus(false);
     };
@@ -221,21 +304,21 @@ void GameManager::processSaveGame(std::string fileName)
         }
         saveData.currentPlayer = getCurrentPlayer().getUsername();
 
-        for (Property &property : bank.getProperties()) {
+        for (Property *property : bank.getProperties()) {
             PropertySaveData propertyData;
-            propertyData.code = property.getCode();
-            propertyData.type = property.getPropertyType();
-            switch (property.getState()) {
+            propertyData.code = property->getCode();
+            propertyData.type = property->getPropertyType();
+            switch (property->getState()) {
                 case PropertyState::BANK:
                     propertyData.owner = "BANK";
                     propertyData.status = "BANK";
                     break;
                 case PropertyState::OWNED:
-                    propertyData.owner = property.getOwner()->getUsername();
+                    propertyData.owner = property->getOwner()->getUsername();
                     propertyData.status = "OWNED";
                     break;
                 case PropertyState::MORTGAGED:
-                    propertyData.owner = property.getOwner()->getUsername();
+                    propertyData.owner = property->getOwner()->getUsername();
                     propertyData.status = "MORTGAGED";
                     break;
                 default:
@@ -243,10 +326,10 @@ void GameManager::processSaveGame(std::string fileName)
                     propertyData.status = "UNKNOWN";
                     break;
             }
-            propertyData.festivalMultiplier = property.getFestivalMultiplier();
-            propertyData.festivalDuration = property.getFestivalDuration();
-            if (property.getPropertyType() == "STREET") {
-                StreetProperty *street = dynamic_cast<StreetProperty *>(&property);
+            propertyData.festivalMultiplier = property->getFestivalMultiplier();
+            propertyData.festivalDuration = property->getFestivalDuration();
+            if (property->getPropertyType() == "STREET") {
+                StreetProperty *street = dynamic_cast<StreetProperty *>(property);
                 propertyData.houseCount = street->getHouseCount();
                 propertyData.hasHotel = street->hasHotel();
             }
@@ -402,11 +485,16 @@ void GameManager::processBuyProperty()
 
     PropertyTile *tile = dynamic_cast<PropertyTile *>(piece.getCurrentTile());
     if (tile != nullptr) {
-        if (view.promptBuyProperty(*tile->getProperty())) {
-            processBuyProperty(player, tile->getProperty());
+        if (player.getMoney() >= tile->getProperty()->getPrice()) {
+            if (tile->getProperty()->getPropertyType() != "STREET" || view.promptBuyProperty(*tile->getProperty())) {
+                processBuyProperty(player, tile->getProperty());
+            }
+            else {
+                processAuctionProperty(tile->getProperty());
+            }
         }
         else {
-            bank.startAuction(*tile->getProperty());
+            processAuctionProperty(tile->getProperty());
         }
     }
 }
@@ -416,7 +504,11 @@ void GameManager::processBuyProperty(Player &player, Property *property)
 
     if (property != nullptr) {
         try {
-            player.buyProperty(property);
+            bool beli = player.buyProperty(property);
+            if (!beli) {
+                processAuctionProperty(property);
+                return;
+            }
             logger.log(turn, player.getUsername(), "BELI",
                        "Properti " + property->getName() + " [ " + property->getCode() + "]" +
                            " dibeli seharga " + std::to_string(property->getPrice()));
@@ -502,7 +594,7 @@ void GameManager::processUnmortgageProperty()
 {
     Player &player = getCurrentPlayer();
     UnmortgageView &view = gameView.getUnmortgageView();
-    Property* property = view.promptChooseProperty(player.getProperties());
+    Property *property = view.promptChooseProperty(player.getProperties());
     if (property == nullptr) return;
 
     StreetProperty *street = dynamic_cast<StreetProperty *>(property);
@@ -591,6 +683,55 @@ void GameManager::processLiquidation()
     Player &player = getCurrentPlayer();
 
     BankruptView &view = gameView.getBankruptView();
+
+    view.outputPotentialWealth(player, -player.getMoney());
+
+    if (player.calculateTotalWealth() >= -player.getMoney()) {
+        while (player.getMoney() < 0) {
+            auto chosenProperty = view.promptLiquidation(player.getProperties(), -player.getMoney());
+            if (chosenProperty.first == "Jual") {
+                player.sellProperty(chosenProperty.second);
+            }
+            else if (chosenProperty.first == "Gadai") {
+                player.mortgageProperty(chosenProperty.second);
+            }
+        }
+    }
+    else {
+        view.outputBankruptByBank(player);
+        std::vector<Property *> auctionedProperty = player.getProperties();
+        player.bankruptByBank();
+        for (Property *property : auctionedProperty) {
+            processAuctionProperty(property);
+        }
+    }
+}
+void GameManager::processLiquidation(Player &creditor)
+{
+    Player &player = getCurrentPlayer();
+
+    BankruptView &view = gameView.getBankruptView();
+
+    long long debt = -player.getMoney();
+    view.outputPotentialWealth(player, -player.getMoney());
+
+    if (player.calculateTotalWealth() >= -player.getMoney()) {
+        while (player.getMoney() < 0) {
+            auto chosenProperty = view.promptLiquidation(player.getProperties(), -player.getMoney());
+            if (chosenProperty.first == "Jual") {
+                player.sellProperty(chosenProperty.second);
+            }
+            else if (chosenProperty.first == "Gadai") {
+                player.mortgageProperty(chosenProperty.second);
+            }
+        }
+        view.outputDebtPaid(debt, &creditor);
+    }
+    else {
+        view.outputBankruptByPlayer(player, creditor);
+        std::vector<Property *> auctionedProperty = player.getProperties();
+        player.bankruptByPlayer(&creditor);
+    }
 }
 
 void GameManager::processWin()
@@ -610,4 +751,22 @@ void GameManager::processWin()
     view.outputWinner(winner, remainingPlayer);
 
     playing = false;
+}
+
+void GameManager::processPayRent()
+{
+    BoardView &boardView = gameView.getBoardView();
+    boardView.outputOnLanded();
+
+    Player &player = getCurrentPlayer();
+    PlayerPiece &piece = player.getPiece();
+
+    PropertyTile *tile = dynamic_cast<PropertyTile *>(piece.getCurrentTile());
+    Property *prop = tile->getProperty();
+    PropertyView &propView = gameView.getPropertyView();
+    propView.outputRent(*prop);
+    int pay = player.payRent(tile->getProperty());
+    if (!pay) {
+        processLiquidation();
+    }
 }
