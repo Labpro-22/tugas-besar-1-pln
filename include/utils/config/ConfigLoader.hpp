@@ -14,6 +14,8 @@ private:
     static void loadTax(Config &config, std::filesystem::path path);
     static void loadSpecial(Config &config, std::filesystem::path path);
     static void loadMisc(Config &config, std::filesystem::path path);
+    static void loadChanceCard(Config &config, std::filesystem::path path);
+    static void loadCommunityChestCard(Config &config, std::filesystem::path path);
 
 public:
     static Config loadConfig(std::string path = "default/");

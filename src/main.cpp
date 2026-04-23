@@ -1,6 +1,6 @@
 #include "core/Nimonspoli.hpp"
 
-int main(int argc, char** argv) {
+int main() {
     Nimonspoli::run();
 
     return 0;

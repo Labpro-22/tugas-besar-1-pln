@@ -7,7 +7,7 @@ private:
     int moveOffset;
 
 public:
-    ForcedMoveCard(int moveOffset);
+    ForcedMoveCard(const std::string& message, int moveOffset);
     void takeEffect(Player& p, GameManager& gm) override;
     void generateForcedMoveMessage(int offset);
 };

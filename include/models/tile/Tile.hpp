@@ -2,9 +2,10 @@
 
 #include <string>
 
-#include "core/GameManager.hpp"
-#include "models/player/Player.hpp"
 #include "models/bank/Bank.hpp"
+
+class Player;
+class GameManager;
 
 class Tile {
     public:

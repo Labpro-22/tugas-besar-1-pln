@@ -163,7 +163,12 @@ void PropertyView::outputRent(Property &pr)const{
     }
     else{
         int width = pr.getOwner()->getUsername().length() + 15;
-        long long money = gameManager.getCurrentPlayer().getMoney(), rent = pr.calculateRent();
+        Player& p = gameManager.getCurrentPlayer();
+        if (p.hasEffect("SHIELD")) {
+            std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda.\n";
+            return;
+        }
+        long long money = p.getMoney(), rent = pr.calculateRent();
         std::cout << std::setw(width) << "Kondisi" << ": ";
         if(auto sp = dynamic_cast<StreetProperty*>(&pr)){
             std::cout << sp->getHouseCount() << " rumah\n"; 
@@ -176,7 +181,10 @@ void PropertyView::outputRent(Property &pr)const{
         }
         std::cout << std::setw(width) << "Sewa" << ": M" << rent << "\n\n";
         std::cout << std::setw(width) << "Uang kamu" << ": M" << money;
-
+        if (p.hasEffect("DISCOUNT")) {
+            rent *= (100 - p.getEffectValue("DISCOUNT")) / 100;
+            std::cout << std::setw(width) << "[DISCOUNT ACTIVE] Tagihan sewa menjadi" << ": M" << rent << "\n\n";
+        }
         if(money >= rent){
             std::cout << " -> M" << money -rent <<"\n";
             std::cout << std::setw(width) << ("Uang Pemain "+ pr.getOwner()->getUsername()) << ": M" << pr.getOwner()->getMoney() << "  -> M" << pr.getOwner()->getMoney() + rent << "\n\n";

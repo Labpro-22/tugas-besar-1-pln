@@ -1,18 +1,18 @@
 #include "models/card/chance-card/GoToNearestStationCard.hpp"
-#include "models/PlayerPiece.hpp"
+#include "models/player/PlayerPiece.hpp"
+#include "models/player/Player.hpp"
+#include "core/GameManager.hpp"
 
 GoToNearestStationCard::GoToNearestStationCard(const std::string& message) 
     : ChanceCard(message) {}
 
 void GoToNearestStationCard::takeEffect(Player& p, GameManager& gm) {
-    if (p.getPiece() != nullptr) {
-        int currentPos = p.getPiece()->getPosition();
-        // TODO : adjust for custom range
-        int targetStation = (((currentPos + 5) / 10) * 10 + 5) % 40;
-        
-        p.getPiece()->setPosition(targetStation);
-        message = "Anda berpindah ke stasiun terdekat di petak " + std::to_string(targetStation) + "!";
-        
-        gm.getBoard()->getTile(targetStation)->onLanded(&p, &gm);
-    }
+    int currentPos = p.getPiece().getPosition();
+    // TODO : adjust for custom range
+    int targetStation = (((currentPos + 5) / 10) * 10 + 5) % 40;
+    
+    p.getPiece().setPosition(targetStation);
+    message = "Anda berpindah ke stasiun terdekat di petak " + std::to_string(targetStation) + "!";
+    
+    gm.getBoard().getTile(targetStation)->onLanded(p, gm);
 }
