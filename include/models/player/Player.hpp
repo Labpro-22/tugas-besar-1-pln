@@ -43,8 +43,7 @@ public:
     int getStreetPropertyCount() const;
     int getRailroadPropertyCount() const;
     int getUtilityPropertyCount() const;
-    int getGetOutOfJailCardCount() const;
-
+    
     void rollDiceAndMove();
     void setDiceAndMove(int value1, int value2);
 
@@ -73,6 +72,7 @@ public:
     void useSkillCard(int index, GameManager& gm);
     void dropSkillCard(int index);
     bool isJailed() const;
+    int getGetOutOfJailCardCount()const;
     void goToJail();
     void useGetOutOfJailCard();
     void addGetOutOfJailCard();

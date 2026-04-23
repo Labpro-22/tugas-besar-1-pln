@@ -6,14 +6,13 @@ int MainMenuView::promptNewGameOrLoadGame(){
 
 
 
-    // Judul
+
     std::cout << BOLD << CYAN;
     std::cout << "=====================================\n";
     std::cout << "        N I M O N S P O L I\n";
     std::cout << "=====================================\n";
     std::cout << RESET;
 
-    // Menu
 
     int input;
     while (true)
