@@ -84,6 +84,14 @@ public:
     void processDropSkillCard();
     void processLiquidation();
     void processLiquidation(Player& player);
+    void processOtherPlayerLiquidation(Player& other);
+    void processOtherPlayerLiquidation(Player& other, Player& creditor);
     void processWin();
     void processPayRent();
+    void processGoTile();
+    void processGoToJail();
+    void processPayLuxuryTax();
+    void processPayIncomeTax();
+    void processUseCommunityChestCard();
+    void processUseChanceCard();
 };
