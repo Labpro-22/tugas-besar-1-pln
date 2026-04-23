@@ -30,8 +30,8 @@ class Player
 {
 public:
     Player(const std::string& username, long long initialMoney);
-    Player( const std::string& username, long long money, PlayerState state, const std::vector<Property*>& properties, 
-            const std::vector<SkillCard*>& skillCards , int getOutOfJailCardCount, int jailTurns, int position);
+    Player( const std::string& username, long long money, PlayerState state, 
+            const std::vector<SkillCard*>& skillCards , int getOutOfJailCardCount, int jailTurns);
 
     PlayerPiece& getPiece();
     long long getMoney() const;
@@ -49,8 +49,7 @@ public:
 
     long long calculateTotalWealth() const;
     void receiveMoney(long long amount);
-    bool giveMoney(Player& recipient, long long amount);
-    void setMoney(long long amount);
+    void giveMoney(Player& recipient, long long amount);
     bool payRent(Property* pr);
     bool payTax(long long amount);
 
@@ -80,6 +79,7 @@ public:
     void setDiceToGetOutOfJail(int value1, int value2);
     void payFineToGetOutOfJail(long long fine);
     void getOutOfJail();
+    int getJailTurns();
     void addEffect(PlayerEffect effect);
     bool hasEffect(const std::string& name) const;
     int getEffectValue(const std::string& name) const;
