@@ -418,7 +418,11 @@ void GameManager::processBuyProperty(Player &player, Property *property)
 
     if (property != nullptr) {
         try {
-            player.buyProperty(property);
+            bool beli = player.buyProperty(property);
+            if (!beli) {
+                bank.startAuction(property);
+                return;
+            }
             logger.log(turn, player.getUsername(), "BELI",
                        "Properti " + property->getName() + " [ " + property->getCode() + "]" +
                            " dibeli seharga " + std::to_string(property->getPrice()));
@@ -612,4 +616,21 @@ void GameManager::processWin()
     view.outputWinner(winner, remainingPlayer);
 
     playing = false;
+}
+
+void GameManager::processPayRent() {
+    BoardView& boardView = gameView.getBoardView();
+    boardView.outputOnLanded();
+
+    Player &player = getCurrentPlayer();
+    PlayerPiece &piece = player.getPiece();
+
+    PropertyTile *tile = dynamic_cast<PropertyTile *>(piece.getCurrentTile());
+    Property* prop = tile->getProperty();
+    PropertyView& propView = gameView.getPropertyView();
+    propView.outputRent(*prop);
+    int pay = player.payRent(tile->getProperty());
+    if (!pay) {
+        processLiquidation();
+    }
 }
