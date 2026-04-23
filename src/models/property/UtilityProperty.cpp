@@ -6,7 +6,7 @@ UtilityProperty::UtilityProperty(const std::string& code, const std::string& nam
     rentMultiplier = rentMul;
 }
 
-long long UtilityProperty::calculateRent() noexcept {
+long long UtilityProperty::calculateRent() const noexcept {
     if (owner == nullptr || isMortgaged()) return 0; 
     
     int count = owner->getUtilityPropertyCount();
@@ -21,14 +21,22 @@ std::string UtilityProperty::getPropertyType() const noexcept {
     return "UTILITY";
 }
 
-long long UtilityProperty::calculateSellValue() const {
-    return getPrice();
+long long UtilityProperty::calculateSellValue() const noexcept {
+    return getMortgageValue();
 }
 
-long long UtilityProperty::calculateAssetValue() const {
-    return getPrice();
+long long UtilityProperty::calculateAssetValue() const noexcept {
+    return getMortgageValue();
 }
 
 std::map<int, long long> UtilityProperty::getRentMultiplier() const noexcept {
     return rentMultiplier;
+}
+
+long long UtilityProperty::redemptionPrice() const noexcept {
+    return 2 * getMortgageValue();
+}
+
+void UtilityProperty::sellProperty() {
+    resetOwnerAsBank();
 }

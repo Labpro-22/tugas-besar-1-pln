@@ -7,7 +7,7 @@ StreetProperty::StreetProperty(const std::string& code, const std::string& name,
     }
 } 
 
-long long StreetProperty::calculateRent() noexcept {
+long long StreetProperty::calculateRent() const noexcept {
     if (owner == nullptr || isMortgaged()) return 0;
     return getFestivalDuration() != 0 ? getFestivalMultiplier() * rentPrice[houseCount] : rentPrice[houseCount]; 
 }
@@ -72,20 +72,20 @@ std::string StreetProperty::getPropertyType() const noexcept {
     return "STREET";
 }
 
-long long StreetProperty::calculateSellValue() const {
+long long StreetProperty::calculateSellValue() const noexcept {
     long long sellValue = getPrice();
 
     int houses = getHouseCount();
     if (houses > 0 && houses <= 4) {
-        sellValue += (houses * getHousePrice()) / 2;
+        sellValue += (houses * getHousePrice());
     } else if (houses == 5) {
-        sellValue += (4 * getHousePrice() + getHotelPrice()) / 2;
+        sellValue += (4 * getHousePrice() + getHotelPrice());
     }
 
     return sellValue;
 }
 
-long long StreetProperty::calculateAssetValue() const {
+long long StreetProperty::calculateAssetValue() const noexcept {
     long long sellValue = getPrice();
 
     int houses = getHouseCount();
@@ -100,4 +100,13 @@ long long StreetProperty::calculateAssetValue() const {
 
 std::array<long long, 6> StreetProperty::getRentPrice() const noexcept {
     return {rentPrice[0], rentPrice[1], rentPrice[2], rentPrice[3], rentPrice[4], rentPrice[5]};
+}
+
+long long StreetProperty::redemptionPrice() const noexcept {
+    return getPrice();
+}
+
+void StreetProperty::sellProperty() {
+    houseCount = 0;
+    resetOwnerAsBank();
 }
