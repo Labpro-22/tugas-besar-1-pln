@@ -46,14 +46,14 @@ void PropertyView::outputProperty() const{
             std::cout << "|" <<std::setw(COLON_WIDTH) << " Harga Hotel" << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(sp->getHotelPrice()))<<"|\n";
         }
         else if(auto rp = dynamic_cast<RailroadProperty*>(pr)){
-            std::vector<long long> rent = rp->getRent();
+            std::map<int, long long> rent = rp->getRent();
             for(int i = 0; i < (int)rent.size(); i++){
                 std::cout << "|" << std::setw(COLON_WIDTH) << (" Sewa (" + std::to_string(i) + " Railroad dimiliki)") << std::setw(WIDTH-COLON_WIDTH) <<
                 (": M" + std::to_string(rent[i])) << "|\n";
             }
         }
         else if(auto up = dynamic_cast<UtilityProperty*>(pr)){
-            std::vector<long long> rent = up->getRentMultiplier();
+            std::map<int,long long> rent = up->getRentMultiplier();
             for(int i = 0; i < (int)rent.size(); i++){
                 std::cout << "|" << std::setw(COLON_WIDTH) << (" Sewa (" + std::to_string(i) + " Utility dimiliki)") << std::setw(WIDTH-COLON_WIDTH) <<
                 (": " + std::to_string(rent[i])) << "|\n|" << std::setw(WIDTH) << std::right<<  " kali lipat jumlah hasil lemparan dadu|" << "\n";
@@ -67,7 +67,8 @@ void PropertyView::outputProperty() const{
             std::cout << "OWNED";
             break;
         case MORTGAGED:
-            std::cout << "MORTGAGED";
+            std::cout << "MORTGAGED [M]";
+            std::cout << "Harga tebus : M" << pr->redemptionPrice() << "\n";
             break;
         case BANK:
             std::cout << "BANK";

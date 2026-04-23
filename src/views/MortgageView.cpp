@@ -60,7 +60,7 @@ bool MortgageView::sellAllBuildings(std::vector<StreetProperty*>colorGroupProper
     for(auto sp : colorGroupProperty){
         std::cout << i << ". " << std::setw(SPACE) << sp->getName() + " (" + sp->getCode() + ")"  << " - ";
         if(sp->hasHotel()){
-            std::cout << "Hotel -> Nilai jual bangunan : M" << sp->calculateSellValue() << "\n";
+            std::cout << "Hotel -> Nilai jual bangunan : M" << sp->calculateSellValue() + sp->getPrice()<< "\n";
         }
         else{
             std::cout << sp->getHouseCount() <<" rumah  -> Nilai jual bangunan : M" << sp->calculateSellValue() - sp->getPrice()<<"\n";
@@ -75,6 +75,7 @@ bool MortgageView::sellAllBuildings(std::vector<StreetProperty*>colorGroupProper
             long long total = 0;
             for(auto sp : colorGroupProperty){
                 std::cout << "Bangunan  " << sp->getName() << "terjual. Kamu menerima M"  << sp->calculateSellValue() - sp->getPrice()<< "\n\n";
+                total += sp->calculateSellValue() -sp->getPrice();
             }
             std::cout << "Uang kamu sekarang: M" << gameManager.getCurrentPlayer().getMoney() + total << "\n\n";
             return true;
