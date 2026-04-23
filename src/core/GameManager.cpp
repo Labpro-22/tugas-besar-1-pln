@@ -231,8 +231,8 @@ void GameManager::processNewGame()
     }
     std::shuffle(players.begin(), players.end(), std::default_random_engine{(long unsigned int)time(0)});
     std::vector<Player *> playerPointer;
-    for (Player &player : players) {
-        playerPointer.push_back(&player);
+    for (auto it = players.begin(); it != players.end(); it++) {
+        playerPointer.push_back(it.base());
     }
 
     // Create board
@@ -250,7 +250,7 @@ void GameManager::processNewGame()
 
     playing = true;
     initGame();
-    nextTurn();
+    nextPlayer();
 }
 void GameManager::processLoadGame()
 {
