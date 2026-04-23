@@ -14,8 +14,9 @@
 #include "models/property/UtilityProperty.hpp"
 #include "models/player/Player.hpp"
 #include "models/player/PlayerPiece.hpp"
+#include "utils/config/Config.hpp"
 
-Board::Board(int tileCount, const std::vector<int>& tileIDSequence, const Config& config, const std::vector<Player*>& players) : playersList(players) {
+Board::Board(int tileCount, const Config& config, const std::vector<Player*>& players) : playersList(players) {
     
     this->width = static_cast<int>(std::ceil((tileCount + 4.0) / 4.0));
     this->height = static_cast<int>(std::floor((tileCount + 4.0) / 4.0));
@@ -33,9 +34,7 @@ Board::Board(int tileCount, const std::vector<int>& tileIDSequence, const Config
     }
 
     for (int i = 0; i < tileCount; ++i) {
-        if (i >= (int)tileIDSequence.size()) break;
-
-        int id = tileIDSequence[i];
+        int id = i + 1;
         Tile* newTile = nullptr;
 
         if (propMap.find(id) != propMap.end()) {

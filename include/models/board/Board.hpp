@@ -14,7 +14,7 @@ class Config;
 
 class Board {
 public:
-    Board(int tileCount, const std::vector<int>& tileIDSequence, const Config& config, const std::vector<Player*>& players);
+    Board(int tileCount, const Config& config, const std::vector<Player*>& players);
 
     ~Board();
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "models/board/Board.hpp"
-#include "models/tile/Tile.hpp"
+class Board;
+class Tile;
 
 class PlayerPiece {
 private:

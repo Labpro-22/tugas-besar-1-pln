@@ -1,5 +1,6 @@
 #pragma once
 
+#include "models/player/PlayerPiece.hpp"
 #include "models/player/PlayerException.hpp"
 #include "models/effect/PlayerEffect.hpp"
 #include "models/property/Property.hpp"
@@ -48,7 +49,7 @@ public:
 
     long long calculateTotalWealth() const;
     void receiveMoney(long long amount);
-    void giveMoney(Player* recipient, long long amount);
+    void giveMoney(Player& recipient, long long amount);
     void payRent(Property* pr);
     void payTax(long long amount);
 

@@ -93,14 +93,14 @@ long long Player::calculateTotalWealth() const {
 void Player::receiveMoney(long long amount) {
     money += amount;
 }
-void Player::giveMoney(Player* recipient, long long amount) {
+void Player::giveMoney(Player& recipient, long long amount) {
     if (money < amount)
         throw InsufficientFundsException(
             "Pemain " + username + " tidak punya cukup uang (M" +
             std::to_string(money) + ") untuk memberi M" + std::to_string(amount));
 
     money -= amount;
-    recipient->receiveMoney(amount);
+    recipient.receiveMoney(amount);
 }
 
 void Player::payRent(Property* pr) {

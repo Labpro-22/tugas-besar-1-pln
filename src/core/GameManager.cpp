@@ -13,7 +13,7 @@ GameManager::GameManager()
       config{ConfigLoader::loadConfig()},
       gameView{*this},
       turn{0},
-      board{(int)config.properties.size(), {}, config, {}},
+      board{(int)(config.actionTiles.size() + config.properties.size()), config, {}},
       players{},
       playerQueue{},
       bank{config.initialMoney, config},
@@ -137,16 +137,14 @@ void GameManager::processNewGame()
     for (std::string &username : usernames) {
         players.push_back(Player{username, config.initialMoney});
     }
-    std::shuffle(players.begin(), players.end(), std::default_random_engine{time(0)});
+    std::shuffle(players.begin(), players.end(), std::default_random_engine{(long unsigned int) time(0)});
     std::vector<Player *> playerPointer;
     for (Player &player : players) {
         playerPointer.push_back(&player);
     }
 
-    std::vector<int> tileID = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40};
-
     // Create board
-    board = Board(40, tileID, config, playerPointer);
+    board = Board((int)(config.actionTiles.size() + config.properties.size()), config, playerPointer);
 
     // Create bank
     bank = Bank(config.initialMoney, config);
@@ -161,23 +159,26 @@ void GameManager::processNewGame()
 void GameManager::processLoadGame()
 {
     LoadView &view = gameView.getLoadView();
-    view.outputSaveNames(); // output semua nama save yang ada (tanpa extension)
-    std::string saveFileName = view.promptSaveName();
+    if (!view.outputSaveFiles()) return;
+    std::string saveFileName = view.promptSaveFile();
     view.outputLoading();
     try {
         SaveData saveData = SaveFileHandler::loadGame(saveFileName);
-        view.outputLoadStatus(true);
+        view.outputLoadStatus(saveFileName, true, true);
     }
-    catch (const SaveFileException &e) {
+    catch (const SaveFileNotFoundException &e) {
         std::cout << e.what() << std::endl;
-        view.outputLoadStatus(false);
+        view.outputLoadStatus(saveFileName, true, false);
+    }
+    catch (const SaveFileFormatException &e) {
+        std::cout << e.what() << std::endl;
+        view.outputLoadStatus(saveFileName, false, true);
     };
 }
 void GameManager::processSaveGame()
 {
     SaveView &view = gameView.getSaveView();
-    view.outputSaveNames();
-    std::string fileName = view.promptSaveName();
+    std::string fileName = view.promptSaveFile();
     if (std::filesystem::exists(fileName) && std::filesystem::is_regular_file(fileName)) {
         if (!view.promptOverwriteSaveFile(fileName)) {
             return;
@@ -223,21 +224,21 @@ void GameManager::processSaveGame()
         }
         saveData.currentPlayer = getCurrentPlayer().getUsername();
 
-        for (Property &property : bank.getProperties()) {
+        for (Property* property : bank.getProperties()) {
             PropertySaveData propertyData;
-            propertyData.code = property.getCode();
-            propertyData.type = property.getPropertyType();
-            switch (property.getState()) {
+            propertyData.code = property->getCode();
+            propertyData.type = property->getPropertyType();
+            switch (property->getState()) {
                 case PropertyState::BANK:
                     propertyData.owner = "BANK";
                     propertyData.status = "BANK";
                     break;
                 case PropertyState::OWNED:
-                    propertyData.owner = property.getOwner()->getUsername();
+                    propertyData.owner = property->getOwner()->getUsername();
                     propertyData.status = "OWNED";
                     break;
                 case PropertyState::MORTGAGED:
-                    propertyData.owner = property.getOwner()->getUsername();
+                    propertyData.owner = property->getOwner()->getUsername();
                     propertyData.status = "MORTGAGED";
                     break;
                 default:
@@ -245,10 +246,10 @@ void GameManager::processSaveGame()
                     propertyData.status = "UNKNOWN";
                     break;
             }
-            propertyData.festivalMultiplier = property.getFestivalMultiplier();
-            propertyData.festivalDuration = property.getFestivalDuration();
-            if (property.getPropertyType() == "STREET") {
-                StreetProperty *street = dynamic_cast<StreetProperty *>(&property);
+            propertyData.festivalMultiplier = property->getFestivalMultiplier();
+            propertyData.festivalDuration = property->getFestivalDuration();
+            if (property->getPropertyType() == "STREET") {
+                StreetProperty *street = dynamic_cast<StreetProperty *>(property);
                 propertyData.houseCount = street->getHouseCount();
                 propertyData.hasHotel = street->hasHotel();
             }
@@ -408,7 +409,7 @@ void GameManager::processBuyProperty()
             processBuyProperty(player, tile->getProperty());
         }
         else {
-            bank.startAuction(*tile->getProperty());
+            processAuctionProperty(tile->getProperty());
         }
     }
 }

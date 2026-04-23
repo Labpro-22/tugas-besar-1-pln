@@ -1,4 +1,7 @@
 #include "models/card/community-chest-card/CollectMoneyCard.hpp"
+#include "models/player/Player.hpp"
+#include "core/GameManager.hpp"
+
 #include <iostream>
 
 CollectMoneyCard::CollectMoneyCard(const std::string& message, int amount) 
@@ -6,5 +9,4 @@ CollectMoneyCard::CollectMoneyCard(const std::string& message, int amount)
 
 void CollectMoneyCard::takeEffect(Player& p, GameManager& gm) {
     p.receiveMoney(amount);
-    message = "Anda menerima uang sebesar " + std::to_string(amount) + "dari Bank";
 }
