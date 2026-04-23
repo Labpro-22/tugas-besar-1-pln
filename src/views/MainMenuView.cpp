@@ -24,7 +24,7 @@ int MainMenuView::promptNewGameOrLoadGame(){
         std::cout << "\n";
         std::cout << BOLD << "Pilih opsi: " << RESET;
         std::cin >> input;
-        if(input >= 0 || input <= 2){
+        if(input >= 0 && input <= 2){
             return input;
         }
         std::cout << RED << "Masukan tidak valid!\n\n" << RESET;
@@ -34,15 +34,14 @@ int MainMenuView::promptNewGameOrLoadGame(){
 std::vector<std::string> MainMenuView::promptUsernames(){
     int n;
     std::string line;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     while (true) {
-        std::cout << CYAN << "Masukkan jumlah pemain (2-4): " << RESET;
-        // std::getline(std::cin, line);
-        // if (line.empty()) {
-        //     std::cout << RED << "Input tidak boleh kosong!\n" <<RESET;
-        //     continue;
-        // }
-        // std::stringstream ss(line);
-        if (!(std::cin >> n) || n < 2 || n > 4) {
+        do {
+            std::cout << CYAN << "Masukkan jumlah pemain (2-4): " << RESET;
+            std::getline(std::cin, line);
+        } while (line.empty());
+        std::stringstream ss(line);
+        if (!(ss >> n) || !(ss.eof()) || n < 2 || n > 4) {
             std::cout << RED << "Input tidak valid! Harus antara 2 sampai 4.\n" << RESET;
             continue;
         }
@@ -83,5 +82,5 @@ std::vector<std::string> MainMenuView::promptUsernames(){
 }
 
 void MainMenuView::outputCurrentPlayer() {
-    std::cout << "Giliran pemain " << gameManager.getCurrentPlayer().getUsername() << "\n";
+    std::cout << YELLOW << "\nGiliran pemain " << gameManager.getCurrentPlayer().getUsername() << "\n";
 }
