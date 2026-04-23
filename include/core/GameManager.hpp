@@ -52,7 +52,6 @@ private:
 
 public:
     GameManager();
-    GameManager();
 
     // Main game runner
     void runGame();
