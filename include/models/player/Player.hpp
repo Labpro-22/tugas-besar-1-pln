@@ -43,14 +43,15 @@ public:
     int getStreetPropertyCount() const;
     int getRailroadPropertyCount() const;
     int getUtilityPropertyCount() const;
+    int getGetOutOfJailCardCount() const;
 
     void rollDiceAndMove();
     void setDiceAndMove(int value1, int value2);
 
     long long calculateTotalWealth() const;
     void receiveMoney(long long amount);
-    void giveMoney(Player& recipient, long long amount);
-    void payRent(Property* pr);
+    void giveMoney(Player* recipient, long long amount);
+    bool payRent(Property* pr);
     void payTax(long long amount);
 
     void bankruptByBank();
@@ -59,7 +60,7 @@ public:
 
     void addProperty(Property* pr);
     void removeProperty(Property* pr);
-    void buyProperty(Property* pr);
+    bool buyProperty(Property* pr);
     void buyProperty(Property* pr, long long bid);
     void sellProperty(Property* pr);
     void mortgageProperty(Property* pr);
