@@ -85,17 +85,7 @@ long long Player::calculateTotalWealth() const {
     long long total = money;
 
     for (Property* pr : properties) {
-        total += pr->getPrice();
-
-        StreetProperty* street = dynamic_cast<StreetProperty*>(pr);
-        if (street) {
-            int houses = street->getHouseCount();
-            if (houses <= 4) {
-                total += houses * street->getHousePrice();
-            } else {
-                total += 4 * street->getHousePrice() + street->getHotelPrice();
-            }
-        }
+        total += pr->calculateAssetValue();
     }
 
     return total;
@@ -247,7 +237,7 @@ void Player::buyProperty(Property* pr, long long bid) {
 
 void Player::sellProperty(Property* pr) {
     money += pr->calculateSellValue();
-    pr->resetOwnerAsBank();
+    pr->sellProperty();
     removeProperty(pr);
 }
 
@@ -258,7 +248,7 @@ void Player::mortgageProperty(Property* pr) {
 }
 
 void Player::unmortgageProperty(Property* pr) {
-    long long redeemPrice = pr->getPrice();
+    long long redeemPrice = pr->redemptionPrice();
     if (hasEffect("DISCOUNT")) {
         redeemPrice = redeemPrice * (100 - getEffectValue("DISCOUNT")) / 100;
     }
