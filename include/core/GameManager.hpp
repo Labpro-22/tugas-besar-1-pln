@@ -70,7 +70,7 @@ public:
 
     void processMainMenu();
     void processNewGame();
-    void processSaveGame();
+    void processSaveGame(std::string filename);
     void processLoadGame();
     void processRollDice();
     void processSetDice(int value1, int value2);
