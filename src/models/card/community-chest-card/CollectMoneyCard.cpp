@@ -10,3 +10,7 @@ CollectMoneyCard::CollectMoneyCard(const std::string& message, int amount)
 void CollectMoneyCard::takeEffect(Player& p, GameManager& gm) {
     p.receiveMoney(amount);
 }
+
+std::string CollectMoneyCard::getCardType() const {
+    return "COLLECTMONEYCARD";
+}

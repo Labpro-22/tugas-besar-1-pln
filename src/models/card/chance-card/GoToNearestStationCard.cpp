@@ -16,3 +16,7 @@ void GoToNearestStationCard::takeEffect(Player& p, GameManager& gm) {
     
     gm.getBoard().getTile(targetStation)->onLanded(p, gm);
 }
+
+std::string GoToNearestStationCard::getCardType() const {
+    return "GOTONEARESTSTATIONCARD";
+}

@@ -12,3 +12,7 @@ void ForcedMoveCard::takeEffect(Player& p, GameManager& gm) {
     int currentPos = p.getPiece().getPosition();
     gm.getBoard().getTile(currentPos)->onLanded(p, gm);
 }
+
+std::string ForcedMoveCard::getCardType() const {
+    return "FORCEMOVECARD";
+}
