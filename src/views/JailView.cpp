@@ -23,7 +23,7 @@ int JailView::promptRollOrBailOrUseCard(){
         std::cout << "3. Gunakan kartu bebas dari penjara (Jumlah kartu bebas dari penjara yang dimiliki: " << cardCount << " Kartu)\n"; 
         int input ;
         std::cin >> input;
-        if(input >= 1 || input <= 3){
+        if(input >= 1 && input <= 3){
             std::cout <<"\n\n";
             if(cardCount == 0 && input == 3){
                 std::cout << "Kamu tidak memiliki kartu bebas dari penjara!\n\n";
@@ -33,7 +33,7 @@ int JailView::promptRollOrBailOrUseCard(){
             }
         }
         else{
-            std::cout << "Masukan tidak valid!";
+            std::cout << "Masukan tidak valid!\n";
         }
     }
 }

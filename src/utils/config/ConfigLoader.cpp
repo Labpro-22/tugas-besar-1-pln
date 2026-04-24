@@ -23,6 +23,8 @@ Config ConfigLoader::loadConfig(std::string path)
     std::filesystem::path taxPath = path + "tax.txt";
     std::filesystem::path specialPath = path + "special.txt";
     std::filesystem::path miscPath = path + "misc.txt";
+    std::filesystem::path chancePath = path + "chance.txt";
+    std::filesystem::path communityChestPath = path + "community-chest.txt";
 
     loadActionTile(config, actionTilePath);
     loadProperty(config, propertyPath);
@@ -31,6 +33,8 @@ Config ConfigLoader::loadConfig(std::string path)
     loadTax(config, taxPath);
     loadSpecial(config, specialPath);
     loadMisc(config, miscPath);
+    loadChanceCard(config, chancePath);
+    loadCommunityChestCard(config, communityChestPath);
 
     return config;
 }
@@ -47,6 +51,10 @@ void ConfigLoader::loadActionTile(Config &config, std::filesystem::path path)
     std::string buffer;
     while (std::getline(in, buffer)) {
         line++;
+        if (buffer.empty()) {
+            continue;
+        }
+
         int col = 0;
 
         ActionTileConfig actionTile;
@@ -86,6 +94,9 @@ void ConfigLoader::loadProperty(Config &config, std::filesystem::path path)
     std::string buffer;
     while (std::getline(in, buffer)) {
         line++;
+        if (buffer.empty()) {
+            continue;
+        }
         int col = 0;
 
         PropertyConfig property;
