@@ -16,6 +16,7 @@ public:
 
     T drawCard();
     void addCard(T card);
+    void operator+=(T card);
     void clearDeck();
     void reshuffle();
     size_t getSize() const;
@@ -45,6 +46,13 @@ void CardDeck<T>::addCard(T card)
 {
     cards.push_back(card);
 }
+
+template <typename T>
+void CardDeck<T>::operator+=(T card)
+{
+    cards.push_back(card);
+}
+
 
 template <typename T>
 void CardDeck<T>::clearDeck()
