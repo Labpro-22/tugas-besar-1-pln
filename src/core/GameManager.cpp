@@ -156,7 +156,7 @@ void GameManager::gameLoop()
             if (startOfTheTurn) {
                 processTurnStart();
             }
-            gameView.InputNextCommand();
+            gameView.inputNextCommand();
         }
     }
 }
@@ -170,40 +170,33 @@ void GameManager::processTurnStart()
     view.outputCurrentPlayerInfo();
 
     if (player.isJailed()) {
-        bool choiceResolved = false;
-        while (!choiceResolved) {
-            int choice = jailView.promptRollOrBailOrUseCard();
-            if (choice == 1) {
-                std::cout << "Gunakan perintah LEMPAR_DADU atau ATUR_DADU untuk mencoba keluar dari penjara.\n\n";
-                choiceResolved = true;
+        int choice = jailView.promptRollOrBailOrUseCard();
+        if (choice == 1) {
+            std::cout << "Gunakan perintah LEMPAR_DADU atau ATUR_DADU untuk mencoba keluar dari penjara.\n\n";
+        }
+        else if (choice == 2) {
+            try {
+                player.payFineToGetOutOfJail(config.jailFine);
+                std::cout << "Kamu membayar jaminan sebesar M" << config.jailFine << " dan keluar dari penjara.\n\n";
+                logger.log(turn, player.getUsername(), "BAYAR_JAMINAN",
+                           "Membayar jaminan sebesar M" + std::to_string(config.jailFine) + " untuk keluar dari penjara.");
             }
-            else if (choice == 2) {
-                try {
-                    player.payFineToGetOutOfJail(config.jailFine);
-                    std::cout << "Kamu membayar jaminan sebesar M" << config.jailFine << " dan keluar dari penjara.\n\n";
-                    logger.log(turn, player.getUsername(), "BAYAR_JAMINAN",
-                               "Membayar jaminan sebesar M" + std::to_string(config.jailFine) + " untuk keluar dari penjara.");
-                    choiceResolved = true;
-                }
-                catch (const PlayerException &e) {
-                    std::cout << e.what() << std::endl;
-                }
+            catch (const PlayerException &e) {
+                std::cout << e.what() << std::endl;
             }
-            else if (choice == 3) {
-                try {
-                    player.useGetOutOfJailCard();
-                    std::cout << "Kamu menggunakan kartu bebas dari penjara.\n\n";
-                    logger.log(turn, player.getUsername(), "PAKAI_KARTU_PENJARA",
-                               "Menggunakan kartu bebas dari penjara.");
-                    choiceResolved = true;
-                }
-                catch (const PlayerException &e) {
-                    std::cout << e.what() << std::endl;
-                }
+        }
+        else if (choice == 3) {
+            try {
+                player.useGetOutOfJailCard();
+                std::cout << "Kamu menggunakan kartu bebas dari penjara.\n\n";
+                logger.log(turn, player.getUsername(), "PAKAI_KARTU_PENJARA",
+                           "Menggunakan kartu bebas dari penjara.");
+            }
+            catch (const PlayerException &e) {
+                std::cout << e.what() << std::endl;
             }
         }
     }
-
     startOfTheTurn = false;
 }
 
@@ -318,7 +311,7 @@ void GameManager::processNewGame()
     board = Board{(int)(config.actionTiles.size() + config.properties.size()), config, playerPointer};
 
     // Create bank
-    bank = Bank(config.initialMoney, config);
+    bank = Bank{config.initialMoney, config};
 
     // Clear logger
     logger.clear();
@@ -335,6 +328,7 @@ void GameManager::processNewGame()
 void GameManager::processLoadGame()
 {
     LoadView &view = gameView.getLoadView();
+    view.outputSaveNames();
     std::string saveFileName = view.promptSaveName();
     view.outputLoading();
     try {
@@ -394,11 +388,25 @@ void GameManager::processLoadGame()
             return playerOrder[p1.getUsername()] < playerOrder[p2.getUsername()];
         });
 
+        while (!playerQueue.empty()) {
+            playerQueue.pop();
+        }
+
+        bool startQueuing = false;
+        for (Player& p : players) {
+            if (p.getUsername() == saveData.currentPlayer) {
+                startQueuing = true;
+            }
+            if (startQueuing) {
+                playerQueue.push(&p);
+            }
+        }
+
         for (SkillCard *card : skillCardDeck.getCards()) {
             saveData.deckCards.push_back(card->getCardType());
         }
 
-        bank = Bank{config.initialMoney, config, saveData.properties, players};
+        bank = Bank{config.initialMoney, config};
 
         std::vector<Player *> playerPointer;
         for (Player &player : players) {
@@ -1093,22 +1101,24 @@ void GameManager::processUseCommunityChestCard()
     card->takeEffect(p, *this);
 }
 
-void GameManager::processUseChanceCard() {
-    CardView& cardView = gameView.getCardView();
-    ChanceCard* card = chanceCardDeck.drawCard();
+void GameManager::processUseChanceCard()
+{
+    CardView &cardView = gameView.getCardView();
+    ChanceCard *card = chanceCardDeck.drawCard();
     cardView.outputCard(*card);
-    Player& p = getCurrentPlayer();
+    Player &p = getCurrentPlayer();
     if (card->getCardType() == "GOTOJAILCARD") {
         processGoToJail();
     }
     card->takeEffect(p, *this);
 }
 
-void GameManager::processStartFestival() {
-    FestivalView& fesView = gameView.getFestivalView();
-    Player& p = getCurrentPlayer();
-    std::vector<Property*> properties = p.getProperties();
-    Property* prop = fesView.promptChooseProperty(properties);
+void GameManager::processStartFestival()
+{
+    FestivalView &fesView = gameView.getFestivalView();
+    Player &p = getCurrentPlayer();
+    std::vector<Property *> properties = p.getProperties();
+    Property *prop = fesView.promptChooseProperty(properties);
     prop->startFestival();
     fesView.outputFestivalStatus(*prop);
 }
