@@ -30,10 +30,10 @@ private:
     Config config;
     GameView gameView;
     int turn;
-    Board board;
+    Board* board;
     std::vector<Player> players;
     std::queue<Player *> playerQueue;
-    Bank bank;
+    Bank* bank;
     TransactionLogger logger;
 
     std::vector<ChanceCard *> chanceCards;

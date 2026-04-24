@@ -47,11 +47,6 @@ Bank::Bank(long long initialMoney, Config &config) : initialMoney{initialMoney}
     }
 }
 
-Bank::Bank(long long initialMoney, Config &config, std::vector<PropertySaveData> &saveData, std::vector<Player> &players) : initialMoney{initialMoney}
-{
-    
-}
-
 Bank::~Bank()
 {
     while (!properties.empty()) {
