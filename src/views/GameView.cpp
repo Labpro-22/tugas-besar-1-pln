@@ -2,48 +2,62 @@
 #include "views/GameView.hpp"
 #include <sstream>
 void GameView::InputNextCommand(){
-    std::cout << "> ";
     std::string input;
-    std::getline(std::cin, input);
-    
-    std::stringstream ss(input);
+
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    std::cout << gameManager.getCurrentPlayer().getUsername() << "> ";
+    std::getline(std::cin, input); // jujur gatau gunanya apa
+    std::stringstream ss(input); // bisa dihapus maybe?
     std::string command;
     ss >> command;
+    bool handled = true;
     if(command == "CETAK_PAPAN"){
         boardView.drawBoard();
     }
-    if(command == "LEMPAR_DADU"){
+    else if(command == "LEMPAR_DADU"){
         gameManager.processRollDice();
     }
-    if(command == "ATUR_DADU"){
+    else if(command == "ATUR_DADU"){
         int val1,val2;
-        ss >> val1 >> val2;
-        gameManager.processSetDice(val1,val2);
+        if (ss >> val1 >> val2) {
+            gameManager.processSetDice(val1,val2);
+        }
+        else {
+            std::cout << "Format ATUR_DADU tidak valid. Gunakan: ATUR_DADU <dadu1> <dadu2>\n\n";
+        }
     }
-    if(command == "CETAK_AKTA"){
+    else if(command == "CETAK_AKTA"){
         propertyView.outputProperty();
     }
-    if(command == "CETAK_PROPERTI"){
+    else if(command == "CETAK_PROPERTI"){
         propertyView.outputPlayerProperties();
     }
-    if(command == "GADAI"){
+    else if(command == "CETAK_INFO"){
+        mainMenuView.outputCurrentPlayerInfo();
+    }
+    else if(command == "GADAI"){
         gameManager.processMortgageProperty();
     }
-    if(command == "TEBUS"){
+    else if(command == "TEBUS"){
         gameManager.processUnmortgageProperty();
     }
-    if(command == "BANGUN"){
+    else if(command == "BANGUN"){
         gameManager.processBuild();
     }
-    if(command == "SIMPAN"){
+    else if(command == "SIMPAN"){
         std::string pathFile;
-        ss >> pathFile;
-        gameManager.processSaveGame(pathFile);
+        if (ss >> pathFile) {
+            gameManager.processSaveGame(pathFile);
+        }
+        else {
+            std::cout << "Format SIMPAN tidak valid. Gunakan: SIMPAN <nama_file>\n\n";
+        }
     }
-    if(command == "GUNAKAN_KEMAMPUAN"){
+    else if(command == "GUNAKAN_KEMAMPUAN"){
         gameManager.processUseSkillCard();
     }
-    if(command == "CETAK_LOG"){
+    else if(command == "CETAK_LOG"){
         int logAmount;
         if(ss >> logAmount){
             logView.printLogView(logAmount);
@@ -51,5 +65,12 @@ void GameView::InputNextCommand(){
         else{
             logView.printLogView();
         }
+    }
+    else {
+        handled = false;
+    }
+
+    if (!handled && !command.empty()) {
+        std::cout << "Perintah tidak dikenali: " << command << "\n\n";
     }
 }

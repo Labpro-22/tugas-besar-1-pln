@@ -147,6 +147,10 @@ std::string BoardView::getOwnershipInfo(Property* pr) const{
 // ==================== Sel: Baris 1 (tag warna + kode petak) ====================
 
 std::string BoardView::getCellLine1(Tile* tile, int tileIndex) const{
+    if (tile == nullptr) {
+        return padRight("[DF] ???", CELL_WIDTH);
+    }
+
     std::string colorTag = "DF";
     std::string code = tile->getCode();
 
@@ -167,6 +171,10 @@ std::string BoardView::getCellLine1(Tile* tile, int tileIndex) const{
 // ==================== Sel: Baris 2 (kepemilikan + bidak) ====================
 
 std::string BoardView::getCellLine2(Tile* tile, int tileIndex) const{
+    if (tile == nullptr) {
+        return "";
+    }
+
     std::string info = "";
 
     // TODO: uncomment saat tersedia

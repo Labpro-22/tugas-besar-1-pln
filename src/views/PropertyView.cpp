@@ -6,10 +6,15 @@ void PropertyView::outputProperty() const{
     std::cout << "Masukkan kode petak: ";
     std::string tileCode;
     std::cin >> tileCode;
-    std::map<std::string, Tile*> m = gameManager.getBoard().getMapTilesCodeTile();
+    const std::map<std::string, Tile*>& m = gameManager.getBoard().getMapTilesCodeTile();
     auto it = m.find(tileCode);
-    auto pt  = dynamic_cast<PropertyTile*>(it->second);
-    if (it == m.end() || pt == nullptr) {
+    if (it == m.end()) {
+        std::cout << "Petak " << tileCode << " tidak ditemukan atau bukan properti.\n\n";
+        return;
+    }
+
+    auto pt = dynamic_cast<PropertyTile*>(it->second);
+    if (pt == nullptr || pt->getProperty() == nullptr) {
 
         std::cout << "Petak " << tileCode << " tidak ditemukan atau bukan properti.\n\n";
     }
@@ -21,10 +26,10 @@ void PropertyView::outputProperty() const{
             int right = padding - left;
             return std::string(left, ' ') + text + std::string(right, ' ');
         };
-        std::cout << "+" << std::string(WIDTH, '=') << "+" ;
+        std::cout << "+" << std::string(WIDTH, '=') << "+\n";
         std::cout << "|" <<  centerText("AKTA KEPEMILIKAN") << "|\n";
         std::cout << "|" << centerText("[" + pr->getColor() +"] " + pr->getName() + " (" + pr->getCode() + ")") <<"|\n";
-        std::cout << "+" << std::string(WIDTH, '=') << "+" ;
+        std::cout << "+" << std::string(WIDTH, '=') << "+\n";
         std::cout << "| " << std::setw(COLON_WIDTH) << " Harga Beli" << std::setw(WIDTH-COLON_WIDTH) << ": M" + std::to_string( pr->getPrice())<<"|\n";
         std::cout << "| " << std::setw(COLON_WIDTH) << " Nilai Gadai" << std::setw(WIDTH-COLON_WIDTH) << ": M" + std::to_string( pr->getMortgageValue())<<"|\n";
         std::cout << "+ " <<std::string(WIDTH, '-') << "+\n";
@@ -59,7 +64,7 @@ void PropertyView::outputProperty() const{
                 (": " + std::to_string(rent[i])) << "|\n|" << std::setw(WIDTH) << std::right<<  " kali lipat jumlah hasil lemparan dadu|" << "\n";
             }
         }
-        std::cout << "+" << std::string(WIDTH, '=') << "+" ;
+        std::cout << "+" << std::string(WIDTH, '=') << "+\n";
         std::cout << "|" << " Status : ";
         switch (pr->getState())
         {
@@ -76,8 +81,14 @@ void PropertyView::outputProperty() const{
         default:
             break;
         }
-        std::cout << " (Pemain " << pr->getOwner()->getUsername() <<  ")\n"; 
-        std::cout << "+" << std::string(WIDTH, '=') << "+" ;
+        if (pr->getOwner() != nullptr) {
+            std::cout << " (Pemain " << pr->getOwner()->getUsername() << ")";
+        }
+        else {
+            std::cout << " (BANK)";
+        }
+        std::cout << "\n";
+        std::cout << "+" << std::string(WIDTH, '=') << "+\n\n";
 
     }
 }
@@ -136,7 +147,7 @@ void PropertyView::outputPlayerProperties() const{
                         std::cout << "\n[UTILITY]\n";
                     }
                 }
-                std::cout << "  - " << std::setw(SPACE)  << (sp->getName() +  " (" + sp->getCode() +")");
+                std::cout << "  - " << std::setw(SPACE)  << (pr->getName() +  " (" + pr->getCode() +")");
             }
             std::cout << "M" << pr->calculateAssetValue() << "\t";
             switch (pr->getState())

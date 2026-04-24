@@ -14,15 +14,28 @@ int UseSkillCardView::promptChooseCardToUse(const std::vector<SkillCard*>& cards
 
     std::cout << "\n=== Skill Card Anda ===\n";
     for (size_t i = 0; i < cards.size(); ++i) {
-        std::cout << i + 1 << ". " << cards[i]->getMessage() << "\n";
+        std::cout << i + 1 << ". " << cards[i]->getCardType();
+        if (!cards[i]->getMessage().empty()) {
+            std::cout << " - " << cards[i]->getMessage();
+        }
+        std::cout << "\n";
     }
     std::cout << "0. Batal / Kembali\n";
     
     int choice;
-    std::cout << "Pilih kartu yang ingin digunakan (0 - " << cards.size() << "): ";
-    std::cin >> choice;
-    
-    return choice - 1; 
+    while (true) {
+        std::cout << "Pilih kartu yang ingin digunakan (0 - " << cards.size() << "): ";
+        std::cin >> choice;
+
+        if (choice == 0) {
+            return -1;
+        }
+        if (choice >= 1 && choice <= static_cast<int>(cards.size())) {
+            return choice - 1;
+        }
+
+        std::cout << "Pilihan tidak valid.\n";
+    }
 }
 
 void UseSkillCardView::processAndPlayCard(SkillCard* card, Player& player, GameManager& gm) {
