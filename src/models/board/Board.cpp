@@ -53,20 +53,18 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                 if (propDataMap.count(conf.code)) {
                     PropertySaveData data = propDataMap[conf.code];
                     StreetProperty* property = new StreetProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, 
-                                                                  data.festivalMultiplier, data.festivalDuration, conf.housePrice, conf.hotelPrice, conf.rent);
-                    if (data.hasHotel) {
-                        property->buildHouse(4);
-                        property->buildHotel();
-                    }
-                    else {
-                        property->buildHouse(data.houseCount);
-                    }
+                                                                  data.festivalMultiplier, data.festivalDuration, 
+                                                                  conf.housePrice, conf.hotelPrice, conf.rent,
+                                                                  data.hasHotel ? 5 : data.houseCount);
+
                     auto player = std::find_if(players.begin(), players.end(), [data](Player *p) {
                         return p->getUsername() == data.owner;
                     });
                     if (player != players.end()) {
                         (*player)->addProperty(property);
                     }
+                    property->setOwner(*player);
+
                     prop = property;
                 }
                 else {
@@ -84,6 +82,8 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     if (player != players.end()) {
                         (*player)->addProperty(property);
                     }
+                    property->setOwner(*player);
+
                     prop = property;
                 }
                 else {
@@ -101,6 +101,8 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     if (player != players.end()) {
                         (*player)->addProperty(property);
                     }
+                    property->setOwner(*player);
+
                     prop = property;
                 }
                 else {
