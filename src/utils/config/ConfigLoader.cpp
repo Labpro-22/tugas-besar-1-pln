@@ -23,6 +23,8 @@ Config ConfigLoader::loadConfig(std::string path)
     std::filesystem::path taxPath = path + "tax.txt";
     std::filesystem::path specialPath = path + "special.txt";
     std::filesystem::path miscPath = path + "misc.txt";
+    std::filesystem::path chancePath = path + "chance.txt";
+    std::filesystem::path communityChestPath = path + "community-chest.txt";
 
     loadActionTile(config, actionTilePath);
     loadProperty(config, propertyPath);
@@ -31,28 +33,8 @@ Config ConfigLoader::loadConfig(std::string path)
     loadTax(config, taxPath);
     loadSpecial(config, specialPath);
     loadMisc(config, miscPath);
-
-    std::ifstream railroadStream(railroadPath);
-    std::ifstream utilityStream(utilityPath);
-    std::ifstream taxStream(taxPath);
-    std::ifstream specialStream(specialPath);
-    std::ifstream miscStream(miscPath);
-
-    if (!railroadStream.is_open()) {
-        throw ConfigFileNotFoundException(railroadPath.string());
-    }
-    if (!utilityStream.is_open()) {
-        throw ConfigFileNotFoundException(utilityPath.string());
-    }
-    if (!taxStream.is_open()) {
-        throw ConfigFileNotFoundException(taxPath.string());
-    }
-    if (!specialStream.is_open()) {
-        throw ConfigFileNotFoundException(specialPath.string());
-    }
-    if (!miscStream.is_open()) {
-        throw ConfigFileNotFoundException(miscPath.string());
-    }
+    loadChanceCard(config, chancePath);
+    loadCommunityChestCard(config, communityChestPath);
 
     return config;
 }
@@ -69,28 +51,35 @@ void ConfigLoader::loadActionTile(Config &config, std::filesystem::path path)
     std::string buffer;
     while (std::getline(in, buffer)) {
         line++;
+        if (buffer.empty()) {
+            continue;
+        }
+
         int col = 0;
 
         ActionTileConfig actionTile;
         std::stringstream bufferStream(buffer);
         col++;
-        if (!(bufferStream << actionTile.id)) {
+        if (!(bufferStream >> actionTile.id)) {
+            if (line == 1) {
+                continue;
+            }
             throw ConfigFileFormatException("ID", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream << actionTile.code)) {
+        if (!(bufferStream >> actionTile.code)) {
             throw ConfigFileFormatException("KODE", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream << actionTile.name)) {
+        if (!(bufferStream >> actionTile.name)) {
             throw ConfigFileFormatException("NAMA", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream << actionTile.color)) {
+        if (!(bufferStream >> actionTile.type)) {
             throw ConfigFileFormatException("JENIS", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream << actionTile.color)) {
+        if (!(bufferStream >> actionTile.color)) {
             throw ConfigFileFormatException("WARNA", path.string(), col, line);
         }
         config.actionTiles.push_back(actionTile);
@@ -108,51 +97,54 @@ void ConfigLoader::loadProperty(Config &config, std::filesystem::path path)
     std::string buffer;
     while (std::getline(in, buffer)) {
         line++;
+        if (buffer.empty()) {
+            continue;
+        }
         int col = 0;
 
         PropertyConfig property;
         std::stringstream bufferStream(buffer);
         col++;
-        if (!(bufferStream << property.id)) {
+        if (!(bufferStream >> property.id)) {
             throw ConfigFileFormatException("ID", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream << property.code)) {
+        if (!(bufferStream >> property.code)) {
             throw ConfigFileFormatException("KODE", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream << property.name)) {
+        if (!(bufferStream >> property.name)) {
             throw ConfigFileFormatException("NAMA", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream << property.color)) {
+        if (!(bufferStream >> property.type)) {
             throw ConfigFileFormatException("JENIS", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream << property.color)) {
+        if (!(bufferStream >> property.color)) {
             throw ConfigFileFormatException("WARNA", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream << property.price)) {
+        if (!(bufferStream >> property.price)) {
             throw ConfigFileFormatException("HARGA_LAHAN", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream << property.mortgageValue)) {
+        if (!(bufferStream >> property.mortgageValue)) {
             throw ConfigFileFormatException("NILAI_GADAI", path.string(), col, line);
         }
 
         if (property.type == "STREET") {
             col++;
-            if (!(bufferStream << property.housePrice)) {
+            if (!(bufferStream >> property.housePrice)) {
                 throw ConfigFileFormatException("HARGA_RUMAH", path.string(), col, line);
             }
             col++;
-            if (!(bufferStream << property.hotelPrice)) {
+            if (!(bufferStream >> property.hotelPrice)) {
                 throw ConfigFileFormatException("HARGA_HOTEL", path.string(), col, line);
             }
             for (int i = 0; i < 6; i++) {
                 col++;
-                if (!(bufferStream << property.rent[i])) {
+                if (!(bufferStream >> property.rent[i])) {
                     throw ConfigFileFormatException("SEWA_L" + std::to_string(i), path.string(), col, line);
                 }
             }
