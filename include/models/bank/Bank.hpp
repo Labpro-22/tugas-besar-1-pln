@@ -17,6 +17,7 @@ private:
 
 public:
     Bank(long long initialMoney, Config &config);
+    Bank(long long initialMoney, Config &config, std::vector<PropertySaveData> &saveData, std::vector<Player> &players);
     ~Bank();
 
     std::vector<Property *> &getProperties();
