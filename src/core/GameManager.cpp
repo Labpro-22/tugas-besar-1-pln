@@ -42,56 +42,56 @@ GameManager::GameManager()
     // Load chance card
     for (CardConfig card : config.chanceCards) {
         if (card.type == "GOTOJAIL") {
-            chanceCardDeck.addCard(new GoToJailCard(card.message));
+            chanceCardDeck += new GoToJailCard(card.message);
         }
         else if (card.type == "GETOUTOFJAIL") {
-            chanceCardDeck.addCard(new GetOutOfJailCard(card.message));
+            chanceCardDeck += new GetOutOfJailCard(card.message);
         }
         else if (card.type == "FORCEDMOVE") {
-            chanceCardDeck.addCard(new ForcedMoveCard(card.message, card.value));
+            chanceCardDeck += new ForcedMoveCard(card.message, card.value);
         }
         else if (card.type == "GOTONEARESTSTATION") {
-            chanceCardDeck.addCard(new GoToNearestStationCard(card.message));
+            chanceCardDeck += new GoToNearestStationCard(card.message);
         }
     }
 
     // Load community-chest card
     for (CardConfig card : config.communityChestCards) {
         if (card.type == "PAY") {
-            communityChestCardDeck.addCard(new PayMoneyCard(card.message, card.value));
+            communityChestCardDeck += new PayMoneyCard(card.message, card.value);
         }
         else if (card.type == "PAYALL") {
-            communityChestCardDeck.addCard(new PayMoneyToPlayersCard(card.message, card.value));
+            communityChestCardDeck += new PayMoneyToPlayersCard(card.message, card.value);
         }
         else if (card.type == "COLLECT") {
-            communityChestCardDeck.addCard(new CollectMoneyCard(card.message, card.value));
+            communityChestCardDeck += new CollectMoneyCard(card.message, card.value);
         }
         else if (card.type == "COLLECTALL") {
-            communityChestCardDeck.addCard(new CollectMoneyFromPlayersCard(card.message, card.value));
+            communityChestCardDeck += new CollectMoneyFromPlayersCard(card.message, card.value);
         }
     }
 
     // Load skill card
     DiceRoller::roll();
-    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    skillCardDeck += new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second);
     DiceRoller::roll();
-    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    skillCardDeck += new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second);
     DiceRoller::roll();
-    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    skillCardDeck += new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second);
     DiceRoller::roll();
-    skillCardDeck.addCard(new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    skillCardDeck += new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second);
     DiceRoller::roll();
-    skillCardDeck.addCard(new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
+    skillCardDeck += new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
     DiceRoller::roll();
-    skillCardDeck.addCard(new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
+    skillCardDeck += new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
     DiceRoller::roll();
-    skillCardDeck.addCard(new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second)));
-    skillCardDeck.addCard(new ShieldCard(""));
-    skillCardDeck.addCard(new ShieldCard(""));
-    skillCardDeck.addCard(new LassoCard(""));
-    skillCardDeck.addCard(new LassoCard(""));
-    skillCardDeck.addCard(new DemolitionCard(""));
-    skillCardDeck.addCard(new DemolitionCard(""));
+    skillCardDeck += new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    skillCardDeck += new ShieldCard("");
+    skillCardDeck += new ShieldCard("");
+    skillCardDeck += new LassoCard("");
+    skillCardDeck += new LassoCard("");
+    skillCardDeck += new DemolitionCard("");
+    skillCardDeck += new DemolitionCard("");
 }
 
 GameManager::~GameManager()
