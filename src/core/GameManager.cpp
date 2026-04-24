@@ -30,10 +30,10 @@ GameManager::GameManager()
       config{ConfigLoader::loadConfig()},
       gameView{*this},
       turn{0},
-      board{nullptr},
+      board{(int)(config.actionTiles.size() + config.properties.size()), config, {}},
       players{},
       playerQueue{},
-      bank{nullptr},
+      bank{config.initialMoney, config},
       logger{},
       chanceCardDeck{},
       communityChestCardDeck{},
@@ -57,16 +57,16 @@ GameManager::GameManager()
 
     // Load community-chest card
     for (CardConfig card : config.communityChestCards) {
-        if (card.type == "PAYMONEYCARD") {
+        if (card.type == "PAY") {
             communityChestCardDeck += new PayMoneyCard(card.message, card.value);
         }
-        else if (card.type == "PAYMONEYTOPLAYERSCARD") {
+        else if (card.type == "PAYALL") {
             communityChestCardDeck += new PayMoneyToPlayersCard(card.message, card.value);
         }
-        else if (card.type == "COLLECTMONEYCARD") {
+        else if (card.type == "COLLECT") {
             communityChestCardDeck += new CollectMoneyCard(card.message, card.value);
         }
-        else if (card.type == "COLLECTMONEYFROMPLAYERSCARD") {
+        else if (card.type == "COLLECTALL") {
             communityChestCardDeck += new CollectMoneyFromPlayersCard(card.message, card.value);
         }
     }
@@ -96,12 +96,6 @@ GameManager::GameManager()
 
 GameManager::~GameManager()
 {
-    if (board != nullptr) {
-        delete board;
-    }
-    if (bank != nullptr) {
-        delete bank;
-    }
     for (Card *card : chanceCardDeck.getCards())
         delete card;
     for (Card *card : communityChestCardDeck.getCards())
@@ -143,6 +137,7 @@ bool GameManager::isGameEnded() const
 void GameManager::initGame()
 {
     turn = 0;
+    bank.giveInitialMoney(getPlayers());
     chanceCardDeck.reshuffle();
     communityChestCardDeck.reshuffle();
     skillCardDeck.reshuffle();
@@ -201,8 +196,8 @@ void GameManager::nextPlayer()
 const Config &GameManager::getConfig() const { return config; }
 int GameManager::getCurrentTurn() const { return turn; }
 Player &GameManager::getCurrentPlayer() const { return *playerQueue.front(); }
-Board &GameManager::getBoard() { return *board; }
-Bank &GameManager::getBank() { return *bank; }
+Board &GameManager::getBoard() { return board; }
+Bank &GameManager::getBank() { return bank; }
 std::vector<Player> &GameManager::getPlayers() { return players; }
 TransactionLogger &GameManager::getLogger() { return logger; }
 CardDeck<ChanceCard *> &GameManager::getChanceCardDeck() { return chanceCardDeck; }
@@ -235,31 +230,16 @@ void GameManager::processNewGame()
         players.push_back(Player{username, config.initialMoney});
     }
     std::shuffle(players.begin(), players.end(), std::default_random_engine{(long unsigned int)time(0)});
-
     std::vector<Player *> playerPointer;
-    for (Player &p : players) {
-        playerPointer.push_back(&p);
+    for (auto it = players.begin(); it != players.end(); it++) {
+        playerPointer.push_back(it.base());
     }
 
     // Create board
-    if (board != nullptr) {
-        delete board;
-    }
-    board = new Board{(int)(config.actionTiles.size() + config.properties.size()), config, playerPointer};
-
-    std::cout << &board << std::endl;
-    for (int i = 0; i < (int)(config.actionTiles.size() + config.properties.size()); i++) {
-        std::cout << board->getTile(i)->getCode() << std::endl;
-    }
-    for (Player &p : players) {
-        std::cout << p.getPiece().getCurrentTile()->getCode() << std::endl;
-    }
+    board = Board{(int)(config.actionTiles.size() + config.properties.size()), config, playerPointer};
 
     // Create bank
-    if (bank != nullptr) {
-        delete bank;
-    }
-    bank = new Bank(config.initialMoney, config);
+    bank = Bank(config.initialMoney, config);
 
     // Clear logger
     logger.clear();
@@ -321,7 +301,7 @@ void GameManager::processLoadGame()
                 playerData.getOutOfJailCardCount,
                 playerData.jailTurns});
             Player &player = players.back();
-            player.getPiece().setPosition(board->getTilePosition(playerData.tileCodePosition));
+            player.getPiece().setPosition(board.getTilePosition(playerData.tileCodePosition));
         }
 
         std::map<std::string, int> playerOrder;
@@ -338,22 +318,13 @@ void GameManager::processLoadGame()
             saveData.deckCards.push_back(card->getCardType());
         }
 
-        // Create bank
-        if (bank != nullptr) {
-            delete bank;
-        }
-        bank = new Bank(config.initialMoney, config);
+        bank = Bank{config.initialMoney, config, saveData.properties, players};
 
         std::vector<Player *> playerPointer;
         for (Player &player : players) {
             playerPointer.push_back(&player);
         }
-
-        // Create board
-        if (board != nullptr) {
-            delete board;
-        }
-        board = new Board{(int)(config.properties.size() + config.actionTiles.size()), config, playerPointer, saveData.properties};
+        board = Board{(int)(config.properties.size() + config.actionTiles.size()), config, playerPointer, saveData.properties};
 
         logger.clear();
         for (LogSaveData &logData : saveData.logs) {
@@ -427,7 +398,7 @@ void GameManager::processSaveGame(std::string fileName)
         }
         saveData.currentPlayer = getCurrentPlayer().getUsername();
 
-        for (Property *property : board->getPropertyList()) {
+        for (Property *property : board.getPropertyList()) {
             PropertySaveData propertyData;
             propertyData.code = property->getCode();
             propertyData.type = property->getPropertyType();
@@ -493,9 +464,6 @@ void GameManager::processRollDice()
     if (player.getState() == PlayerState::ACTIVE) {
         player.rollDiceAndMove();
         view.outputRollDice();
-        for (int i = 0; i < (int)(config.actionTiles.size() + config.properties.size()); i++) {
-            std::cout << board->getTile(i)->getCode() << std::endl;
-        }
         if (player.isJailed()) {
             logger.log(turn, player.getUsername(), "LEMPAR_DADU",
                        "Hasil dadu: " +
@@ -506,9 +474,6 @@ void GameManager::processRollDice()
         }
         else {
             PlayerPiece &piece = player.getPiece();
-            std::cout << "Posisi: " << piece.getPosition() << std::endl;
-            std::cout << "Tile: " << piece.getCurrentTile() << std::endl;
-            std::cout << "Kode: " << board->getTile(piece.getPosition())->getCode() << std::endl;
             piece.getCurrentTile()->onLanded(player, *this);
             if (DiceRoller::getLastRoll().first == DiceRoller::getLastRoll().second) {
                 logger.log(turn, player.getUsername(), "LEMPAR_DADU",
@@ -1029,24 +994,22 @@ void GameManager::processUseCommunityChestCard()
     card->takeEffect(p, *this);
 }
 
-void GameManager::processUseChanceCard()
-{
-    CardView &cardView = gameView.getCardView();
-    ChanceCard *card = chanceCardDeck.drawCard();
+void GameManager::processUseChanceCard() {
+    CardView& cardView = gameView.getCardView();
+    ChanceCard* card = chanceCardDeck.drawCard();
     cardView.outputCard(*card);
-    Player &p = getCurrentPlayer();
+    Player& p = getCurrentPlayer();
     if (card->getCardType() == "GOTOJAILCARD") {
         processGoToJail();
     }
     card->takeEffect(p, *this);
 }
 
-void GameManager::processStartFestival()
-{
-    FestivalView &fesView = gameView.getFestivalView();
-    Player &p = getCurrentPlayer();
-    std::vector<Property *> properties = p.getProperties();
-    Property *prop = fesView.promptChooseProperty(properties);
+void GameManager::processStartFestival() {
+    FestivalView& fesView = gameView.getFestivalView();
+    Player& p = getCurrentPlayer();
+    std::vector<Property*> properties = p.getProperties();
+    Property* prop = fesView.promptChooseProperty(properties);
     prop->startFestival();
     fesView.outputFestivalStatus(*prop);
 }
