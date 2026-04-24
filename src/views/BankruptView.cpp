@@ -1,5 +1,6 @@
 #include "core/GameManager.hpp"
 #include "views/BankruptView.hpp"
+#define SPACE 20
 void BankruptView::outputPotentialWealth(Player &p, long long debt) const{
     long double wealth = 0;
     std::cout<<"Uang kamu       : M" << p.getMoney() << "\n";
@@ -109,7 +110,7 @@ void BankruptView::outputBankruptByBank(Player &p) const{
     if(p.getProperties().size() > 0){
         std::cout << "Properti berikut akan dilelang:\n";
         for(auto pr : p.getProperties()){
-            std::cout << "-> " << std::setw(20) <<  pr->getName() <<  "(" << pr->getCode() << ")";
+            std::cout << "-> " << std::left << std::setw(SPACE) <<  pr->getName() <<  "(" << pr->getCode() << ")";
         }
     }
     std::cout << p.getUsername() << " telah keluar dari permainan.\n";
@@ -131,7 +132,7 @@ void BankruptView::outputBankruptByPlayer(Player &p, Player& creditor) const{
     std::cout << "Pengalihan aset ke " << creditor.getUsername() << ":\n";
     std::cout << "   - Uang tunai sisa  : M" << p.getMoney()  << "\n";
     for(auto pr: p.getProperties()){
-        std::cout <<std::setw(20) << pr->getName() <<  "(" << pr->getCode() << ")\t" << std::setw(10) 
+        std::cout <<std::left << std::setw(SPACE) << pr->getName() <<  "(" << pr->getCode() << ")\t" << std::left << std::setw(10) 
         << ("[" + pr->getColor() + "]") ;
         switch (pr->getState())
         {

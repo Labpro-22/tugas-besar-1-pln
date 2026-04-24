@@ -18,7 +18,7 @@ Property* MortgageView::promptChooseProperty(std::vector<Property*> pr) const{
         for(auto p : pr){
             if(!p->isMortgaged()){
                 indeks[idx] = i;
-                std::cout << idx++ << ". " << std::setw(SPACE) << p->getName() +  " (" + p->getCode() + ")"
+                std::cout << idx++ << ". " << std::left << std::setw(SPACE) << p->getName() +  " (" + p->getCode() + ")"
                 << "[" << p->getColor() << "] Nilai Gadai: M" << p->getMortgageValue()<< "\n"; 
                 
             }
@@ -58,7 +58,7 @@ bool MortgageView::sellAllBuildings(std::vector<StreetProperty*>colorGroupProper
     std::cout << "Daftar bangunan di color group [" << colorGroupProperty[0]->getColor() << "]:\n";
     int i = 1;
     for(auto sp : colorGroupProperty){
-        std::cout << i << ". " << std::setw(SPACE) << sp->getName() + " (" + sp->getCode() + ")"  << " - ";
+        std::cout << i << ". " << std::left << std::setw(SPACE) << sp->getName() + " (" + sp->getCode() + ")"  << " - ";
         if(sp->hasHotel()){
             std::cout << "Hotel -> Nilai jual bangunan : M" << sp->calculateSellValue() + sp->getPrice()<< "\n";
         }
