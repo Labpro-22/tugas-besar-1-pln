@@ -64,7 +64,7 @@ void ConfigLoader::loadActionTile(Config &config, std::filesystem::path path)
             throw ConfigFileFormatException("NAMA", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream >> actionTile.color)) {
+        if (!(bufferStream >> actionTile.type)) {
             throw ConfigFileFormatException("JENIS", path.string(), col, line);
         }
         col++;
@@ -103,7 +103,7 @@ void ConfigLoader::loadProperty(Config &config, std::filesystem::path path)
             throw ConfigFileFormatException("NAMA", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream >> property.color)) {
+        if (!(bufferStream >> property.type)) {
             throw ConfigFileFormatException("JENIS", path.string(), col, line);
         }
         col++;
