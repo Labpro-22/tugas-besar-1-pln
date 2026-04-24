@@ -4,6 +4,7 @@
 void GameView::InputNextCommand(){
     std::cout << "> ";
     std::string input;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::getline(std::cin, input);
     
     std::stringstream ss(input);
