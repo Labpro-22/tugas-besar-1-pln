@@ -217,28 +217,28 @@ void SaveFileHandler::loadProperty(SaveData &saveData, std::ifstream &in, std::f
         }
         col++;
         if (!(bufferStream >> propertyData.type)) {
-            throw SaveFileFormatException("KODE", path.string(), col, line);
+            throw SaveFileFormatException("TIPE", path.string(), col, line);
         }
         col++;
         if (!(bufferStream >> propertyData.owner)) {
-            throw SaveFileFormatException("KODE", path.string(), col, line);
+            throw SaveFileFormatException("OWNER", path.string(), col, line);
         }
         col++;
         if (!(bufferStream >> propertyData.status)) {
-            throw SaveFileFormatException("KODE", path.string(), col, line);
+            throw SaveFileFormatException("STATUS", path.string(), col, line);
         }
         col++;
         if (!(bufferStream >> propertyData.festivalMultiplier)) {
-            throw SaveFileFormatException("KODE", path.string(), col, line);
+            throw SaveFileFormatException("FESTIVAL_MULTIPLIER", path.string(), col, line);
         }
         col++;
         if (!(bufferStream >> propertyData.festivalDuration)) {
-            throw SaveFileFormatException("KODE", path.string(), col, line);
+            throw SaveFileFormatException("FESTIVAL_DURATION", path.string(), col, line);
         }
         std::string temp;
         col++;
         if (!(bufferStream >> temp)) {
-            throw SaveFileFormatException("KODE", path.string(), col, line);
+            throw SaveFileFormatException("NBUILDING", path.string(), col, line);
         }
         if (temp == "H") {
             propertyData.houseCount = 0;
