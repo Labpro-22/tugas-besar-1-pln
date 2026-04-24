@@ -1,5 +1,6 @@
 #include "core/GameManager.hpp"
 #include "views/MainMenuView.hpp"
+#include <sstream>
 
 int MainMenuView::promptNewGameOrLoadGame(){
     std::cout << "\033[2J\033[1;1H";
@@ -83,4 +84,63 @@ std::vector<std::string> MainMenuView::promptUsernames(){
 
 void MainMenuView::outputCurrentPlayer() {
     std::cout << YELLOW << "\nGiliran pemain " << gameManager.getCurrentPlayer().getUsername() << "\n";
+}
+
+void MainMenuView::outputCurrentPlayerInfo() {
+    Player &player = gameManager.getCurrentPlayer();
+    Tile *tile = player.getPiece().getCurrentTile();
+
+    std::cout << YELLOW << "\nGiliran pemain " << player.getUsername() << "\n" << RESET;
+    std::cout << "Status   : "
+              << (player.getState() == PlayerState::ACTIVE ? "ACTIVE"
+                  : player.getState() == PlayerState::JAILED ? "JAILED"
+                                                             : "BANKRUPT")
+              << "\n";
+    if (tile != nullptr) {
+        std::cout << "Posisi   : " << tile->getName() << " [" << tile->getCode() << "]\n";
+    }
+    std::cout << "Uang     : M" << player.getMoney() << "\n";
+    std::cout << "Properti : " << player.getProperties().size() << "\n";
+
+    std::ostringstream skillInfo;
+    const auto &cards = player.getSkillCards();
+    if (cards.empty()) {
+        skillInfo << "-";
+    }
+    else {
+        for (size_t i = 0; i < cards.size(); ++i) {
+            if (i > 0) {
+                skillInfo << ", ";
+            }
+            skillInfo << cards[i]->getCardType();
+        }
+    }
+    std::cout << "Skill    : " << skillInfo.str() << "\n";
+
+    std::ostringstream effectInfo;
+    const auto &effects = player.getEffects();
+    if (effects.empty()) {
+        effectInfo << "-";
+    }
+    else {
+        for (size_t i = 0; i < effects.size(); ++i) {
+            if (i > 0) {
+                effectInfo << ", ";
+            }
+            effectInfo << effects[i].getName();
+            if (effects[i].getValue() != 0) {
+                effectInfo << "(" << effects[i].getValue() << ")";
+            }
+            if (!effects[i].getIsOneTimeUse()) {
+                effectInfo << "[" << effects[i].getDuration() << "]";
+            }
+        }
+    }
+    std::cout << "Efek     : " << effectInfo.str() << "\n";
+
+    if (player.isJailed()) {
+        std::cout << "Penjara  : " << player.getJailTurns() << " giliran\n";
+    }
+
+    std::cout << "\n";
 }

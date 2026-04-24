@@ -169,9 +169,47 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
     }
 }
 
+Board::Board(Board&& other) noexcept
+    : width(other.width),
+      height(other.height),
+      tiles(std::move(other.tiles)),
+      pieces(std::move(other.pieces)),
+      tilePositions(std::move(other.tilePositions)),
+      mapTilesCodeTile(std::move(other.mapTilesCodeTile)),
+      mapTilesCodeColor(std::move(other.mapTilesCodeColor)),
+      mapTilesColorCount(std::move(other.mapTilesColorCount)),
+      playersList(std::move(other.playersList)),
+      propertyList(std::move(other.propertyList)) {
+    other.width = 0;
+    other.height = 0;
+    rebindPieces();
+}
+
+Board& Board::operator=(Board&& other) noexcept {
+    if (this != &other) {
+        clear();
+
+        width = other.width;
+        height = other.height;
+        tiles = std::move(other.tiles);
+        pieces = std::move(other.pieces);
+        tilePositions = std::move(other.tilePositions);
+        mapTilesCodeTile = std::move(other.mapTilesCodeTile);
+        mapTilesCodeColor = std::move(other.mapTilesCodeColor);
+        mapTilesColorCount = std::move(other.mapTilesColorCount);
+        playersList = std::move(other.playersList);
+        propertyList = std::move(other.propertyList);
+
+        other.width = 0;
+        other.height = 0;
+        rebindPieces();
+    }
+
+    return *this;
+}
+
 Board::~Board() {
-    for (Tile* t : tiles) delete t;
-    for (Property* p : propertyList) delete p;
+    clear();
 }
 
 int Board::getWidth() const noexcept { 
@@ -239,4 +277,34 @@ const std::map<std::string, int>& Board::getMapTilesColorCount() const noexcept 
 
 const std::vector<Property*>& Board::getPropertyList() const noexcept {
     return propertyList;
+}
+
+void Board::clear() noexcept {
+    for (Tile* t : tiles) {
+        delete t;
+    }
+    for (Property* p : propertyList) {
+        delete p;
+    }
+
+    tiles.clear();
+    pieces.clear();
+    tilePositions.clear();
+    mapTilesCodeTile.clear();
+    mapTilesCodeColor.clear();
+    mapTilesColorCount.clear();
+    playersList.clear();
+    propertyList.clear();
+    width = 0;
+    height = 0;
+}
+
+void Board::rebindPieces() noexcept {
+    pieces.clear();
+    for (Player* player : playersList) {
+        if (player != nullptr) {
+            pieces.push_back(&(player->getPiece()));
+            player->getPiece().setBoard(this);
+        }
+    }
 }

@@ -153,16 +153,68 @@ void GameManager::gameLoop()
             processWin();
         }
         else {
+            if (startOfTheTurn) {
+                processTurnStart();
+            }
             gameView.InputNextCommand();
         }
     }
+}
+
+void GameManager::processTurnStart()
+{
+    MainMenuView &view = gameView.getMainMenuView();
+    JailView &jailView = gameView.getJailView();
+    Player &player = getCurrentPlayer();
+
+    view.outputCurrentPlayerInfo();
+
+    if (player.isJailed()) {
+        bool choiceResolved = false;
+        while (!choiceResolved) {
+            int choice = jailView.promptRollOrBailOrUseCard();
+            if (choice == 1) {
+                std::cout << "Gunakan perintah LEMPAR_DADU atau ATUR_DADU untuk mencoba keluar dari penjara.\n\n";
+                choiceResolved = true;
+            }
+            else if (choice == 2) {
+                try {
+                    player.payFineToGetOutOfJail(config.jailFine);
+                    std::cout << "Kamu membayar jaminan sebesar M" << config.jailFine << " dan keluar dari penjara.\n\n";
+                    logger.log(turn, player.getUsername(), "BAYAR_JAMINAN",
+                               "Membayar jaminan sebesar M" + std::to_string(config.jailFine) + " untuk keluar dari penjara.");
+                    choiceResolved = true;
+                }
+                catch (const PlayerException &e) {
+                    std::cout << e.what() << std::endl;
+                }
+            }
+            else if (choice == 3) {
+                try {
+                    player.useGetOutOfJailCard();
+                    std::cout << "Kamu menggunakan kartu bebas dari penjara.\n\n";
+                    logger.log(turn, player.getUsername(), "PAKAI_KARTU_PENJARA",
+                               "Menggunakan kartu bebas dari penjara.");
+                    choiceResolved = true;
+                }
+                catch (const PlayerException &e) {
+                    std::cout << e.what() << std::endl;
+                }
+            }
+        }
+    }
+
+    startOfTheTurn = false;
 }
 
 void GameManager::nextTurn()
 {
     turn++;
 
-    // Reset player queue
+    while (!playerQueue.empty()) {
+        playerQueue.pop();
+    }
+
     for (Player &player : players) {
         if (!player.isBankrupt()) {
             playerQueue.push(&player);
@@ -172,17 +224,44 @@ void GameManager::nextTurn()
 
 void GameManager::nextPlayer()
 {
-    if (getCurrentPlayer().getMoney() < 0) {
-        processLiquidation();
-    }
-    while (getCurrentPlayer().isBankrupt()) {
+    if (startOfTheTurn && !playerQueue.empty()) {
         playerQueue.pop();
+        startOfTheTurn = false;
     }
+
     if (playerQueue.empty()) {
         nextTurn();
     }
 
-    gameView.getMainMenuView().outputCurrentPlayer();
+    while (!playerQueue.empty() && playerQueue.front()->isBankrupt()) {
+        playerQueue.pop();
+    }
+
+    if (playerQueue.empty()) {
+        nextTurn();
+    }
+
+    while (!playerQueue.empty() && playerQueue.front()->isBankrupt()) {
+        playerQueue.pop();
+    }
+
+    if (playerQueue.empty()) {
+        return;
+    }
+
+    if (getCurrentPlayer().getMoney() < 0) {
+        processLiquidation();
+        while (!playerQueue.empty() && playerQueue.front()->isBankrupt()) {
+            playerQueue.pop();
+        }
+        if (playerQueue.empty()) {
+            nextTurn();
+        }
+        if (playerQueue.empty()) {
+            return;
+        }
+    }
+
     Player &player = getCurrentPlayer();
     player.onNextTurn();
     player.addSkillCard(skillCardDeck.drawCard());
@@ -250,6 +329,7 @@ void GameManager::processNewGame()
 
     playing = true;
     initGame();
+    nextTurn();
     nextPlayer();
 }
 void GameManager::processLoadGame()
@@ -461,10 +541,13 @@ void GameManager::processRollDice()
 {
     Player &player = getCurrentPlayer();
     DiceView view = gameView.getDiceView();
+    MainMenuView &mainMenuView = gameView.getMainMenuView();
     if (player.getState() == PlayerState::ACTIVE) {
         player.rollDiceAndMove();
-        view.outputRollDice();
         if (player.isJailed()) {
+            player.getPiece().setPosition(board.getTilePosition("PEN"));
+            view.outputSpeedingToJail(DiceRoller::getLastRoll().first, DiceRoller::getLastRoll().second);
+            processGoToJail();
             logger.log(turn, player.getUsername(), "LEMPAR_DADU",
                        "Hasil dadu: " +
                            std::to_string(DiceRoller::getLastRoll().first) + " + " + std::to_string(DiceRoller::getLastRoll().second) + " = " +
@@ -473,8 +556,10 @@ void GameManager::processRollDice()
             nextPlayer();
         }
         else {
+            view.outputRollDice();
             PlayerPiece &piece = player.getPiece();
             piece.getCurrentTile()->onLanded(player, *this);
+            mainMenuView.outputCurrentPlayerInfo();
             if (DiceRoller::getLastRoll().first == DiceRoller::getLastRoll().second) {
                 logger.log(turn, player.getUsername(), "LEMPAR_DADU",
                            "Hasil dadu: " +
@@ -495,8 +580,9 @@ void GameManager::processRollDice()
     }
     else if (player.getState() == PlayerState::JAILED) {
         player.rollToGetOutOfJail();
-        view.outputRollDice();
+        view.outputRollDice(!player.isJailed());
         if (!player.isJailed()) {
+            mainMenuView.outputCurrentPlayerInfo();
             logger.log(turn, player.getUsername(), "LEMPAR_DADU",
                        "Hasil dadu: " +
                            std::to_string(DiceRoller::getLastRoll().first) + " + " + std::to_string(DiceRoller::getLastRoll().second) + " = " +
@@ -520,10 +606,13 @@ void GameManager::processSetDice(int value1, int value2)
 {
     Player &player = getCurrentPlayer();
     DiceView view = gameView.getDiceView();
+    MainMenuView &mainMenuView = gameView.getMainMenuView();
     if (player.getState() == PlayerState::ACTIVE) {
         player.setDiceAndMove(value1, value2);
-        view.outputSetDice(value1, value2);
         if (player.isJailed()) {
+            player.getPiece().setPosition(board.getTilePosition("PEN"));
+            view.outputSpeedingToJail(value1, value2);
+            processGoToJail();
             logger.log(turn, player.getUsername(), "ATUR_DADU",
                        "Hasil dadu: " +
                            std::to_string(value1) + " + " + std::to_string(value2) + " = " +
@@ -532,8 +621,10 @@ void GameManager::processSetDice(int value1, int value2)
             nextPlayer();
         }
         else {
+            view.outputSetDice(value1, value2);
             PlayerPiece &piece = player.getPiece();
             piece.getCurrentTile()->onLanded(player, *this);
+            mainMenuView.outputCurrentPlayerInfo();
             if (value1 == value2) {
                 logger.log(turn, player.getUsername(), "ATUR_DADU",
                            "Hasil dadu: " +
@@ -554,8 +645,9 @@ void GameManager::processSetDice(int value1, int value2)
     }
     else if (player.getState() == PlayerState::JAILED) {
         player.setDiceToGetOutOfJail(value1, value2);
-        view.outputSetDice(value1, value2);
+        view.outputSetDice(value1, value2, !player.isJailed());
         if (!player.isJailed()) {
+            mainMenuView.outputCurrentPlayerInfo();
             logger.log(turn, player.getUsername(), "ATUR_DADU",
                        "Hasil dadu: " +
                            std::to_string(value1) + " + " + std::to_string(value2) + " = " +
@@ -574,7 +666,6 @@ void GameManager::processSetDice(int value1, int value2)
     else {
         throw AlreadyBankruptException("Player tidak bisa melakukan aksi apapun setelah bangkrut!");
     }
-    nextPlayer();
 }
 void GameManager::processBuyProperty()
 {
@@ -743,6 +834,10 @@ void GameManager::processUseSkillCard()
     CardView &cardView = gameView.getCardView();
 
     int skillIndex = view.promptChooseCardToUse(player.getSkillCards());
+    if (skillIndex < 0 || skillIndex >= static_cast<int>(player.getSkillCards().size())) {
+        return;
+    }
+
     try {
         SkillCard *card = player.getSkillCards()[skillIndex];
         cardView.outputCard(*card);
@@ -770,6 +865,10 @@ void GameManager::processDropSkillCard()
     DropSkillCardView &view = gameView.getDropSkillCardView();
 
     int skillIndex = view.promptChooseSkillCard(player.getSkillCards());
+    if (skillIndex < 0 || skillIndex >= static_cast<int>(player.getSkillCards().size())) {
+        return;
+    }
+
     try {
         SkillCard *card = player.getSkillCards()[skillIndex];
         player.dropSkillCard(skillIndex);

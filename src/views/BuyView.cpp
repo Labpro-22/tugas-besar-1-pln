@@ -10,10 +10,10 @@ bool BuyView::promptBuyProperty(Property& pr){
             int right = padding - left;
             return std::string(left, ' ') + text + std::string(right, ' ');
         };
-        std::cout << "+" << std::string(WIDTH, '=') << "+" ;
+        std::cout << "+" << std::string(WIDTH, '=') << "+\n";
         std::cout << "|" <<  centerText("AKTA KEPEMILIKAN") << "|\n";
         std::cout << "|" << centerText("[" + sp->getColor() +"] " + sp->getName() + " (" + sp->getCode() + ")") <<"|\n";
-        std::cout << "+" << std::string(WIDTH, '=') << "+" ;
+        std::cout << "+" << std::string(WIDTH, '=') << "+\n";
         std::cout << "| " << std::setw(COLON_WIDTH) << " Harga Beli" << std::setw(WIDTH-COLON_WIDTH) << ": M" + std::to_string( sp->getPrice())<<"|\n";
         std::cout << "| " << std::setw(COLON_WIDTH) << " Nilai Gadai" << std::setw(WIDTH-COLON_WIDTH) << ": M" + std::to_string( sp->getMortgageValue())<<"|\n";
         std::cout << "+ " <<std::string(WIDTH, '-') << "+\n";
@@ -32,9 +32,7 @@ bool BuyView::promptBuyProperty(Property& pr){
         std::cout << "+" << std::string(WIDTH,'-') << "+\n";
         std::cout << "|" << std::setw(COLON_WIDTH) << " Harga Rumah" << std::setw(WIDTH-COLON_WIDTH) << ( ": M" + std::to_string(sp->getHousePrice()))<<"|\n";
         std::cout << "|" <<std::setw(COLON_WIDTH) << " Harga Hotel" << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(sp->getHotelPrice()))<<"|\n";
-        std::cout << "+" << std::string(WIDTH, '=') << "+" ;
-
-
+        std::cout << "+" << std::string(WIDTH, '=') << "+\n";
         std::cout << "Uang kamu saat ini: M" << gameManager.getCurrentPlayer().getMoney() << "\n";
         std::string yayOrNay;
         std::cout << "Apakah kamu ingin membeli properti ini seharga M" << sp->getPrice() << "? (y/n): ";
@@ -71,5 +69,6 @@ void BuyView::outputBuyStatus(bool success, Property* pr)const{
             std::cout.flush(); 
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
+        std::cout << "\n";
     }
 }
