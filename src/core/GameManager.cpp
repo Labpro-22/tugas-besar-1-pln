@@ -57,17 +57,17 @@ GameManager::GameManager()
 
     // Load community-chest card
     for (CardConfig card : config.communityChestCards) {
-        if (card.type == "PAY") {
-            communityChestCardDeck.addCard(new PayMoneyCard(card.message, card.value));
+        if (card.type == "PAYMONEYCARD") {
+            communityChestCardDeck += new PayMoneyCard(card.message, card.value);
         }
-        else if (card.type == "PAYALL") {
-            communityChestCardDeck.addCard(new PayMoneyToPlayersCard(card.message, card.value));
+        else if (card.type == "PAYMONEYTOPLAYERSCARD") {
+            communityChestCardDeck += new PayMoneyToPlayersCard(card.message, card.value);
         }
-        else if (card.type == "COLLECT") {
-            communityChestCardDeck.addCard(new CollectMoneyCard(card.message, card.value));
+        else if (card.type == "COLLECTMONEYCARD") {
+            communityChestCardDeck += new CollectMoneyCard(card.message, card.value);
         }
-        else if (card.type == "COLLECTALL") {
-            communityChestCardDeck.addCard(new CollectMoneyFromPlayersCard(card.message, card.value));
+        else if (card.type == "COLLECTMONEYFROMPLAYERSCARD") {
+            communityChestCardDeck += new CollectMoneyFromPlayersCard(card.message, card.value);
         }
     }
 
@@ -224,13 +224,8 @@ void GameManager::nextTurn()
 
 void GameManager::nextPlayer()
 {
-    if (startOfTheTurn && !playerQueue.empty()) {
+    if (!playerQueue.empty()) {
         playerQueue.pop();
-        startOfTheTurn = false;
-    }
-
-    if (playerQueue.empty()) {
-        nextTurn();
     }
 
     while (!playerQueue.empty() && playerQueue.front()->isBankrupt()) {
@@ -239,27 +234,13 @@ void GameManager::nextPlayer()
 
     if (playerQueue.empty()) {
         nextTurn();
-    }
-
-    while (!playerQueue.empty() && playerQueue.front()->isBankrupt()) {
-        playerQueue.pop();
+        while (!playerQueue.empty() && playerQueue.front()->isBankrupt()) {
+            playerQueue.pop();
+        }
     }
 
     if (playerQueue.empty()) {
         return;
-    }
-
-    if (getCurrentPlayer().getMoney() < 0) {
-        processLiquidation();
-        while (!playerQueue.empty() && playerQueue.front()->isBankrupt()) {
-            playerQueue.pop();
-        }
-        if (playerQueue.empty()) {
-            nextTurn();
-        }
-        if (playerQueue.empty()) {
-            return;
-        }
     }
 
     Player &player = getCurrentPlayer();
@@ -308,10 +289,12 @@ void GameManager::processNewGame()
     for (std::string &username : usernames) {
         players.push_back(Player{username, config.initialMoney});
     }
+    players.reserve(players.size()); 
     std::shuffle(players.begin(), players.end(), std::default_random_engine{(long unsigned int)time(0)});
+
     std::vector<Player *> playerPointer;
-    for (auto it = players.begin(); it != players.end(); it++) {
-        playerPointer.push_back(it.base());
+    for (Player &p : players) {
+        playerPointer.push_back(&p);
     }
 
     // Create board
@@ -1104,11 +1087,13 @@ void GameManager::processUseChanceCard() {
     card->takeEffect(p, *this);
 }
 
-void GameManager::processStartFestival() {
-    FestivalView& fesView = gameView.getFestivalView();
-    Player& p = getCurrentPlayer();
-    std::vector<Property*> properties = p.getProperties();
-    Property* prop = fesView.promptChooseProperty(properties);
+void GameManager::processStartFestival()
+{
+    FestivalView &fesView = gameView.getFestivalView();
+    Player &p = getCurrentPlayer();
+    std::vector<Property *> properties = p.getProperties();
+    Property *prop = fesView.promptChooseProperty(properties);
+    if (prop == nullptr) return;
     prop->startFestival();
     fesView.outputFestivalStatus(*prop);
 }

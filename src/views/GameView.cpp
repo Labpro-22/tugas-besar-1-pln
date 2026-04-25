@@ -1,16 +1,19 @@
 #include "core/GameManager.hpp"
 #include "views/GameView.hpp"
 #include <sstream>
-void GameView::InputNextCommand(){
+#include <algorithm>
+#include <cctype>
+void GameView::inputNextCommand(){
     std::string input;
 
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     std::cout << gameManager.getCurrentPlayer().getUsername() << "> ";
-    std::getline(std::cin, input); // jujur gatau gunanya apa
-    std::stringstream ss(input); // bisa dihapus maybe?
+    std::cin >> std::ws;
+    std::getline(std::cin, input);
+    std::stringstream ss(input);
     std::string command;
     ss >> command;
+    std::transform(command.begin(), command.end(), command.begin(), ::toupper);
     bool handled = true;
     if(command == "CETAK_PAPAN"){
         boardView.drawBoard();

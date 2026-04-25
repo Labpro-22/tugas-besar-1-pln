@@ -66,40 +66,43 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     });
                     if (player != players.end()) {
                         (*player)->addProperty(property);
+                        property->setOwner(*player);
                     }
                     prop = property;
                 }
                 else {
                     prop = new StreetProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, conf.housePrice, conf.hotelPrice, conf.rent);
                 }
-            } 
+            }
             else if (conf.type == "RAILROAD") {
                 if (propDataMap.count(conf.code)) {
                     PropertySaveData data = propDataMap[conf.code];
-                    RailroadProperty* property = new RailroadProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, 
+                    RailroadProperty* property = new RailroadProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue,
                                                                       data.festivalMultiplier, data.festivalDuration, config.railroadRent);
                     auto player = std::find_if(players.begin(), players.end(), [data](Player *p) {
                         return p->getUsername() == data.owner;
                     });
                     if (player != players.end()) {
                         (*player)->addProperty(property);
+                        property->setOwner(*player);
                     }
                     prop = property;
                 }
                 else {
                     prop = new RailroadProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, initialFestMul, initialFestDur, config.railroadRent);
                 }
-            } 
+            }
             else if (conf.type == "UTILITY") {
                 if (propDataMap.count(conf.code)) {
                     PropertySaveData data = propDataMap[conf.code];
-                    UtilityProperty* property = new UtilityProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue, 
+                    UtilityProperty* property = new UtilityProperty(conf.code, conf.name, conf.color, conf.price, conf.mortgageValue,
                                                                       data.festivalMultiplier, data.festivalDuration, config.utilityRent);
                     auto player = std::find_if(players.begin(), players.end(), [data](Player *p) {
                         return p->getUsername() == data.owner;
                     });
                     if (player != players.end()) {
                         (*player)->addProperty(property);
+                        property->setOwner(*player);
                     }
                     prop = property;
                 }
