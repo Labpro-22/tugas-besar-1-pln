@@ -13,8 +13,9 @@ void GoToNearestStationCard::takeEffect(Player& p, GameManager& gm) {
     
     p.getPiece().setPosition(targetStation);
     message = "Anda berpindah ke stasiun terdekat di petak " + std::to_string(targetStation) + "!";
-    
-    gm.getBoard().getTile(targetStation)->onLanded(p, gm);
+
+    Tile* tile = gm.getBoard().getTile(targetStation);
+    if (tile) tile->onLanded(p, gm);
 }
 
 std::string GoToNearestStationCard::getCardType() const {
