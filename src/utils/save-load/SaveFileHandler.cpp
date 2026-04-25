@@ -2,7 +2,7 @@
 
 void SaveFileHandler::saveGame(SaveData saveData, std::string fileName)
 {
-    std::filesystem::path path = "data/" + fileName + ".txt";
+    std::filesystem::path path = "data/" + fileName;
     std::filesystem::create_directories(path.parent_path());
 
     std::ofstream out(path);
@@ -76,7 +76,7 @@ void SaveFileHandler::saveLog(SaveData &saveData, std::ofstream &out)
 
 SaveData SaveFileHandler::loadGame(std::string fileName)
 {
-    std::filesystem::path path = "data/" + fileName + ".txt";
+    std::filesystem::path path = "data/" + fileName;
     std::ifstream in(path);
     if (!in.is_open()) {
         throw SaveFileNotFoundException(path.string());
@@ -116,31 +116,31 @@ void SaveFileHandler::loadPlayer(SaveData &saveData, std::ifstream &in, std::fil
     }
 
     for (int i = 0; i < playerCount; i++) {
-        PlayerSaveData player;
+        PlayerSaveData playerData;
 
         int col = 0;
         line++;
         std::getline(in, buffer);
         bufferStream = std::stringstream(buffer);
         col++;
-        if (!(bufferStream >> player.username)) {
+        if (!(bufferStream >> playerData.username)) {
             throw SaveFileFormatException("USERNAME", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream >> player.money)) {
+        if (!(bufferStream >> playerData.money)) {
             throw SaveFileFormatException("UANG", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream >> player.tileCodePosition)) {
+        if (!(bufferStream >> playerData.tileCodePosition)) {
             throw SaveFileFormatException("POSISI_PETAK", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream >> player.getOutOfJailCardCount)) {
-            player.getOutOfJailCardCount = 0;
+        if (!(bufferStream >> playerData.getOutOfJailCardCount)) {
+            playerData.getOutOfJailCardCount = 0;
         }
         col++;
-        if (!(bufferStream >> player.jailTurns)) {
-            player.jailTurns = 0;
+        if (!(bufferStream >> playerData.jailTurns)) {
+            playerData.jailTurns = 0;
         }
 
         int skillCardCount;
@@ -157,21 +157,24 @@ void SaveFileHandler::loadPlayer(SaveData &saveData, std::ifstream &in, std::fil
             line++;
             std::getline(in, buffer);
             bufferStream = std::stringstream(buffer);
+
+            SkillCardSaveData cardData;
             col++;
-            if (!(bufferStream >> skillCardCount)) {
+            if (!(bufferStream >> cardData.type)) {
                 throw SaveFileFormatException("JENIS_KARTU", path.string(), col, line);
             }
             col++;
-            if (!(bufferStream >> skillCardCount)) {
-                throw SaveFileFormatException("NILAI_KARTU", path.string(), col, line);
+            if (!(bufferStream >> cardData.value)) {
+                cardData.value = 0;
             }
             col++;
-            if (!(bufferStream >> skillCardCount)) {
-                throw SaveFileFormatException("SISA_DURASI", path.string(), col, line);
+            if (!(bufferStream >> cardData.duration)) {
+                cardData.duration = 1;
             }
+            playerData.skillCards.push_back(cardData);
         }
 
-        saveData.players.push_back(player);
+        saveData.players.push_back(playerData);
     }
     line++;
     std::getline(in, buffer);
@@ -203,49 +206,49 @@ void SaveFileHandler::loadProperty(SaveData &saveData, std::ifstream &in, std::f
         throw SaveFileFormatException("JUMLAH_PROPERTI", path.string(), 1, line);
     }
     for (int i = 0; i < propertyCount; i++) {
-        PropertySaveData property;
+        PropertySaveData propertyData;
         line++;
         std::getline(in, buffer);
         std::stringstream bufferStream(buffer);
         int col = 0;
         col++;
-        if (!(bufferStream >> property.code)) {
+        if (!(bufferStream >> propertyData.code)) {
             throw SaveFileFormatException("KODE", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream >> property.type)) {
-            throw SaveFileFormatException("KODE", path.string(), col, line);
+        if (!(bufferStream >> propertyData.type)) {
+            throw SaveFileFormatException("TIPE", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream >> property.owner)) {
-            throw SaveFileFormatException("KODE", path.string(), col, line);
+        if (!(bufferStream >> propertyData.owner)) {
+            throw SaveFileFormatException("OWNER", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream >> property.status)) {
-            throw SaveFileFormatException("KODE", path.string(), col, line);
+        if (!(bufferStream >> propertyData.status)) {
+            throw SaveFileFormatException("STATUS", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream >> property.festivalMultiplier)) {
-            throw SaveFileFormatException("KODE", path.string(), col, line);
+        if (!(bufferStream >> propertyData.festivalMultiplier)) {
+            throw SaveFileFormatException("FESTIVAL_MULTIPLIER", path.string(), col, line);
         }
         col++;
-        if (!(bufferStream >> property.festivalDuration)) {
-            throw SaveFileFormatException("KODE", path.string(), col, line);
+        if (!(bufferStream >> propertyData.festivalDuration)) {
+            throw SaveFileFormatException("FESTIVAL_DURATION", path.string(), col, line);
         }
         std::string temp;
         col++;
         if (!(bufferStream >> temp)) {
-            throw SaveFileFormatException("KODE", path.string(), col, line);
+            throw SaveFileFormatException("NBUILDING", path.string(), col, line);
         }
         if (temp == "H") {
-            property.houseCount = 0;
-            property.hasHotel = true;
+            propertyData.houseCount = 0;
+            propertyData.hasHotel = true;
         }
         else {
-            property.houseCount = std::stoi(temp);
-            property.hasHotel = false;
+            propertyData.houseCount = std::stoi(temp);
+            propertyData.hasHotel = false;
         }
-        saveData.properties.push_back(property);
+        saveData.properties.push_back(propertyData);
     }
 }
 
@@ -282,27 +285,27 @@ void SaveFileHandler::loadLog(SaveData &saveData, std::ifstream &in, std::filesy
         throw SaveFileFormatException("JUMLAH_KARTU", path.string(), 1, line);
     }
     for (int i = 0; i < logCount; i++) {
-        LogSaveData log;
+        LogSaveData logData;
         line++;
         std::getline(in, buffer);
         std::stringstream bufferStream(buffer);
         int col = 0;
         col++;
-        if (!(bufferStream >> log.turn)) {
+        if (!(bufferStream >> logData.turn)) {
             throw SaveFileFormatException("TURN", path.string(), 1, line);
         }
         col++;
-        if (!(bufferStream >> log.username)) {
+        if (!(bufferStream >> logData.username)) {
             throw SaveFileFormatException("USERNAME", path.string(), 1, line);
         }
         col++;
-        if (!(bufferStream >> log.action)) {
+        if (!(bufferStream >> logData.action)) {
             throw SaveFileFormatException("JENIS_AKSI", path.string(), 1, line);
         }
         col++;
-        if (!(std::getline(bufferStream, log.details))) {
+        if (!(std::getline(bufferStream, logData.details))) {
             throw SaveFileFormatException("DETAIL", path.string(), 1, line);
         }
-        saveData.logs.push_back(log);
+        saveData.logs.push_back(logData);
     }
 }

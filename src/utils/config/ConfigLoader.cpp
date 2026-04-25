@@ -61,9 +61,6 @@ void ConfigLoader::loadActionTile(Config &config, std::filesystem::path path)
         std::stringstream bufferStream(buffer);
         col++;
         if (!(bufferStream >> actionTile.id)) {
-            if (line == 1) {
-                continue;
-            }
             throw ConfigFileFormatException("ID", path.string(), col, line);
         }
         col++;

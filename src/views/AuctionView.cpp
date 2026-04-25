@@ -5,6 +5,7 @@
 #include <sstream>
 void AuctionView::outputProperty(Property &pr) const{
     std::cout << "Properti "<< pr.getName() << "(" << pr.getCode() << ")" << "akan dilelang!\n\n";
+    
 }
 long long AuctionView::promptBidOrPass(Player &p) const {
     std::cout << "Giliran: Pemain " << p.getUsername() << "\n";
