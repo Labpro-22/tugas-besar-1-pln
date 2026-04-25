@@ -55,6 +55,26 @@ Bank::~Bank()
     }
 }
 
+Bank::Bank(Bank&& other) noexcept
+    : initialMoney(other.initialMoney), properties(std::move(other.properties))
+{
+    other.initialMoney = 0;
+}
+
+Bank& Bank::operator=(Bank&& other) noexcept
+{
+    if (this != &other) {
+        while (!properties.empty()) {
+            delete properties.back();
+            properties.pop_back();
+        }
+        initialMoney = other.initialMoney;
+        properties = std::move(other.properties);
+        other.initialMoney = 0;
+    }
+    return *this;
+}
+
 std::vector<Property *> &Bank::getProperties()
 {
     return properties;

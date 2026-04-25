@@ -18,6 +18,10 @@ private:
 public:
     Bank(long long initialMoney, Config &config);
     ~Bank();
+    Bank(const Bank&) = delete;
+    Bank& operator=(const Bank&) = delete;
+    Bank(Bank&& other) noexcept;
+    Bank& operator=(Bank&& other) noexcept;
 
     std::vector<Property *> &getProperties();
 
