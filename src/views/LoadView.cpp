@@ -30,20 +30,27 @@ void LoadView::outputLoadStatus(bool success)const{
 
 void LoadView::outputSaveNames() const{
     try {
+        bool first = true;
         for (const auto& entry : std::filesystem::directory_iterator("data")) {
             if (entry.is_regular_file()) {
-                std::string filename = entry.path().filename().string();
-
-                if (entry.path().extension() == ".txt") {
-                    std::string nameOnly = entry.path().stem().string();
-                    std::cout << "- " << nameOnly << "\n";
+                if (first) {
+                    std::cout << "Nama save file:\n";
+                    first = false;
                 }
+                std::string filename = entry.path().filename().string();
+                std::cout << "- " << filename << "\n";
+                // if (entry.path().extension() == ".txt") {
+                //     std::string nameOnly = entry.path().stem().string();
+                // }
             }
+        }
+        if (first) {
+            std::cout << "Belum ada permainan yang disimpan\n";
         }
     } catch (const std::filesystem::filesystem_error& e) {
         std::cout << "Error membuka folder: " << e.what() << "\n";
     }
-    std::cout << "\n";
+    std::cout << std::endl;
 }
 
 std::string LoadView::promptSaveName(){

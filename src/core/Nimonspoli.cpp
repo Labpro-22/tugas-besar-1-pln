@@ -6,6 +6,7 @@
 void Nimonspoli::run()
 {
     try {
+        std::cout << "\033[2J\033[1;1H\n";
         GameManager gameManager;
         gameManager.runGame();
     }

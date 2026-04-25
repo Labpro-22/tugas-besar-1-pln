@@ -3,7 +3,6 @@
 #include <sstream>
 
 int MainMenuView::promptNewGameOrLoadGame(){
-    std::cout << "\033[2J\033[1;1H";
 
 
 
@@ -142,5 +141,5 @@ void MainMenuView::outputCurrentPlayerInfo() {
         std::cout << "Penjara  : " << player.getJailTurns() << " giliran\n";
     }
 
-    std::cout << "\n";
+    std::cout << std::endl;
 }
