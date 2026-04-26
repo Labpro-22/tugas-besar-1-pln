@@ -54,7 +54,7 @@ void SaveFileHandler::saveProperty(SaveData &saveData, std::ofstream &out)
             << property.status << " "
             << property.festivalMultiplier << " "
             << property.festivalDuration << " "
-            << (property.hasHotel ? std::to_string(property.houseCount) : "H") << "\n";
+            << (property.hasHotel ? "H" : std::to_string(property.houseCount)) << "\n";
     }
 }
 
