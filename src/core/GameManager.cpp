@@ -27,6 +27,8 @@ GameManager::GameManager()
     : running{false},
       playing{false},
       startOfTheTurn{false},
+      skillCardUsedThisTurn{false},
+      diceRolledThisTurn{false},
       config{ConfigLoader::loadConfig()},
       gameView{*this},
       turn{0},
@@ -250,15 +252,17 @@ void GameManager::nextPlayer()
     if (playerQueue.empty()) {
         return;
     }
+    
+    skillCardUsedThisTurn = false;
+    diceRolledThisTurn = false;
 
     Player &player = getCurrentPlayer();
     player.onNextTurn();
+    SkillCard* newCard = skillCardDeck.drawCard();
     try {
-        player.addSkillCard(skillCardDeck.drawCard());
+        player.addSkillCard(newCard);
     }
     catch (const FullHandException &) {
-        SkillCard* newCard = skillCardDeck.drawCard();
-        // Temporarily add the 4th card so player can choose which to drop
         player.getSkillCardsRef().push_back(newCard);
         std::cout << "\nKamu mendapatkan 1 kartu acak baru!\n";
         std::cout << "Kartu yang didapat: " << newCard->getCardType() << ".\n";
@@ -410,10 +414,6 @@ void GameManager::processLoadGame()
             }
         }
 
-        for (SkillCard *card : skillCardDeck.getCards()) {
-            saveData.deckCards.push_back(card->getCardType());
-        }
-
         bank = Bank{config.initialMoney, config};
 
         std::vector<Player *> playerPointer;
@@ -558,6 +558,7 @@ void GameManager::processRollDice()
     Player &player = getCurrentPlayer();
     DiceView view = gameView.getDiceView();
     MainMenuView &mainMenuView = gameView.getMainMenuView();
+    diceRolledThisTurn = true;
     if (player.getState() == PlayerState::ACTIVE) {
         player.rollDiceAndMove(*this);
         if (player.isJailed()) {
@@ -623,6 +624,7 @@ void GameManager::processSetDice(int value1, int value2)
     Player &player = getCurrentPlayer();
     DiceView view = gameView.getDiceView();
     MainMenuView &mainMenuView = gameView.getMainMenuView();
+    diceRolledThisTurn = true;
     if (player.getState() == PlayerState::ACTIVE) {
         player.setDiceAndMove(value1, value2, *this); 
         if (player.isJailed()) {
@@ -757,15 +759,14 @@ void GameManager::processAuctionProperty(Property *property)
     }
 
     Player *lastBidder = nullptr;
-    long long bestBidAmount = 0;
+    long long bestBidAmount = -1;
     int consecutivePasses = 0;
 
     int idx = 0;
     while (true) {
         Player *bidder = order[idx % order.size()];
         long long bid = view.promptBidOrPass(*bidder);
-
-        if (bid > bestBidAmount) {
+        if (bid >= 0 && bid > bestBidAmount) {
             lastBidder = bidder;
             bestBidAmount = bid;
             consecutivePasses = 0;
@@ -781,19 +782,23 @@ void GameManager::processAuctionProperty(Property *property)
         idx++;
         if (consecutivePasses >= activePlayers - 1 && lastBidder != nullptr) break;
         if (consecutivePasses >= activePlayers && lastBidder == nullptr) {
+            // Force the last player who didn't pass to bid
             Player *forced = order[(idx - 1) % order.size()];
-            long long forcedBid = view.promptBidOrPass(*forced);
-            if (forcedBid > 0) {
-                lastBidder = forced;
-                bestBidAmount = forcedBid;
-                logger.log(turn, forced->getUsername(), "BID",
-                           "Bid paksa " + property->getName() + " [" + property->getCode() + "] M" + std::to_string(forcedBid));
+            long long forcedBid = -1;
+            while (forcedBid < 0) {
+                std::cout << "Minimal satu pemain harus melakukan bid. ";
+                forcedBid = view.promptBidOrPass(*forced);
+                if (forcedBid < 0) std::cout << "Tidak bisa PASS! Harus BID.\n";
             }
+            lastBidder = forced;
+            bestBidAmount = forcedBid;
+            logger.log(turn, forced->getUsername(), "BID",
+                       "Bid paksa " + property->getName() + " [" + property->getCode() + "] M" + std::to_string(forcedBid));
             break;
         }
     }
 
-    if (lastBidder == nullptr || bestBidAmount == 0) {
+    if (lastBidder == nullptr || bestBidAmount < 0) {
         property->resetOwnerAsBank();
         view.outputNoBid(property);
     }
@@ -816,9 +821,45 @@ void GameManager::processMortgageProperty()
     MortgageView &view = gameView.getMortgageView();
     Property *chosenProperty = view.promptChooseProperty(player.getProperties());
     if (chosenProperty == nullptr) return;
+
+    if (chosenProperty->getPropertyType() == "STREET") {
+        StreetProperty* chosenStreet = dynamic_cast<StreetProperty*>(chosenProperty);
+        std::string color = chosenStreet->getColor();
+        std::vector<StreetProperty*> colorGroupWithBuildings;
+        bool hasBuildings = false;
+        for (Property* pr : player.getProperties()) {
+            if (pr->getColor() == color) {
+                if (auto sp = dynamic_cast<StreetProperty*>(pr)) {
+                    if (sp->getHouseCount() > 0) {
+                        hasBuildings = true;
+                        colorGroupWithBuildings.push_back(sp);
+                    }
+                }
+            }
+        }
+        if (hasBuildings) {
+            bool sold = view.sellAllBuildings(colorGroupWithBuildings);
+            if (!sold) return;
+            for (StreetProperty* sp : colorGroupWithBuildings) {
+                long long refund = 0;
+                int count = sp->getHouseCount();
+                for (int i = 0; i < count; i++) {
+                    refund += (sp->hasHotel() ? sp->getHotelPrice() : sp->getHousePrice()) / 2;
+                    sp->removeBuilding();
+                }
+                player.receiveMoney(refund);
+            }
+        }
+        // Ask again to confirm mortgage after buildings sold
+        std::string confirm;
+        std::cout << "Lanjut menggadaikan " << chosenProperty->getName() << "? (y/n): ";
+        std::cin >> confirm;
+        if (confirm != "y") return;
+    }
+
     try {
         logger.log(turn, player.getUsername(), "GADAI",
-                   chosenProperty->getName() + " [ " + chosenProperty->getCode() + "]" +
+                   chosenProperty->getName() + " [" + chosenProperty->getCode() + "]" +
                        " digadaikan seharga " + std::to_string(chosenProperty->getMortgageValue()));
         player.mortgageProperty(chosenProperty);
         view.outputMortgageStatus(true, *chosenProperty);
@@ -875,6 +916,15 @@ void GameManager::processBuild()
 void GameManager::processUseSkillCard()
 {
     Player &player = getCurrentPlayer();
+    if (diceRolledThisTurn) {
+        std::cout << "Kartu kemampuan hanya bisa digunakan SEBELUM melempar dadu.\n\n";
+        return;
+    }
+    if (skillCardUsedThisTurn) {
+        std::cout << "Kamu sudah menggunakan kartu kemampuan pada giliran ini!\n";
+        std::cout << "Penggunaan kartu dibatasi maksimal 1 kali dalam 1 giliran.\n\n";
+        return;
+    }
 
     UseSkillCardView &view = gameView.getUseSkillCardView();
     CardView &cardView = gameView.getCardView();
@@ -897,6 +947,7 @@ void GameManager::processUseSkillCard()
             card->prepareUse(gameView.getUseSkillCardView(), *this);
         }
         player.useSkillCard(skillIndex, *this);
+        skillCardUsedThisTurn = true;
         logger.log(turn, player.getUsername(), "USE_CARD",
                    card->getCardType() + " dipakai. " + card->getMessage());
     }
@@ -939,6 +990,12 @@ void GameManager::processLiquidation()
     if (player.calculateTotalWealth() >= -player.getMoney()) {
         while (player.getMoney() < 0) {
             auto chosenProperty = view.promptLiquidation(player.getProperties(), -player.getMoney());
+            if (chosenProperty.first == "Batal") {
+                if (player.getMoney() < 0) {
+                    std::cout << "Kamu masih memiliki kewajiban! Kamu harus melikuidasi aset.\n";
+                }
+                continue;
+            }
             if (chosenProperty.first == "Jual") {
                 player.sellProperty(chosenProperty.second);
             }
@@ -1019,6 +1076,12 @@ void GameManager::processLiquidation(Player &creditor)
     if (player.calculateTotalWealth() >= -player.getMoney()) {
         while (player.getMoney() < 0) {
             auto chosenProperty = view.promptLiquidation(player.getProperties(), -player.getMoney());
+            if (chosenProperty.first == "Batal") {
+                if (player.getMoney() < 0) {
+                    std::cout << "Kamu masih memiliki kewajiban! Kamu harus melikuidasi aset.\n";
+                }
+                continue;
+            }
             if (chosenProperty.first == "Jual") {
                 player.sellProperty(chosenProperty.second);
             }
@@ -1057,6 +1120,7 @@ void GameManager::processWin()
     view.outputWinner(winner, remainingPlayer);
 
     playing = false;
+    stopGame();
 }
 
 void GameManager::processPayRent()
@@ -1156,6 +1220,10 @@ void GameManager::processStartFestival()
     FestivalView &fesView = gameView.getFestivalView();
     Player &p = getCurrentPlayer();
     std::vector<Property *> properties = p.getProperties();
+    if (properties.empty()) {
+        std::cout << "Kamu tidak memiliki properti. Efek festival tidak dapat digunakan.\n\n";
+        return;
+    }
     Property *prop = fesView.promptChooseProperty(properties);
     if (prop == nullptr) return;
     prop->startFestival();
