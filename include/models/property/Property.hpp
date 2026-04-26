@@ -42,6 +42,8 @@ class Property {
 
         void setMortgaged(bool mortgaged) noexcept;
 
+        virtual void resetToBank() noexcept;
+
         virtual long long calculateRent() const noexcept = 0;
 
         virtual long long redemptionPrice() const noexcept = 0;

@@ -22,9 +22,11 @@ void PlayerPiece::setBoard(Board* board) {
     this->board = board;
 }
 
-void PlayerPiece::goForward(int tileCount) {
+bool PlayerPiece::goForward(int tileCount) {
     int boardSize = board->getTileCount();
+    int oldPosition = position;
     position = (position + tileCount) % boardSize;
+    return tileCount > 0 && position != 0 && oldPosition + tileCount >= boardSize;
 }
 
 void PlayerPiece::goBackward(int tileCount) {

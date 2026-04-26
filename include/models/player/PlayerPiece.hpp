@@ -16,7 +16,7 @@ public:
     Tile* getCurrentTile() const;
     void setBoard(Board* board);
     
-    void goForward(int tileCount);
+    bool goForward(int tileCount);
     void goBackward(int tileCount);
 };
 

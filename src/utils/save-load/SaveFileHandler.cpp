@@ -54,7 +54,7 @@ void SaveFileHandler::saveProperty(SaveData &saveData, std::ofstream &out)
             << property.status << " "
             << property.festivalMultiplier << " "
             << property.festivalDuration << " "
-            << (property.hasHotel ? std::to_string(property.houseCount) : "H") << "\n";
+            << (property.hasHotel ? "H" : std::to_string(property.houseCount)) << "\n";
     }
 }
 
@@ -133,6 +133,10 @@ void SaveFileHandler::loadPlayer(SaveData &saveData, std::ifstream &in, std::fil
         col++;
         if (!(bufferStream >> playerData.tileCodePosition)) {
             throw SaveFileFormatException("POSISI_PETAK", path.string(), col, line);
+        }
+        col++;
+        if (!(bufferStream >> playerData.status)) {
+            throw SaveFileFormatException("STATUS", path.string(), col, line);
         }
         col++;
         if (!(bufferStream >> playerData.getOutOfJailCardCount)) {
@@ -263,14 +267,12 @@ void SaveFileHandler::loadDeck(SaveData &saveData, std::ifstream &in, std::files
         throw SaveFileFormatException("JUMLAH_KARTU", path.string(), 1, line);
     }
     for (int i = 0; i < cardCount; i++) {
-        std::string card;
         line++;
         std::getline(in, buffer);
-        std::stringstream bufferStream(buffer);
-        if (!(bufferStream >> card)) {
+        if (buffer.empty()) {
             throw SaveFileFormatException("JENIS_KARTU", path.string(), 1, line);
         }
-        saveData.deckCards.push_back(card);
+        saveData.deckCards.push_back(buffer);
     }
 }
 
@@ -288,22 +290,22 @@ void SaveFileHandler::loadLog(SaveData &saveData, std::ifstream &in, std::filesy
         LogSaveData logData;
         line++;
         std::getline(in, buffer);
-        std::stringstream bufferStream(buffer);
+        std::stringstream logStream(buffer);
         int col = 0;
         col++;
-        if (!(bufferStream >> logData.turn)) {
+        if (!(logStream >> logData.turn)) {
             throw SaveFileFormatException("TURN", path.string(), 1, line);
         }
         col++;
-        if (!(bufferStream >> logData.username)) {
+        if (!(logStream >> logData.username)) {
             throw SaveFileFormatException("USERNAME", path.string(), 1, line);
         }
         col++;
-        if (!(bufferStream >> logData.action)) {
+        if (!(logStream >> logData.action)) {
             throw SaveFileFormatException("JENIS_AKSI", path.string(), 1, line);
         }
         col++;
-        if (!(std::getline(bufferStream, logData.details))) {
+        if (!(std::getline(logStream >> std::ws, logData.details))) {
             throw SaveFileFormatException("DETAIL", path.string(), 1, line);
         }
         saveData.logs.push_back(logData);
