@@ -95,10 +95,11 @@ public:
     void processPayRent();
     void processGoTile();
     void processGoToJail();
+    void processLandingMessage();
     void processPayLuxuryTax();
     void processPayIncomeTax();
     void processUseCommunityChestCard();
     void processUseChanceCard();
-    void processStartFestival();
     void processExit();
+    void processStartFestival();
 };
