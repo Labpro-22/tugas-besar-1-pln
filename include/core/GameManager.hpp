@@ -27,6 +27,8 @@ private:
     bool running;
     bool playing;
     bool startOfTheTurn;
+    bool skillCardUsedThisTurn;
+    bool diceRolledThisTurn;
     Config config;
     GameView gameView;
     int turn;
