@@ -343,6 +343,7 @@ void GameManager::nextTurn()
 void GameManager::nextPlayer()
 {
     if (!playerQueue.empty()) {
+        playerQueue.front()->removeEffect("SHIELD");
         playerQueue.front()->resetDoubleRollCounter();
     }
 
@@ -832,15 +833,19 @@ void GameManager::processSetDice(int value1, int value2)
 }
 void GameManager::processBuyProperty()
 {
-    BuyView &view = gameView.getBuyView();
-
     Player &player = getCurrentPlayer();
+    processBuyProperty(player);
+}
+
+void GameManager::processBuyProperty(Player &player)
+{
+    BuyView &view = gameView.getBuyView();
     PlayerPiece &piece = player.getPiece();
 
     PropertyTile *tile = dynamic_cast<PropertyTile *>(piece.getCurrentTile());
     if (tile != nullptr) {
         if (player.getMoney() >= tile->getProperty()->getPrice()) {
-            if (tile->getProperty()->getPropertyType() != "STREET" || view.promptBuyProperty(*tile->getProperty())) {
+            if (tile->getProperty()->getPropertyType() != "STREET" || view.promptBuyProperty(*tile->getProperty(), player)) {
                 processBuyProperty(player, tile->getProperty());
             }
             else {
@@ -866,15 +871,15 @@ void GameManager::processBuyProperty(Player &player, Property *property)
             logger.log(turn, player.getUsername(), "BELI",
                        "Properti " + property->getName() + " [ " + property->getCode() + "]" +
                            " dibeli seharga " + std::to_string(property->getPrice()));
-            view.outputBuyStatus(true, property);
+            view.outputBuyStatus(true, property, player);
         }
         catch (const PlayerException &e) {
             std::cout << e.what() << std::endl;
-            view.outputBuyStatus(false, property);
+            view.outputBuyStatus(false, property, player);
         }
     }
     else {
-        view.outputBuyStatus(false, property);
+        view.outputBuyStatus(false, property, player);
     }
 }
 void GameManager::processAuctionProperty(Property *property, Player *excludedPlayer)
@@ -1323,18 +1328,28 @@ void GameManager::processWin()
 void GameManager::processPayRent()
 {
     Player &player = getCurrentPlayer();
+    processPayRent(player);
+}
+
+void GameManager::processPayRent(Player &player)
+{
     PlayerPiece &piece = player.getPiece();
 
     PropertyTile *tile = dynamic_cast<PropertyTile *>(piece.getCurrentTile());
     Property *prop = tile->getProperty();
     PropertyView &propView = gameView.getPropertyView();
-    propView.outputRent(*prop);
+    propView.outputRent(*prop, player);
     if (prop->getState() == PropertyState::MORTGAGED) {
         return;
     }
     int pay = player.payRent(tile->getProperty());
     if (!pay) {
-        processLiquidation(*prop->getOwner());
+        if (&player == &getCurrentPlayer()) {
+            processLiquidation(*prop->getOwner());
+        }
+        else {
+            processOtherPlayerLiquidation(player, *prop->getOwner());
+        }
     }
 }
 
@@ -1346,51 +1361,77 @@ void GameManager::processGoTile()
 
 void GameManager::processGoToJail(const std::string& reason)
 {
+    processGoToJail(getCurrentPlayer(), reason);
+}
+
+void GameManager::processGoToJail(Player &player, const std::string& reason)
+{
     JailView &jail = gameView.getJailView();
-    jail.outputGoToJail(reason);
+    jail.outputGoToJail(player, reason);
 }
 
 void GameManager::processPayLuxuryTax()
 {
-    TaxView &taxView = gameView.getTaxView();
-    taxView.outputLuxuryTax(config.luxuryFlatTax);
+    processPayLuxuryTax(getCurrentPlayer());
+}
 
-    Player &player = getCurrentPlayer();
+void GameManager::processPayLuxuryTax(Player &player)
+{
+    TaxView &taxView = gameView.getTaxView();
+    taxView.outputLuxuryTax(config.luxuryFlatTax, player);
+
     bool payTax = player.payTax(config.luxuryFlatTax);
 
     if (!payTax) {
-        processLiquidation();
+        if (&player == &getCurrentPlayer()) {
+            processLiquidation();
+        }
+        else {
+            processLiquidation(player);
+        }
     }
 }
 
 void GameManager::processPayIncomeTax()
 {
+    processPayIncomeTax(getCurrentPlayer());
+}
+
+void GameManager::processPayIncomeTax(Player &player)
+{
     TaxView &taxView = gameView.getTaxView();
-    Player &p = getCurrentPlayer();
-    int input = taxView.promptIncomeTax(config.incomeFlatTax, config.incomePercentageTax);
+    int input = taxView.promptIncomeTax(config.incomeFlatTax, config.incomePercentageTax, player);
     long long amount;
     if (input == 1) {
         amount = config.incomeFlatTax;
     }
     else if (input == 2) {
-        amount = p.calculateTotalWealth() * config.incomePercentageTax / 100;
+        amount = player.calculateTotalWealth() * config.incomePercentageTax / 100;
     }
     else {
         return;
     }
-    Player &player = getCurrentPlayer();
     bool payTax = player.payTax(amount);
     if (!payTax) {
-        processLiquidation();
+        if (&player == &getCurrentPlayer()) {
+            processLiquidation();
+        }
+        else {
+            processLiquidation(player);
+        }
     }
 }
 
 void GameManager::processUseCommunityChestCard()
 {
+    processUseCommunityChestCard(getCurrentPlayer());
+}
+
+void GameManager::processUseCommunityChestCard(Player &p)
+{
     CardView &cardView = gameView.getCardView();
     CommunityChestCard *card = communityChestCardDeck.drawCard();
     cardView.outputCard(*card);
-    Player &p = getCurrentPlayer();
     if ((card->getCardType() == "PAYMONEYCARD" || card->getCardType() == "PAYMONEYTOPLAYERSCARD") && p.hasEffect("SHIELD")) {
         if (p.hasEffect("SHIELD")) {
             cardView.outputShielded();
@@ -1402,20 +1443,28 @@ void GameManager::processUseCommunityChestCard()
 
 void GameManager::processUseChanceCard()
 {
+    processUseChanceCard(getCurrentPlayer());
+}
+
+void GameManager::processUseChanceCard(Player &p)
+{
     CardView &cardView = gameView.getCardView();
     ChanceCard *card = chanceCardDeck.drawCard();
     cardView.outputCard(*card);
-    Player &p = getCurrentPlayer();
     if (card->getCardType() == "GOTOJAILCARD") {
-        processGoToJail("Kartu Chance memerintahkan kamu masuk penjara.");
+        processGoToJail(p, "Kartu Chance memerintahkan kamu masuk penjara.");
     }
     card->takeEffect(p, *this);
 }
 
 void GameManager::processStartFestival()
 {
+    processStartFestival(getCurrentPlayer());
+}
+
+void GameManager::processStartFestival(Player &p)
+{
     FestivalView &fesView = gameView.getFestivalView();
-    Player &p = getCurrentPlayer();
     std::vector<Property *> properties = p.getProperties();
     if (properties.empty()) {
         std::cout << "Kamu tidak memiliki properti. Efek festival tidak dapat digunakan.\n\n";

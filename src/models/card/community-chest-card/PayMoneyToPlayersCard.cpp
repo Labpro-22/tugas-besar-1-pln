@@ -13,7 +13,7 @@ void PayMoneyToPlayersCard::takeEffect(Player& p, GameManager& gm) {
     int moneyNow = p.getMoney() - expectedTotalPaid;
     p.setMoney(moneyNow);
     if (p.getMoney() < 0) {
-        gm.processLiquidation();
+        gm.processLiquidation(p);
     }
     if (p.getState() != PlayerState::BANKRUPT) {
         for (Player& other : allPlayers) {

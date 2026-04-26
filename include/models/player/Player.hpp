@@ -82,6 +82,7 @@ public:
     void getOutOfJail();
     int getJailTurns();
     void addEffect(PlayerEffect effect);
+    void removeEffect(const std::string& name);
     bool hasEffect(const std::string& name) const;
     int getEffectValue(const std::string& name) const;
     void resetDoubleRollCounter();

@@ -2,7 +2,10 @@
 #include "core/GameManager.hpp"
 #include <limits>
 int TaxView::promptIncomeTax(long long flat, double percentage ) const{
-    Player& p = gameManager.getCurrentPlayer();
+    return promptIncomeTax(flat, percentage, gameManager.getCurrentPlayer());
+}
+
+int TaxView::promptIncomeTax(long long flat, double percentage, Player &p) const{
     if (p.hasEffect("SHIELD")) {
         std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu membayar pajak.\n";
         return -1;
@@ -20,7 +23,6 @@ int TaxView::promptIncomeTax(long long flat, double percentage ) const{
         }
         if(input == 1 || input == 2){
             std::cout << "\n\n";
-            Player& p = gameManager.getCurrentPlayer();
             long long money = p.getMoney();
             double tax = 0;
             if(input == 1){
@@ -67,7 +69,10 @@ int TaxView::promptIncomeTax(long long flat, double percentage ) const{
     }
 }
 void TaxView::outputLuxuryTax(long long tax)const{
-    Player& p = gameManager.getCurrentPlayer();
+    outputLuxuryTax(tax, gameManager.getCurrentPlayer());
+}
+
+void TaxView::outputLuxuryTax(long long tax, Player &p)const{
     if (p.hasEffect("SHIELD")) {
         std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu membayar pajak.\n";
         return;

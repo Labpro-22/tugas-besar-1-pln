@@ -449,6 +449,14 @@ void Player::addEffect(PlayerEffect effect) {
     effects.push_back(effect);
 }
 
+void Player::removeEffect(const std::string& name) {
+    effects.erase(
+        std::remove_if(effects.begin(), effects.end(),
+            [&](const PlayerEffect& e) { return e.getName() == name; }),
+        effects.end()
+    );
+}
+
 bool Player::hasEffect(const std::string& name) const {
     for (const PlayerEffect& e : effects) {
         if (e.getName() == name && !e.isExpired()) return true;
