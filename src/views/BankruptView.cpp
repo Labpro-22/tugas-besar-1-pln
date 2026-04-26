@@ -1,5 +1,6 @@
 #include "core/GameManager.hpp"
 #include "views/BankruptView.hpp"
+#include <limits>
 #define SPACE 20
 void BankruptView::outputPotentialWealth(Player &p, long long debt) const{
     long double wealth = 0;
@@ -27,60 +28,81 @@ std::pair<std::string, Property*> BankruptView::promptLiquidation(std::vector<Pr
     std::cout << "=== Panel Likuidasi ===\n";
     std::cout << "Uang kamu saat ini: M" << gameManager.getCurrentPlayer().getMoney() << "  |  Kewajiban: M" << debt << "\n\n";
 
-    std::vector<Property*> sellableList;
-    std::vector<Property*> mortgageableList;
+    std::vector<int> propertyIdx;
+    int idx = 0;
+    int i = 1;
 
     std::cout << "[Jual ke Bank]\n";
-    int i = 1;
     for(auto prop : pr){
         if(!prop->isMortgaged()){
             std::cout << i << ". " << prop->getName() << " (" << prop->getCode() << ")\t[" << prop->getColor() << "]\tHarga Jual: M" << prop->calculateSellValue();
             if(auto sp = dynamic_cast<StreetProperty*>(prop)){
                 if(sp->hasHotel()){
                     std::cout << " (termasuk hotel)";
-                } else if(sp->getHouseCount() > 0){
+                }
+                else if(sp->getHouseCount() > 0){
                     std::cout << " (termasuk " << sp->getHouseCount() << " Rumah)";
                 }
             }
+            propertyIdx.push_back(idx);
             std::cout << "\n";
-            sellableList.push_back(prop);
             i++;
         }
+        idx++;
     }
 
-    int sellCount = i - 1;
+    int sellCount = static_cast<int>(propertyIdx.size());
+    idx = 0;
+
     std::cout << "[Gadai]\n";
     for(auto prop : pr){
         if(!prop->isMortgaged()){
-            std::cout << i << ". " << prop->getName() << " (" << prop->getCode() << ")\t[" << prop->getColor() << "]\tNilai Gadai: M" << prop->getMortgageValue();
+            long long liquidationValue = prop->calculateSellValue() - prop->getPrice() + prop->getMortgageValue();
+            std::cout << i << ". " << prop->getName() << " (" << prop->getCode() << ")\t[" << prop->getColor() << "]\tNilai Gadai: M" << liquidationValue;
             if(auto sp = dynamic_cast<StreetProperty*>(prop)){
-                if(sp->hasHotel() || sp->getHouseCount() > 0){
-                    std::cout << " (bangunan dijual dulu)";
+                if(sp->hasHotel()){
+                    std::cout << " (termasuk jual hotel)";
+                }
+                else if(sp->getHouseCount() > 0){
+                    std::cout << " (termasuk jual " << sp->getHouseCount() << " Rumah)";
                 }
             }
+            propertyIdx.push_back(idx);
             std::cout << "\n";
-            mortgageableList.push_back(prop);
             i++;
         }
+        idx++;
     }
 
+    if(propertyIdx.empty()){
+        std::cout << "Tidak ada aset yang bisa dilikuidasi.\n";
+        return std::make_pair("Batal", nullptr);
+    }
+
+    int input;
     while(true){
         std::cout << "Pilih aksi (0 jika sudah cukup): ";
-        int input;
-        std::cin >> input;
+        if(!(std::cin >> input)){
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Masukkan tidak valid!\n";
+            continue;
+        }
         if(input == 0){
             return std::make_pair("Batal", nullptr);
         }
-        if(input >= 1 && input <= sellCount){
-            Property* p = sellableList[input - 1];
-            std::cout << p->getName() << " terjual ke Bank. Kamu menerima M" << p->calculateSellValue();
-            std::cout << ".\nUang kamu sekarang: M" << gameManager.getCurrentPlayer().getMoney() + p->calculateSellValue() << "\n";
-            return std::make_pair("Jual", p);
-        }
-        if(input > sellCount && input < i){
-            Property* p = mortgageableList[input - sellCount - 1];
-            std::cout << p->getName() << " digadaikan ke Bank. Kamu menerima M" << p->getMortgageValue();
-            std::cout << ".\nUang kamu sekarang: M" << gameManager.getCurrentPlayer().getMoney() + p->getMortgageValue() << "\n";
+        if(input >= 1 && input <= static_cast<int>(propertyIdx.size())){
+            int selectedIdx = input - 1;
+            Property* p = pr[propertyIdx[selectedIdx]];
+            if(selectedIdx < sellCount){
+                std::cout << p->getName() << " terjual ke Bank. Kamu menerima M" << p->calculateSellValue();
+                std::cout << ".\nUang kamu sekarang: M" << gameManager.getCurrentPlayer().getMoney() + p->calculateSellValue() << "\n";
+                return std::make_pair("Jual", p);
+            }
+
+            long long liquidationValue = p->calculateSellValue() - p->getPrice() + p->getMortgageValue();
+            std::cout << p->getName() << " digadaikan ke Bank. Kamu menerima M" << liquidationValue;
+            std::cout << ".\nUang kamu sekarang: M" << gameManager.getCurrentPlayer().getMoney() + liquidationValue << "\n";
             return std::make_pair("Gadai", p);
         }
         std::cout << "Masukkan tidak valid!\n";

@@ -2,6 +2,6 @@
 #include "models/player/Player.hpp"
 #include "core/GameManager.hpp"
 
-void CommunityChestTile::onLanded(Player& p, GameManager& gm) {
+void CommunityChestTile::onLanded(Player&, GameManager& gm) {
     gm.processUseCommunityChestCard();
 }

@@ -1,10 +1,14 @@
 #include "views/JailView.hpp"
 #include "core/GameManager.hpp"
-void JailView::outputGoToJail()const {
+#include <limits>
+void JailView::outputGoToJail(const std::string& reason) const {
     Player& p = gameManager.getCurrentPlayer();
     if (p.hasEffect("SHIELD")) {
         std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu pergi ke penjara.\n";
         return;
+    }
+    if (!reason.empty()) {
+        std::cout << reason << "\n";
     }
     std::cout << "Kamu masuk penjara!\n";
     std::cout << "Langsung ke penjara.\n";
@@ -22,7 +26,12 @@ int JailView::promptRollOrBailOrUseCard(){
         int cardCount = p.getGetOutOfJailCardCount(); 
         std::cout << "3. Gunakan kartu bebas dari penjara (Jumlah kartu bebas dari penjara yang dimiliki: " << cardCount << " Kartu)\n"; 
         int input ;
-        std::cin >> input;
+        if(!(std::cin >> input)){
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Masukan tidak valid!\n";
+            continue;
+        }
         if(input >= 1 && input <= 3){
             std::cout <<"\n\n";
             if(cardCount == 0 && input == 3){

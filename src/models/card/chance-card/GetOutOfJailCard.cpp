@@ -4,7 +4,7 @@
 
 GetOutOfJailCard::GetOutOfJailCard(const std::string& message) : ChanceCard(message) {}
 
-void GetOutOfJailCard::takeEffect(Player& p, GameManager& gm) {
+void GetOutOfJailCard::takeEffect(Player& p, GameManager&) {
     p.addGetOutOfJailCard();
 }
 

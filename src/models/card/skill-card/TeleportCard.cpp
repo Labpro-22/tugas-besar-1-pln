@@ -9,16 +9,19 @@ void TeleportCard::setTargetPosition(int pos) {
 }
 
 void TeleportCard::takeEffect(Player& p, GameManager& gm) {
-    if (targetPosition >= 0 && targetPosition < 40) {
+    if (targetPosition >= 0 && targetPosition < gm.getBoard().getTileCount()) {
         p.getPiece().setPosition(targetPosition);
-        message = "Anda berpindah ke petak " + std::to_string(targetPosition) + "!";
+        Tile *targetTile = gm.getBoard().getTile(targetPosition);
+        message = "Anda berpindah ke petak " + targetTile->getName() + " [" + targetTile->getCode() + "]!";
         gm.getBoard().getTile(targetPosition)->onLanded(p, gm);
-        targetPosition = -1; 
     }
+    targetPosition = -1;
 }
 
-void TeleportCard::prepareUse(UseSkillCardView& view, GameManager& gm) {
+bool TeleportCard::prepareUse(UseSkillCardView& view, GameManager& gm) {
+    (void)gm;
     this->setTargetPosition(view.askForTargetPosition());
+    return targetPosition >= 0;
 }
 
 std::string TeleportCard::getCardType() const {

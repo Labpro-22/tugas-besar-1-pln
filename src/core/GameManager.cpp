@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <random>
+#include <sstream>
 
 #include "core/GameManager.hpp"
 #include "core/GameManagerException.hpp"
@@ -22,6 +23,109 @@
 #include "models/card/skill-card/SkillCard.hpp"
 #include "models/card/skill-card/TeleportCard.hpp"
 #include "models/tile/PropertyTile.hpp"
+
+namespace {
+SkillCard *createSkillCard(const std::string &type, int value)
+{
+    if (type == "DiscountCard") {
+        return new DiscountCard("", value);
+    }
+    if (type == "LassoCard") {
+        return new LassoCard("");
+    }
+    if (type == "MoveCard") {
+        return new MoveCard("", value);
+    }
+    if (type == "TeleportCard") {
+        return new TeleportCard("");
+    }
+    if (type == "DemolitionCard") {
+        return new DemolitionCard("");
+    }
+    if (type == "ShieldCard") {
+        return new ShieldCard("");
+    }
+    return nullptr;
+}
+
+SkillCardSaveData serializeSkillCard(const SkillCard *card)
+{
+    SkillCardSaveData data;
+    data.type = card->getCardType();
+    data.duration = 1;
+    data.value = 0;
+
+    if (const auto *moveCard = dynamic_cast<const MoveCard *>(card)) {
+        data.value = moveCard->getAmount();
+    }
+    else if (const auto *discountCard = dynamic_cast<const DiscountCard *>(card)) {
+        data.value = discountCard->getPercentage();
+    }
+
+    return data;
+}
+
+std::string serializeSkillCardLine(const SkillCard *card)
+{
+    SkillCardSaveData data = serializeSkillCard(card);
+    std::ostringstream stream;
+    stream << data.type << " " << data.value << " " << data.duration;
+    return stream.str();
+}
+
+SkillCardSaveData parseSkillCardLine(const std::string &line)
+{
+    SkillCardSaveData data;
+    data.type = "";
+    data.value = 0;
+    data.duration = 1;
+
+    std::stringstream stream(line);
+    stream >> data.type;
+    stream >> data.value;
+    stream >> data.duration;
+
+    return data;
+}
+
+void clearOwnedSkillCards(std::vector<SkillCard *> &cards)
+{
+    for (SkillCard *card : cards) {
+        delete card;
+    }
+    cards.clear();
+}
+
+void resetSkillDeckToDefault(CardDeck<SkillCard *> &deck)
+{
+    deck.reshuffle();
+    for (SkillCard *card : deck.getCards()) {
+        delete card;
+    }
+    deck.clearDeck();
+
+    DiceRoller::roll();
+    deck += new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second);
+    DiceRoller::roll();
+    deck += new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second);
+    DiceRoller::roll();
+    deck += new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second);
+    DiceRoller::roll();
+    deck += new MoveCard("", DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second);
+    DiceRoller::roll();
+    deck += new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    DiceRoller::roll();
+    deck += new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    DiceRoller::roll();
+    deck += new DiscountCard("", 10 + 3 * (DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second));
+    deck += new ShieldCard("");
+    deck += new ShieldCard("");
+    deck += new LassoCard("");
+    deck += new LassoCard("");
+    deck += new DemolitionCard("");
+    deck += new DemolitionCard("");
+}
+}
 
 GameManager::GameManager()
     : running{false},
@@ -98,12 +202,16 @@ GameManager::GameManager()
 
 GameManager::~GameManager()
 {
+    chanceCardDeck.reshuffle();
+    communityChestCardDeck.reshuffle();
+    skillCardDeck.reshuffle();
     for (Card *card : chanceCardDeck.getCards())
         delete card;
     for (Card *card : communityChestCardDeck.getCards())
         delete card;
     for (Card *card : skillCardDeck.getCards())
         delete card;
+    clearOwnedSkillCards(skillCards);
 };
 
 // Game runner
@@ -235,6 +343,10 @@ void GameManager::nextTurn()
 void GameManager::nextPlayer()
 {
     if (!playerQueue.empty()) {
+        playerQueue.front()->resetDoubleRollCounter();
+    }
+
+    if (!playerQueue.empty()) {
         playerQueue.pop();
     }
 
@@ -258,16 +370,30 @@ void GameManager::nextPlayer()
 
     Player &player = getCurrentPlayer();
     player.onNextTurn();
-    SkillCard* newCard = skillCardDeck.drawCard();
-    try {
-        player.addSkillCard(newCard);
+
+    SkillCard *drawnCard = skillCardDeck.drawCard();
+    if (player.getSkillCards().size() >= 4) {
+        UseSkillCardView &skillView = gameView.getUseSkillCardView();
+        DropSkillCardView &dropView = gameView.getDropSkillCardView();
+        skillView.outputReceivedCard(*drawnCard);
+
+        while (player.getSkillCards().size() >= 4) {
+            int droppedIndex = dropView.promptChooseSkillCard(player.getSkillCards());
+            if (droppedIndex < 0) {
+                std::cout << "Kamu harus membuang 1 kartu untuk menyimpan kartu baru.\n";
+                continue;
+            }
+
+            SkillCard *droppedCard = player.getSkillCards()[droppedIndex];
+            player.dropSkillCard(droppedIndex);
+            dropView.outputDropSkillCardStatus(*droppedCard);
+            logger.log(turn, player.getUsername(), "DROP_CARD",
+                       droppedCard->getCardType() + " dibuang untuk memberi ruang kartu baru.");
+        }
     }
-    catch (const FullHandException &) {
-        player.getSkillCardsRef().push_back(newCard);
-        std::cout << "\nKamu mendapatkan 1 kartu acak baru!\n";
-        std::cout << "Kartu yang didapat: " << newCard->getCardType() << ".\n";
-        processDropSkillCard();
-    }
+
+    player.addSkillCard(drawnCard);
+    gameView.getUseSkillCardView().outputReceivedCard(*drawnCard);
     if (player.getMoney() < 0) {
         processLiquidation();
     }
@@ -304,6 +430,9 @@ void GameManager::processMainMenu()
 void GameManager::processNewGame()
 {
     MainMenuView mainMenuView = gameView.getMainMenuView();
+
+    clearOwnedSkillCards(skillCards);
+    resetSkillDeckToDefault(skillCardDeck);
 
     // Create players
     std::vector<std::string> usernames = mainMenuView.promptUsernames();
@@ -347,34 +476,16 @@ void GameManager::processLoadGame()
         SaveData saveData = SaveFileHandler::loadGame(saveFileName);
         turn = saveData.turn;
         config.maxTurn = saveData.maxTurn;
+        clearOwnedSkillCards(skillCards);
         players.clear();
 
         for (PlayerSaveData &playerData : saveData.players) {
             std::vector<SkillCard *> playerCards;
             for (SkillCardSaveData &cardData : playerData.skillCards) {
-                if (cardData.type == "DiscountCard") {
-                    skillCards.push_back(new DiscountCard("", cardData.value));
-                    playerCards.push_back(skillCards.back());
-                }
-                else if (cardData.type == "LassoCard") {
-                    skillCards.push_back(new LassoCard(""));
-                    playerCards.push_back(skillCards.back());
-                }
-                else if (cardData.type == "MoveCard") {
-                    skillCards.push_back(new MoveCard("", cardData.value));
-                    playerCards.push_back(skillCards.back());
-                }
-                else if (cardData.type == "TeleportCard") {
-                    skillCards.push_back(new TeleportCard(""));
-                    playerCards.push_back(skillCards.back());
-                }
-                if (cardData.type == "DemolitionCard") {
-                    skillCards.push_back(new DemolitionCard(""));
-                    playerCards.push_back(skillCards.back());
-                }
-                if (cardData.type == "ShieldCard") {
-                    skillCards.push_back(new ShieldCard(""));
-                    playerCards.push_back(skillCards.back());
+                SkillCard *card = createSkillCard(cardData.type, cardData.value);
+                if (card != nullptr) {
+                    skillCards.push_back(card);
+                    playerCards.push_back(card);
                 }
             }
             players.push_back(Player{
@@ -386,8 +497,6 @@ void GameManager::processLoadGame()
                 playerCards,
                 playerData.getOutOfJailCardCount,
                 playerData.jailTurns});
-            Player &player = players.back();
-            player.getPiece().setPosition(board.getTilePosition(playerData.tileCodePosition));
         }
 
         std::map<std::string, int> playerOrder;
@@ -413,6 +522,12 @@ void GameManager::processLoadGame()
                 playerQueue.push(&p);
             }
         }
+        for (Player &p : players) {
+            if (p.getUsername() == saveData.currentPlayer) {
+                break;
+            }
+            playerQueue.push(&p);
+        }
 
         bank = Bank{config.initialMoney, config};
 
@@ -422,6 +537,15 @@ void GameManager::processLoadGame()
         }
         board = Board{(int)(config.properties.size() + config.actionTiles.size()), config, playerPointer, saveData.properties};
 
+        for (PlayerSaveData &playerData : saveData.players) {
+            auto playerIt = std::find_if(players.begin(), players.end(), [&](Player &player) {
+                return player.getUsername() == playerData.username;
+            });
+            if (playerIt != players.end()) {
+                playerIt->getPiece().setPosition(board.getTilePosition(playerData.tileCodePosition));
+            }
+        }
+
         logger.clear();
         for (LogSaveData &logData : saveData.logs) {
             logger.log(logData.turn, logData.username, logData.action, logData.details);
@@ -430,7 +554,23 @@ void GameManager::processLoadGame()
 
         chanceCardDeck.reshuffle();
         communityChestCardDeck.reshuffle();
-        skillCardDeck.reshuffle();
+        if (saveData.deckCards.empty()) {
+            resetSkillDeckToDefault(skillCardDeck);
+        }
+        else {
+            skillCardDeck.reshuffle();
+            for (SkillCard *card : skillCardDeck.getCards()) {
+                delete card;
+            }
+            skillCardDeck.clearDeck();
+            for (const std::string &cardLine : saveData.deckCards) {
+                SkillCardSaveData cardData = parseSkillCardLine(cardLine);
+                SkillCard *card = createSkillCard(cardData.type, cardData.value);
+                if (card != nullptr) {
+                    skillCardDeck += card;
+                }
+            }
+        }
 
         playing = true;
         startOfTheTurn = true;
@@ -447,7 +587,8 @@ void GameManager::processLoadGame()
 void GameManager::processSaveGame(std::string fileName)
 {
     SaveView &view = gameView.getSaveView();
-    if (std::filesystem::exists(fileName) && std::filesystem::is_regular_file(fileName)) {
+    std::filesystem::path savePath = std::filesystem::path("data") / fileName;
+    if (std::filesystem::exists(savePath) && std::filesystem::is_regular_file(savePath)) {
         if (!view.promptOverwriteSaveFile(fileName)) {
             return;
         }
@@ -482,11 +623,7 @@ void GameManager::processSaveGame(std::string fileName)
             playerData.jailTurns = player.getJailTurns();
 
             for (SkillCard *card : player.getSkillCards()) {
-                SkillCardSaveData cardData;
-                cardData.type = card->getCardType();
-                cardData.duration = 1;
-                cardData.value = 30;
-                playerData.skillCards.push_back(cardData);
+                playerData.skillCards.push_back(serializeSkillCard(card));
             }
             saveData.players.push_back(playerData);
             saveData.playerOrder.push_back(player.getUsername());
@@ -531,7 +668,7 @@ void GameManager::processSaveGame(std::string fileName)
         }
 
         for (SkillCard *card : skillCardDeck.getCards()) {
-            saveData.deckCards.push_back(card->getCardType());
+            saveData.deckCards.push_back(serializeSkillCardLine(card));
         }
 
         for (const TransactionLog &log : logger.getLogs()) {
@@ -549,7 +686,7 @@ void GameManager::processSaveGame(std::string fileName)
     }
     catch (const SaveFileException &e) {
         std::cout << e.what() << std::endl;
-        logger.log(turn, "Game", "SIMPAN", "Berhasil menyimpan permainan dengan nama " + fileName);
+        logger.log(turn, "Game", "SIMPAN", "Gagal menyimpan permainan dengan nama " + fileName);
         view.outputSaveStatus(false, fileName);
     }
 }
@@ -560,11 +697,11 @@ void GameManager::processRollDice()
     MainMenuView &mainMenuView = gameView.getMainMenuView();
     diceRolledThisTurn = true;
     if (player.getState() == PlayerState::ACTIVE) {
-        player.rollDiceAndMove(*this);
+        bool passedStart = player.rollDiceAndMove();
         if (player.isJailed()) {
             player.getPiece().setPosition(board.getTilePosition("PEN"));
             view.outputSpeedingToJail(DiceRoller::getLastRoll().first, DiceRoller::getLastRoll().second);
-            processGoToJail();
+            processGoToJail("Double tiga kali berturut-turut.");
             logger.log(turn, player.getUsername(), "LEMPAR_DADU",
                        "Hasil dadu: " +
                            std::to_string(DiceRoller::getLastRoll().first) + " + " + std::to_string(DiceRoller::getLastRoll().second) + " = " +
@@ -574,7 +711,11 @@ void GameManager::processRollDice()
         }
         else {
             view.outputRollDice();
+            if (passedStart) {
+                board.getTile(0)->onPassBy(player, *this);
+            }
             PlayerPiece &piece = player.getPiece();
+            view.outputLandedOnTile(*piece.getCurrentTile());
             piece.getCurrentTile()->onLanded(player, *this);
             mainMenuView.outputCurrentPlayerInfo();
             if (DiceRoller::getLastRoll().first == DiceRoller::getLastRoll().second) {
@@ -626,11 +767,11 @@ void GameManager::processSetDice(int value1, int value2)
     MainMenuView &mainMenuView = gameView.getMainMenuView();
     diceRolledThisTurn = true;
     if (player.getState() == PlayerState::ACTIVE) {
-        player.setDiceAndMove(value1, value2, *this); 
+        bool passedStart = player.setDiceAndMove(value1, value2);
         if (player.isJailed()) {
             player.getPiece().setPosition(board.getTilePosition("PEN"));
             view.outputSpeedingToJail(value1, value2);
-            processGoToJail();
+            processGoToJail("Double tiga kali berturut-turut.");
             logger.log(turn, player.getUsername(), "ATUR_DADU",
                        "Hasil dadu: " +
                            std::to_string(value1) + " + " + std::to_string(value2) + " = " +
@@ -640,7 +781,11 @@ void GameManager::processSetDice(int value1, int value2)
         }
         else {
             view.outputSetDice(value1, value2);
+            if (passedStart) {
+                board.getTile(0)->onPassBy(player, *this);
+            }
             PlayerPiece &piece = player.getPiece();
+            view.outputLandedOnTile(*piece.getCurrentTile());
             piece.getCurrentTile()->onLanded(player, *this);
             mainMenuView.outputCurrentPlayerInfo();
             if (value1 == value2) {
@@ -699,7 +844,7 @@ void GameManager::processBuyProperty()
                 processBuyProperty(player, tile->getProperty());
             }
             else {
-                processAuctionProperty(tile->getProperty());
+                processAuctionProperty(tile->getProperty(), &player);
             }
         }
         else {
@@ -732,68 +877,93 @@ void GameManager::processBuyProperty(Player &player, Property *property)
         view.outputBuyStatus(false, property);
     }
 }
-void GameManager::processAuctionProperty(Property *property)
+void GameManager::processAuctionProperty(Property *property, Player *excludedPlayer)
 {
     AuctionView &view = gameView.getAuctionView();
+    if (property == nullptr) {
+        return;
+    }
+
     view.outputProperty(*property);
-
-    std::vector<Player *> order;
-    Player *current = &getCurrentPlayer();
-    bool startQueuing = false;
-    for (Player &p : players) {
-        if (startQueuing && !p.isBankrupt()) order.push_back(&p);
-        if (&p == current) startQueuing = true;
+    if (excludedPlayer != nullptr) {
+        view.outputExcludedPlayer(*excludedPlayer);
     }
-    for (Player &p : players) {
-        if (&p == current) break;
-        if (!p.isBankrupt()) order.push_back(&p);
-    }
-    if (!current->isBankrupt()) order.push_back(current);
 
-    if (order.empty()) {
+    std::vector<Player *> bidders;
+    for (Player &player : players) {
+        if (!player.isBankrupt() && &player != excludedPlayer) {
+            bidders.push_back(&player);
+        }
+    }
+
+    if (bidders.empty()) {
         property->resetOwnerAsBank();
         view.outputNoBid(property);
         return;
     }
 
-    std::cout << "Urutan lelang dimulai dari pemain setelah Pemain " << current->getUsername() << ".\n\n";
-
-    Player *lastBidder = nullptr;
-    long long bestBidAmount = -1;
-    int consecutivePasses = 0;
-    int N = (int)order.size();
-
-    int idx = 0;
-    while (true) {
-        Player *bidder = order[idx % N];
-        long long bid = view.promptBidOrPass(*bidder);
-
-        if (bid >= 0 && bid > bestBidAmount) {
-            lastBidder = bidder;
-            bestBidAmount = bid;
-            consecutivePasses = 0;
-            std::cout << "Penawaran tertinggi: M" << bestBidAmount << " (Pemain " << lastBidder->getUsername() << ")\n\n";
-            logger.log(turn, bidder->getUsername(), "BID",
-                       "Bid " + property->getName() + " [" + property->getCode() + "] M" + std::to_string(bid));
-        }
-        else {
-            if (bid >= 0) {
-                std::cout << "Bid harus lebih besar dari M" << bestBidAmount << "!\n\n";
-                continue;
+    auto findBidderIndex = [&](Player *player) {
+        for (size_t i = 0; i < bidders.size(); ++i) {
+            if (bidders[i] == player) {
+                return i;
             }
-            consecutivePasses++;
-            logger.log(turn, bidder->getUsername(), "PASS",
-                       "Pass pelelangan " + property->getName() + " [" + property->getCode() + "]");
         }
+        return static_cast<size_t>(0);
+    };
 
-        idx++;
-
-        if (lastBidder != nullptr && consecutivePasses >= N - 1) break;
-        if (N == 1 && lastBidder != nullptr) break;
-        if (lastBidder == nullptr && consecutivePasses >= N) break;
+    Player *startFrom = excludedPlayer != nullptr ? excludedPlayer : &getCurrentPlayer();
+    size_t currentBidderIndex = 0;
+    for (size_t offset = excludedPlayer != nullptr ? 1 : 0; offset <= players.size(); ++offset) {
+        auto playerIt = std::find_if(players.begin(), players.end(), [&](const Player &player) {
+            return &player == startFrom;
+        });
+        if (playerIt == players.end()) {
+            break;
+        }
+        size_t playerIndex = static_cast<size_t>(std::distance(players.begin(), playerIt));
+        Player *candidate = &players[(playerIndex + offset) % players.size()];
+        if (std::find(bidders.begin(), bidders.end(), candidate) != bidders.end()) {
+            currentBidderIndex = findBidderIndex(candidate);
+            break;
+        }
     }
 
-    if (lastBidder == nullptr || bestBidAmount < 0) {
+    Player *lastBidder = nullptr;
+    long long bestBidAmount = 0;
+    std::vector<bool> activeBidders(bidders.size(), true);
+    int activeBidderCount = static_cast<int>(bidders.size());
+
+    while (activeBidderCount > 0) {
+        if (lastBidder != nullptr && activeBidderCount == 1) {
+            break;
+        }
+
+        Player *currentBidder = bidders[currentBidderIndex];
+        if (!activeBidders[currentBidderIndex] || currentBidder == lastBidder) {
+            currentBidderIndex = (currentBidderIndex + 1) % bidders.size();
+            continue;
+        }
+
+        long long currentBidAmount = view.promptBidOrPass(*currentBidder, bestBidAmount, lastBidder, activeBidderCount);
+        if (currentBidAmount != 0) {
+            lastBidder = currentBidder;
+            bestBidAmount = currentBidAmount;
+            view.outputBidAccepted(*currentBidder, currentBidAmount);
+            logger.log(turn, currentBidder->getUsername(), "BID",
+                       "Melakukan bid terhadap " + property->getName() + " [ " + property->getCode() + "]" +
+                           " sebanyak " + std::to_string(currentBidAmount));
+        }
+        else {
+            activeBidders[currentBidderIndex] = false;
+            activeBidderCount--;
+            view.outputPass(*currentBidder, activeBidderCount);
+            logger.log(turn, currentBidder->getUsername(), "PASS",
+                       "Melewati pelelangan " + property->getName() + " [ " + property->getCode() + "]");
+        }
+        currentBidderIndex = (currentBidderIndex + 1) % bidders.size();
+    }
+
+    if (lastBidder == nullptr) {
         property->resetOwnerAsBank();
         view.outputNoBid(property);
     }
@@ -859,7 +1029,7 @@ void GameManager::processMortgageProperty()
         player.mortgageProperty(chosenProperty);
         view.outputMortgageStatus(true, *chosenProperty);
     }
-    catch (const PlayerException &e) {
+    catch (const std::exception &e) {
         std::cout << e.what() << std::endl;
         view.outputMortgageStatus(false, *chosenProperty);
     }
@@ -873,11 +1043,13 @@ void GameManager::processUnmortgageProperty()
 
     try {
         player.unmortgageProperty(property);
-        gameView.getUnmortgageView().outputUnmortgageStatus(true, *property);
+        logger.log(turn, player.getUsername(), "TEBUS",
+                   property->getName() + " [ " + property->getCode() + "] ditebus seharga " + std::to_string(property->redemptionPrice()));
+        view.outputUnmortgageStatus(true, *property);
     }
-    catch (const PlayerException &e) {
+    catch (const std::exception &e) {
         std::cout << e.what() << std::endl;
-        gameView.getUnmortgageView().outputUnmortgageStatus(false, *property);
+        view.outputUnmortgageStatus(false, *property);
     }
 }
 void GameManager::processBuild()
@@ -889,17 +1061,19 @@ void GameManager::processBuild()
     StreetProperty *street = view.promptChooseProperty(player.getProperties());
     if (street != nullptr) {
         try {
-            player.buildOnProperty(street);
-            if (street->hasHotel()) {
-                logger.log(turn, player.getUsername(), "BANGUN",
-                           street->getName() + " di-upgrade dan sekarang memiliki hotel");
-            } else {
+            if (street->getHouseCount() < 4) {
+                player.buildOnProperty(street);
                 logger.log(turn, player.getUsername(), "BANGUN",
                            street->getName() + " di-upgrade dan sekarang memiliki " + std::to_string(street->getHouseCount()) + " rumah");
             }
+            else {
+                player.buildOnProperty(street);
+                logger.log(turn, player.getUsername(), "BANGUN",
+                           street->getName() + " di-upgrade dan sekarang memiliki hotel");
+            }
             view.outputBuildStatus(true, street);
         }
-        catch (StreetPropertyException &e) {
+        catch (const std::exception &e) {
             std::cout << e.what() << std::endl;
             view.outputBuildStatus(false, nullptr);
         }
@@ -932,17 +1106,14 @@ void GameManager::processUseSkillCard()
     try {
         SkillCard *card = player.getSkillCards()[skillIndex];
         cardView.outputCard(*card);
-        if (card->getCardType() == "DemolitionCard") {
-            card->prepareUse(gameView.getUseSkillCardView(), *this);
-        }
-        else if (card->getCardType() == "LassoCard") {
-            card->prepareUse(gameView.getUseSkillCardView(), *this);
-        }
-        else if (card->getCardType() == "TeleportCard") {
-            card->prepareUse(gameView.getUseSkillCardView(), *this);
+        if (!card->prepareUse(gameView.getUseSkillCardView(), *this)) {
+            view.outputCardUseCancelled(*card);
+            return;
         }
         player.useSkillCard(skillIndex, *this);
         skillCardUsedThisTurn = true;
+        view.outputCardUseResult(*card);
+        gameView.getMainMenuView().outputCurrentPlayerInfo();
         logger.log(turn, player.getUsername(), "USE_CARD",
                    card->getCardType() + " dipakai. " + card->getMessage());
     }
@@ -1142,10 +1313,10 @@ void GameManager::processGoTile()
     board.outputOnPassByStart();
 }
 
-void GameManager::processGoToJail()
+void GameManager::processGoToJail(const std::string& reason)
 {
     JailView &jail = gameView.getJailView();
-    jail.outputGoToJail();
+    jail.outputGoToJail(reason);
 }
 
 void GameManager::processPayLuxuryTax()
@@ -1205,7 +1376,7 @@ void GameManager::processUseChanceCard()
     cardView.outputCard(*card);
     Player &p = getCurrentPlayer();
     if (card->getCardType() == "GOTOJAILCARD") {
-        processGoToJail();
+        processGoToJail("Kartu Chance memerintahkan kamu masuk penjara.");
     }
     card->takeEffect(p, *this);
 }
@@ -1221,6 +1392,7 @@ void GameManager::processStartFestival()
     }
     Property *prop = fesView.promptChooseProperty(properties);
     if (prop == nullptr) return;
+    long long previousMultiplier = prop->getFestivalMultiplier();
     prop->startFestival();
-    fesView.outputFestivalStatus(*prop);
+    fesView.outputFestivalStatus(*prop, previousMultiplier);
 }

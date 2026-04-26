@@ -5,7 +5,7 @@
 #include "core/GameManager.hpp"
 
 PlayerPiece::PlayerPiece(int startPosition)
-    : position(startPosition), board(nullptr) {}
+    : board(nullptr), position(startPosition) {}
 
 void PlayerPiece::setPosition(int pos) {
     position = pos;
@@ -24,22 +24,11 @@ void PlayerPiece::setBoard(Board* board) {
     this->board = board;
 }
 
-void PlayerPiece::goForward(int tileCount) {
+bool PlayerPiece::goForward(int tileCount) {
     int boardSize = board->getTileCount();
+    int oldPosition = position;
     position = (position + tileCount) % boardSize;
-}
-
-void PlayerPiece::goForward(int tileCount, Player& player, GameManager& gm) {
-    int boardSize = board->getTileCount();
-    int oldPos = position;
-    int newPos = (oldPos + tileCount) % boardSize;
-    if (oldPos + tileCount >= boardSize) {
-        Tile* goTile = board->getTile(0);
-        if (goTile) {
-            goTile->onPassBy(player, gm);
-        }
-    }
-    position = newPos;
+    return tileCount > 0 && position != 0 && oldPosition + tileCount >= boardSize;
 }
 
 void PlayerPiece::goBackward(int tileCount) {
