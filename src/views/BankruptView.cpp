@@ -17,10 +17,10 @@ void BankruptView::outputPotentialWealth(Player &p, long long debt) const{
     }
     std::cout << "\tTotal potensi\t -> M " << wealth;
     if(wealth >= debt){
-        std::cout << "Dana likuidasi dapat menutup kewajiban.\nKamu wajib melikuidasi aset untuk membayar.\n\n";
+        std::cout << "\nDana likuidasi dapat menutup kewajiban.\nKamu wajib melikuidasi aset untuk membayar.\n\n";
     }
     else{
-        std::cout << "Tidak cukup untuk menutup kewajiban M" << debt <<".\n\n";
+        std::cout << "\nTidak cukup untuk menutup kewajiban M" << debt <<".\n\n";
     }
 }
 

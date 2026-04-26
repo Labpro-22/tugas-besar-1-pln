@@ -202,7 +202,7 @@ void PropertyView::outputRent(Property &pr, Player &p)const{
             std::cout << std::left << std::setw(width) << ("Uang Pemain "+ pr.getOwner()->getUsername()) << ": M" << pr.getOwner()->getMoney() << "  -> M" << pr.getOwner()->getMoney() + rent << "\n\n";
         }
         else{
-            std::cout << "Kamu tidak mampu membayar sewa penuh! (M" << rent << ")Uang kamu saat ini: " << money << "\n\n";
+            std::cout << "\nKamu tidak mampu membayar sewa penuh! (M" << rent << ") \nUang kamu saat ini: " << money << "\n\n";
         }
     }
 }
