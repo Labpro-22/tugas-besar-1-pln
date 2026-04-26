@@ -185,19 +185,18 @@ void PropertyView::outputRent(Property &pr, Player &p)const{
         else if(auto up = dynamic_cast<UtilityProperty*>(&pr)){
             std::cout << up->getOwner()->getUtilityPropertyCount() << " Properti Utility dimiliki\n";
             std::cout << std::left << std::setw(width) << "Faktor Pengali" << ": " << rent << "x jumlah dadu\n";
-            rent = 0; // actual rent depends on dice; show 0 as placeholder
+            rent *= p.getLastRollTotal();
+            std::cout << std::left << std::setw(width) << "Jumlah dadu" << ": " << p.getLastRollTotal() << "\n";
         }
         else if(auto rp = dynamic_cast<RailroadProperty*>(&pr)){
             std::cout << rp->getOwner()->getRailroadPropertyCount() << " Properti Railroad dimiliki\n";
         }
-        if(dynamic_cast<UtilityProperty*>(&pr) == nullptr){
-            std::cout << std::left << std::setw(width) << "Sewa" << ": M" << rent << "\n\n";
-        }
-        std::cout << std::left << std::setw(width) << "Uang Pemain "+ p.getUsername() << ": M" << money;
+        std::cout << std::left << std::setw(width) << "Sewa" << ": M" << rent << "\n\n";
         if (p.hasEffect("DISCOUNT")) {
-            rent *= (100 - p.getEffectValue("DISCOUNT")) / 100;
+            rent = rent * (100 - p.getEffectValue("DISCOUNT")) / 100;
             std::cout << std::left << std::setw(width) << "[DISCOUNT ACTIVE] Tagihan sewa menjadi" << ": M" << rent << "\n\n";
         }
+        std::cout << std::left << std::setw(width) << "Uang Pemain "+ p.getUsername() << ": M" << money;
         if(money >= rent){
             std::cout << " -> M" << money -rent <<"\n";
             std::cout << std::left << std::setw(width) << ("Uang Pemain "+ pr.getOwner()->getUsername()) << ": M" << pr.getOwner()->getMoney() << "  -> M" << pr.getOwner()->getMoney() + rent << "\n\n";
