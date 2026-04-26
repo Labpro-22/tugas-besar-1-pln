@@ -1396,3 +1396,8 @@ void GameManager::processStartFestival()
     prop->startFestival();
     fesView.outputFestivalStatus(*prop, previousMultiplier);
 }
+
+void GameManager::processExit() {
+    running = false;
+    playing = false;
+}

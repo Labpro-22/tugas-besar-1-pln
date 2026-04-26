@@ -101,4 +101,5 @@ public:
     void processUseCommunityChestCard();
     void processUseChanceCard();
     void processStartFestival();
+    void processExit();
 };
