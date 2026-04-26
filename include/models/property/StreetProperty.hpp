@@ -5,7 +5,7 @@
 
 class StreetProperty: public Property {
     public:
-        StreetProperty(const std::string& code, const std::string& name, const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, long long housePrice, long long hotelPrice, long long rentPrice[6]);
+        StreetProperty(const std::string& code, const std::string& name, const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, long long housePrice, long long hotelPrice, long long rentPrice[6], int houseCount = 0);
 
         long long calculateRent() const noexcept override;
 

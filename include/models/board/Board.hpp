@@ -6,6 +6,9 @@
 #include <exception>
 #include <cmath>
 
+#include "models/property/Property.hpp"
+#include "utils/save-load/PropertySaveData.hpp"
+
 class Tile;
 class Player;
 class PlayerPiece;
@@ -14,7 +17,11 @@ class Config;
 
 class Board {
 public:
-    Board(int tileCount, const Config& config, const std::vector<Player*>& players);
+    Board(int tileCount, const Config& config, const std::vector<Player*>& players, const std::vector<PropertySaveData>& properties = {});
+    Board(const Board&) = delete;
+    Board& operator=(const Board&) = delete;
+    Board(Board&& other) noexcept;
+    Board& operator=(Board&& other) noexcept;
 
     ~Board();
 
@@ -44,6 +51,8 @@ public:
 
     const std::map<std::string, int>& getMapTilesColorCount() const noexcept;
 
+    const std::vector<Property*>& getPropertyList() const noexcept;
+
 private:
     int width;
 
@@ -62,4 +71,9 @@ private:
     std::map<std::string, int> mapTilesColorCount;
 
     std::vector<Player*> playersList; 
+
+    std::vector<Property*> propertyList; 
+
+    void clear() noexcept;
+    void rebindPieces() noexcept;
 };

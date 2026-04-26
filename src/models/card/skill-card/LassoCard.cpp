@@ -19,6 +19,6 @@ void LassoCard::prepareUse(UseSkillCardView& view, GameManager& gm) {
     this->setTargetPlayer(view.askForTargetPlayer(gm));
 }
 
-std::string LassoCard::getType() const {
+std::string LassoCard::getCardType() const {
     return "LassoCard"; 
 }

@@ -17,8 +17,11 @@ private:
 
 public:
     Bank(long long initialMoney, Config &config);
-    Bank(long long initialMoney, Config &config, std::vector<PropertySaveData> &saveData, std::vector<Player> &players);
     ~Bank();
+    Bank(const Bank&) = delete;
+    Bank& operator=(const Bank&) = delete;
+    Bank(Bank&& other) noexcept;
+    Bank& operator=(Bank&& other) noexcept;
 
     std::vector<Property *> &getProperties();
 

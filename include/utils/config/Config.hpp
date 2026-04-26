@@ -11,7 +11,6 @@ class Config {
 public:
     int maxTurn;
     int playerCount;
-    int tileCount;
     std::map<int, std::string> tileCodeSequence;
     std::vector<ActionTileConfig> actionTiles;
     std::vector<PropertyConfig> properties;

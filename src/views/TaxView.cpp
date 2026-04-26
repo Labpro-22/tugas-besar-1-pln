@@ -1,7 +1,11 @@
 #include "views/TaxView.hpp"
 #include "core/GameManager.hpp"
 int TaxView::promptIncomeTax(long long flat, double percentage ) const{
-
+    Player& p = gameManager.getCurrentPlayer();
+    if (p.hasEffect("SHIELD")) {
+        std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu membayar pajak.\n";
+        return -1;
+    }
     int input;
     while(true){
         std::cout << "Pilih opsi pembayaran pajak:\n";
@@ -19,19 +23,19 @@ int TaxView::promptIncomeTax(long long flat, double percentage ) const{
                     std::cout << "Kamu tidak mampu membayar pajak flat M" << tax << "!\nUang kamu saat ini: M" << money <<"\n\n";
                 }
                 else{
-                    std::cout << std::setw(COLON_WIDTH) <<"Uang kamu" << ": M" << money<< "  -> M" << money - tax << "\n\n";
+                    std::cout << std::left << std::setw(COLON_WIDTH) <<"Uang kamu" << ": M" << money<< "  -> M" << money - tax << "\n\n";
                 }
             }
             else if(input == 2){
                 std::cout <<"Total kekayaan kamu:\n";
-                std::cout << std::setw(COLON_WIDTH) << "- Uang tunai" << ": M" << money << "\n";
-                std::cout << std::setw(COLON_WIDTH) << "- Harga beli properti" << ": M";
+                std::cout << std::left << std::setw(COLON_WIDTH) << "- Uang tunai" << ": M" << money << "\n";
+                std::cout << std::left << std::setw(COLON_WIDTH) << "- Harga beli properti" << ": M";
                 long long propertyBuyPriceTotal = 0;
                 for(auto pr : p.getProperties()){
                     propertyBuyPriceTotal += pr->getPrice();
                 }
                 std::cout << propertyBuyPriceTotal << " (termasuk yang digadaikan)\n";
-                std::cout << std::setw(COLON_WIDTH) << "- Harga beli bangunan" << ": M"; 
+                std::cout << std::left << std::setw(COLON_WIDTH) << "- Harga beli bangunan" << ": M"; 
                 long long buildingBuyPriceTotal = 0;
                 for(auto pr : p.getProperties()){
                     if(pr->getPropertyType() == "STREET"){
@@ -41,9 +45,9 @@ int TaxView::promptIncomeTax(long long flat, double percentage ) const{
                 std::cout << buildingBuyPriceTotal << "\n";
                 long long total = money + propertyBuyPriceTotal + buildingBuyPriceTotal;
                 tax = std::abs(percentage*total/100);
-                std::cout << std::setw(COLON_WIDTH) << "Total" << ": M" << total << "\n";
-                std::cout << std::setw(COLON_WIDTH) << ("Pajak " + std::to_string(percentage) + "%") << ": M" << tax << "\n";
-                std::cout << std::setw(COLON_WIDTH) <<"Uang kamu" << ": M" << money;
+                std::cout << std::left << std::setw(COLON_WIDTH) << "Total" << ": M" << total << "\n";
+                std::cout << std::left << std::setw(COLON_WIDTH) << ("Pajak " + std::to_string(percentage) + "%") << ": M" << tax << "\n";
+                std::cout << std::left << std::setw(COLON_WIDTH) <<"Uang kamu" << ": M" << money;
                 if(tax > money){
                     std::cout << "\nKamu tidak mampu membayar pajak persentase M" << tax << "!\n\n";
                 }
@@ -57,8 +61,13 @@ int TaxView::promptIncomeTax(long long flat, double percentage ) const{
     }
 }
 void TaxView::outputLuxuryTax(long long tax)const{
+    Player& p = gameManager.getCurrentPlayer();
+    if (p.hasEffect("SHIELD")) {
+        std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu membayar pajak.\n";
+        return;
+    }
     std::cout << "Pajak sebesar M" << tax << " langsung dipotong.\n";
-    long long money = gameManager.getCurrentPlayer().getMoney();
+    long long money = p.getMoney();
     if(money >= tax){
         std::cout << "Uang kamu: M" << money << " -> M" << money - tax << "\n\n";
     }

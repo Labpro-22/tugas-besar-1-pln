@@ -27,6 +27,6 @@ void DemolitionCard::prepareUse(UseSkillCardView& view, GameManager& gm) {
     this->setTargetTileId(view.askForDemolitionTileId());
 }
 
-std::string DemolitionCard::getType() const {
+std::string DemolitionCard::getCardType() const {
     return "DemolitionCard";
 }

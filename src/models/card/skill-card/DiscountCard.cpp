@@ -11,6 +11,6 @@ void DiscountCard::takeEffect(Player& p, GameManager& gm) {
     message = "Diskon " + std::to_string(percentage) + "% aktif untuk 1 putaran!";
 }
 
-std::string DiscountCard::getType() const {
+std::string DiscountCard::getCardType() const {
     return "DiscountCard"; 
 }

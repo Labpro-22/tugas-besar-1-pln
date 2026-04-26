@@ -9,5 +9,13 @@ void CardView::outputCard(Card& card) const{
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
     std::cout <<"\n";
-    std::cout << "Kartu: " << card.getMessage();
+    std::cout << "Kartu: " << card.getCardType();
+    if (!card.getMessage().empty()) {
+        std::cout << " - " << card.getMessage();
+    }
+    std::cout << '\n';
+}
+
+void CardView::outputShielded() const {
+    std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu membayar.\n";
 }
