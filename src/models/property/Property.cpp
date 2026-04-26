@@ -2,8 +2,7 @@
 #include "models/player/Player.hpp"
 
 Property::Property(const std::string& code, const std::string& name, const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration)
-    : code(code), name(name), color(color), 
-      owner(nullptr), state(BANK), 
+    : owner(nullptr), code(code), name(name), state(BANK), color(color),
       price(price), mortgageValue(mortgageValue), 
       festivalMultiplier(festivalMultiplier), festivalDuration(festivalDuration) {}
 
@@ -52,6 +51,10 @@ void Property::setMortgaged(bool mortgaged) noexcept {
     else {
         state = OWNED;
     }
+}
+
+void Property::resetToBank() noexcept {
+    resetOwnerAsBank();
 }
 
 void Property::startFestival() {

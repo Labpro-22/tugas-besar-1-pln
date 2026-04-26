@@ -1,5 +1,6 @@
 #include "core/GameManager.hpp"
 #include "views/UnmortgageView.hpp"
+#include <limits>
 #define SPACE 30
 #define SPACE_2 20
 Property* UnmortgageView::promptChooseProperty(std::vector<Property*> pr) const{
@@ -26,7 +27,12 @@ Property* UnmortgageView::promptChooseProperty(std::vector<Property*> pr) const{
         std::cout << "Pilih nomor properti (0 untuk batal): ";
         int input;
         while(true){
-            std::cin >> input;
+            if(!(std::cin >> input)){
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Nomor properti tidak Valid!\n";
+                continue;
+            }
             if(input == 0){
                 std::cout << "\n\n";
                 return nullptr;
@@ -45,11 +51,11 @@ Property* UnmortgageView::promptChooseProperty(std::vector<Property*> pr) const{
 
 void UnmortgageView::outputUnmortgageStatus(bool success, Property &pr) const{
     if(success){
-        std::cout << pr.getName() << " berhasil ditebus!\nKamu membayar M" << pr.getPrice() << " ke Bank.\nUang kamu sekarang: M" 
+        std::cout << pr.getName() << " berhasil ditebus!\nKamu membayar M" << pr.redemptionPrice() << " ke Bank.\nUang kamu sekarang: M"
         << gameManager.getCurrentPlayer().getMoney() << "\n\n";
     }
     else{
-        std::cout << "Uang kamu tidak cukup untuk menebus "  << pr.getName() <<".\nHarga tebus: M" << pr.getPrice() <<
+        std::cout << "Uang kamu tidak cukup untuk menebus "  << pr.getName() <<".\nHarga tebus: M" << pr.redemptionPrice() <<
          "| Uang kamu: M" << gameManager.getCurrentPlayer().getMoney() << "\n\n";
     }
 }

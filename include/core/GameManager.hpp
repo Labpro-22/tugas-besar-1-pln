@@ -1,6 +1,7 @@
 #pragma once
 
 #include <queue>
+#include <string>
 #include <vector>
 
 #include "models/bank/Bank.hpp"
@@ -81,7 +82,7 @@ public:
     void processSetDice(int value1, int value2);
     void processBuyProperty();
     void processBuyProperty(Player &player, Property *property);
-    void processAuctionProperty(Property *property);
+    void processAuctionProperty(Property *property, Player *excludedPlayer = nullptr);
     void processMortgageProperty();
     void processUnmortgageProperty();
     void processBuild();
@@ -94,7 +95,7 @@ public:
     void processWin();
     void processPayRent();
     void processGoTile();
-    void processGoToJail();
+    void processGoToJail(const std::string& reason = "");
     void processPayLuxuryTax();
     void processPayIncomeTax();
     void processUseCommunityChestCard();

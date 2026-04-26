@@ -8,6 +8,6 @@ class GoToJailTile: public SpecialTile {
 
         void onLanded(Player& p, GameManager& gm) override;
         
-        void onPassBy(Player& p, GameManager& gm) override {}
+        void onPassBy(Player&, GameManager&) override {}
     
 };
