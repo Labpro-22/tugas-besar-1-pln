@@ -484,14 +484,29 @@ void GameManager::processSaveGame(std::string fileName)
             for (SkillCard *card : player.getSkillCards()) {
                 SkillCardSaveData cardData;
                 cardData.type = card->getCardType();
+                cardData.value = card->getCardValue();
+                // DiscountCard stores remaining duration via PlayerEffect; default 1 for others
                 cardData.duration = 1;
-                cardData.value = 30;
                 playerData.skillCards.push_back(cardData);
             }
             saveData.players.push_back(playerData);
-            saveData.playerOrder.push_back(player.getUsername());
         }
         saveData.currentPlayer = getCurrentPlayer().getUsername();
+
+        // Build turn order from players vector (sorted by turn order on load)
+        // Reconstruct the round-robin order starting from current player
+        {
+            std::string current = saveData.currentPlayer;
+            bool started = false;
+            for (Player &p : players) {
+                if (p.getUsername() == current) started = true;
+                if (started && !p.isBankrupt()) saveData.playerOrder.push_back(p.getUsername());
+            }
+            for (Player &p : players) {
+                if (p.getUsername() == current) break;
+                if (!p.isBankrupt()) saveData.playerOrder.push_back(p.getUsername());
+            }
+        }
 
         for (Property *property : board.getPropertyList()) {
             PropertySaveData propertyData;
@@ -599,12 +614,19 @@ void GameManager::processRollDice()
         player.rollToGetOutOfJail();
         view.outputRollDice(!player.isJailed());
         if (!player.isJailed()) {
+            // Escaped jail — move the piece using the roll that freed them
+            int total = DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second;
+            player.getPiece().goForward(total, player, *this);
+            PlayerPiece &piece = player.getPiece();
+            piece.getCurrentTile()->onLanded(player, *this);
             mainMenuView.outputCurrentPlayerInfo();
             logger.log(turn, player.getUsername(), "LEMPAR_DADU",
                        "Hasil dadu: " +
                            std::to_string(DiceRoller::getLastRoll().first) + " + " + std::to_string(DiceRoller::getLastRoll().second) + " = " +
                            std::to_string(DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second) +
-                           ". Berhasil keluar dari penjara karena dua mata dadu sama. Mendapat giliran lagi.");
+                           ". Berhasil keluar dari penjara karena dua mata dadu sama. Mendarat di petak " +
+                           piece.getCurrentTile()->getName() + " [" + piece.getCurrentTile()->getCode() + "].");
+            nextPlayer();
         }
         else {
             logger.log(turn, player.getUsername(), "LEMPAR_DADU",
@@ -665,12 +687,18 @@ void GameManager::processSetDice(int value1, int value2)
         player.setDiceToGetOutOfJail(value1, value2);
         view.outputSetDice(value1, value2, !player.isJailed());
         if (!player.isJailed()) {
+            // Escaped jail — move the piece using the set dice values
+            player.getPiece().goForward(value1 + value2, player, *this);
+            PlayerPiece &piece = player.getPiece();
+            piece.getCurrentTile()->onLanded(player, *this);
             mainMenuView.outputCurrentPlayerInfo();
             logger.log(turn, player.getUsername(), "ATUR_DADU",
                        "Hasil dadu: " +
                            std::to_string(value1) + " + " + std::to_string(value2) + " = " +
                            std::to_string(value1 + value2) +
-                           ". Berhasil keluar dari penjara karena dua mata dadu sama. Mendapat giliran lagi.");
+                           ". Berhasil keluar dari penjara karena dua mata dadu sama. Mendarat di petak " +
+                           piece.getCurrentTile()->getName() + " [" + piece.getCurrentTile()->getCode() + "].");
+            nextPlayer();
         }
         else {
             logger.log(turn, player.getUsername(), "ATUR_DADU",
@@ -694,8 +722,13 @@ void GameManager::processBuyProperty()
 
     PropertyTile *tile = dynamic_cast<PropertyTile *>(piece.getCurrentTile());
     if (tile != nullptr) {
-        if (player.getMoney() >= tile->getProperty()->getPrice()) {
-            if (tile->getProperty()->getPropertyType() != "STREET" || view.promptBuyProperty(*tile->getProperty())) {
+        std::string propType = tile->getProperty()->getPropertyType();
+        if (propType != "STREET") {
+            // Railroad and Utility: auto-acquire without prompting
+            processBuyProperty(player, tile->getProperty());
+        }
+        else if (player.getMoney() >= tile->getProperty()->getPrice()) {
+            if (view.promptBuyProperty(*tile->getProperty())) {
                 processBuyProperty(player, tile->getProperty());
             }
             else {
@@ -980,6 +1013,7 @@ void GameManager::processLiquidation()
 
     BankruptView &view = gameView.getBankruptView();
 
+    long long debt = -player.getMoney();
     view.outputPotentialWealth(player, -player.getMoney());
 
     if (player.calculateTotalWealth() >= -player.getMoney()) {
@@ -998,6 +1032,8 @@ void GameManager::processLiquidation()
                 player.mortgageProperty(chosenProperty.second);
             }
         }
+        // Deduct debt from player (tax goes to bank and is removed from circulation)
+        player.deductMoney(debt);
     }
     else {
         view.outputBankruptByBank(player);
@@ -1012,6 +1048,7 @@ void GameManager::processOtherPlayerLiquidation(Player &other)
 {
     BankruptView &view = gameView.getBankruptView();
 
+    long long debt = -other.getMoney();
     view.outputPotentialWealth(other, -other.getMoney());
 
     if (other.calculateTotalWealth() >= -other.getMoney()) {
@@ -1024,6 +1061,7 @@ void GameManager::processOtherPlayerLiquidation(Player &other)
                 other.mortgageProperty(chosenProperty.second);
             }
         }
+        other.deductMoney(debt);
     }
     else {
         view.outputBankruptByBank(other);
@@ -1051,6 +1089,8 @@ void GameManager::processOtherPlayerLiquidation(Player &other, Player &creditor)
                 other.mortgageProperty(chosenProperty.second);
             }
         }
+        other.deductMoney(debt);
+        creditor.receiveMoney(debt);
         view.outputDebtPaid(debt, &creditor);
     }
     else {
@@ -1084,6 +1124,8 @@ void GameManager::processLiquidation(Player &creditor)
                 player.mortgageProperty(chosenProperty.second);
             }
         }
+        player.deductMoney(debt);
+        creditor.receiveMoney(debt);
         view.outputDebtPaid(debt, &creditor);
     }
     else {
@@ -1140,6 +1182,12 @@ void GameManager::processGoTile()
 {
     BoardView &board = gameView.getBoardView();
     board.outputOnPassByStart();
+}
+
+void GameManager::processLandingMessage()
+{
+    // Prints the "Kamu mendarat di X" message for the current player's tile
+    gameView.getBoardView().outputOnLanded();
 }
 
 void GameManager::processGoToJail()
@@ -1224,7 +1272,6 @@ void GameManager::processStartFestival()
     prop->startFestival();
     fesView.outputFestivalStatus(*prop);
 }
-
 void GameManager::processExit() {
     running = false;
     playing = false;
