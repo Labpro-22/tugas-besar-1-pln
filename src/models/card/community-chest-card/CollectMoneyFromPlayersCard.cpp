@@ -9,11 +9,14 @@ CollectMoneyFromPlayersCard::CollectMoneyFromPlayersCard(const std::string& mess
 
 void CollectMoneyFromPlayersCard::takeEffect(Player& p, GameManager& gm) {
     std::vector<Player>& allPlayers = gm.getPlayers();
-    int totalCollected = 0;
 
     for (Player& other : allPlayers) {
-        if (other.getUsername() != p.getUsername()) {
+        if (other.getUsername() != p.getUsername() && !other.isBankrupt()) {
             bool canPay = other.giveMoney(p, amount);
+            // If other cannot pay, trigger their liquidation with p as creditor
+            if (!canPay) {
+                gm.processOtherPlayerLiquidation(other, p);
+            }
         }
     }
 }
