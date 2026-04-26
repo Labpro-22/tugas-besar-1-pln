@@ -221,7 +221,6 @@ void BoardView::printHorizontalBorder(int count) const{
 // ==================== Area Tengah ====================
 
 std::string BoardView::getCenterContent(int row) const{
-    // TODO: uncomment saat GameManager tersedia
     int turn = gameManager.getCurrentTurn();
     int maxTurn = gameManager.getConfig().maxTurn;
 
@@ -229,55 +228,42 @@ std::string BoardView::getCenterContent(int row) const{
     int sideLength = board.getTileCount() / 4;
 
     int innerCols = sideLength - 1;
-    int innerWidth = (CELL_WIDTH + 1) * innerCols;
+    int innerWidth = (CELL_WIDTH + 1) * innerCols - 1;
 
+    auto c = [&](const std::string& s) { return padCenter(s, innerWidth); };
+
+    // 9 middle rows × 3 slot per row = slot 0..26 (slot 26 tidak terpakai).
+    // Slot 0,1 = baris konten sel; slot 2 = baris separator (juga jadi tempat teks).
     switch (row) {
-        case 0:
-            return padCenter("", innerWidth);
-        case 1:
-            return padCenter("==================================", innerWidth);
-        case 2:
-            return padCenter("||          NIMONSPOLI          ||", innerWidth);
-        case 3:
-            return padCenter("==================================", innerWidth);
-        case 4:
-            return padCenter("", innerWidth);
-        case 5:
-            return padCenter("TURN " + std::to_string(turn) + " / " + std::to_string(maxTurn), innerWidth);
-        case 6:
-            return padCenter("", innerWidth);
-        case 7:
-            return padCenter("----------------------------------", innerWidth);
-        case 8:
-            return padCenter("LEGENDA KEPEMILIKAN & STATUS", innerWidth);
-        case 9:
-            return padCenter("P1-P4 : Properti milik Pemain 1-4", innerWidth);
-        case 10:
-            return padCenter("^    : Rumah Level 1", innerWidth);
-        case 11:
-            return padCenter("^^   : Rumah Level 2", innerWidth);
-        case 12:
-            return padCenter("^^^  : Rumah Level 3", innerWidth);
-        case 13:
-            return padCenter("*    : Hotel (Maksimal)", innerWidth);
-        case 14:
-            return padCenter("(1)-(4): Bidak (IN=Tahanan, V=Mampir)", innerWidth);
-        case 15:
-            return padCenter("----------------------------------", innerWidth);
-        case 16:
-            return padCenter("KODE WARNA:", innerWidth);
-        case 17:
-            return padCenter("[CK]=Coklat   [MR]=Merah", innerWidth);
-        case 18:
-            return padCenter("[BM]=Biru Muda [KN]=Kuning", innerWidth);
-        case 19:
-            return padCenter("[PK]=Pink      [HJ]=Hijau", innerWidth);
-        case 20:
-            return padCenter("[OR]=Orange    [BT]=Biru Tua", innerWidth);
-        case 21:
-            return padCenter("[DF]=Aksi      [AB]=Utilitas", innerWidth);
-        default:
-            return padCenter("", innerWidth);
+        // Header
+        case  0:  return c("");
+        case  1:  return c("==========================================");
+        case  2:  return c("||         N I M O N S P O L I          ||");
+        case  3:  return c("==========================================");
+        case  4:  return c("");
+        case  5:  return c("[ TURN " + std::to_string(turn) + " / " + std::to_string(maxTurn) + " ]");
+        case  6:  return c("");
+        case  7:  return c("------- LEGENDA KEPEMILIKAN -------");
+
+        // Legenda
+        case  8:  return c("P1-P4    : Properti milik Pemain 1-4");
+        case  9:  return c("^ ^^ ^^^ ^^^^ : Rumah Level 1-4");
+        case 10:  return c("*        : Hotel (Maksimal)");
+        case 11:  return c("[M]      : Properti Digadaikan");
+        case 12:  return c("(1)-(4)  : Bidak Pemain di Petak");
+        case 13:  return c("IN / V   : Tahanan / Mampir di Penjara");
+
+        // Kode Warna
+        case 14:  return c("");
+        case 15:  return c("--------- KODE WARNA ---------");
+        case 16:  return c("");
+        case 17:  return c("[CK]=Coklat      [MR]=Merah");
+        case 18:  return c("[BM]=Biru Muda   [KN]=Kuning");
+        case 19:  return c("[PK]=Pink        [HJ]=Hijau");
+        case 20:  return c("[OR]=Orange      [BT]=Biru Tua");
+        case 21:  return c("[AB]=Utilitas    [DF]=Aksi/Stasiun");
+
+        default:  return c("");
     }
 }
 
@@ -311,13 +297,14 @@ void BoardView::printTopRow() const{
     printHorizontalBorder(topCount);
 }
 
-// ==================== Cetak Baris Bawah (index 0-10) ====================
+// ==================== Cetak Baris Bawah (index 10..0, kiri ke kanan) ====================
 
 void BoardView::printBottomRow() const{
     Board &board = gameManager.getBoard();
     int sideLength = board.getTileCount() / 4;
     int bottomCount = sideLength + 1;
 
+    // Border atas penuh (menyatu dengan akhir middle)
     printHorizontalBorder(bottomCount);
 
     // Baris 1
@@ -346,49 +333,46 @@ void BoardView::printMiddleRows()const {
     int sideLength = board.getTileCount() / 4;
     int middleCount = sideLength - 1; // 9 baris tengah
     int innerCols = sideLength - 1;
-    int innerWidth = (CELL_WIDTH + 1) * innerCols;
+    int innerWidth = (CELL_WIDTH + 1) * innerCols - 1;
 
-    for (int row = 0; row < middleCount; row++) {
-        int leftIndex = sideLength * 2 - 1 - row;        // sisi kiri (atas ke bawah)
-        int rightIndex = sideLength * 3 + 1 + row;       // sisi kanan (atas ke bawah)
-
-        Tile* leftTile = board.getTile(leftIndex);
-        Tile* rightTile = board.getTile(rightIndex);
-
-        // --- Baris 1 sel ---
-        // Sel kiri
-        std::cout << "|" << getCellLine1(leftTile, leftIndex) ;
-        std::cout << "|";
-
-        // Area tengah baris 1
-        int centerRow = row * 2;
-        std::string centerLine = getCenterContent(centerRow);
-        // Potong atau pad ke innerWidth - 1
-        std::cout << padRight(centerLine, innerWidth - 1);
-
-        // Sel kanan
-        std::cout << "|" << getCellLine1(rightTile, rightIndex);
-        std::cout << "|" << std::endl;
-
-        // --- Baris 2 sel ---
-        std::cout << "|" << padRight(getCellLine2(leftTile, leftIndex), CELL_WIDTH);
-        std::cout << "|";
-
-        int centerRow2 = row * 2 + 1;
-        std::string centerLine2 = getCenterContent(centerRow2);
-        std::cout << padRight(centerLine2, innerWidth - 1);
-        
-        std::cout << "|" << padRight(getCellLine2(rightTile, rightIndex), CELL_WIDTH);
-        std::cout << "|" << std::endl;
-
-        // Border antara baris
+    auto cellSeparator = [&](const std::string& centerLine) {
         std::cout << "+";
         for (int j = 0; j < CELL_WIDTH; j++) std::cout << "-";
         std::cout << "+";
-        std::cout << padRight("", innerWidth - 1);
+        std::cout << centerLine;
         std::cout << "+";
         for (int j = 0; j < CELL_WIDTH; j++) std::cout << "-";
         std::cout << "+" << std::endl;
+    };
+
+    for (int row = 0; row < middleCount; row++) {
+        int leftIndex  = sideLength * 2 - 1 - row;    // 19, 18, ..., 11
+        int rightIndex = sideLength * 3 + 1 + row;    // 31, 32, ..., 39
+
+        Tile* leftTile  = board.getTile(leftIndex);
+        Tile* rightTile = board.getTile(rightIndex);
+
+        // 3 slot konten center per row
+        int slot0 = row * 3;     // baris 1 sel
+        int slot1 = row * 3 + 1; // baris 2 sel
+        int slot2 = row * 3 + 2; // baris pemisah (antar sel kiri/kanan)
+
+        // --- Baris 1 sel: kode petak ---
+        std::cout << "|" << getCellLine1(leftTile, leftIndex);
+        std::cout << "|" << getCenterContent(slot0);
+        std::cout << "|" << getCellLine1(rightTile, rightIndex);
+        std::cout << "|" << std::endl;
+
+        // --- Baris 2 sel: info kepemilikan + bidak ---
+        std::cout << "|" << padRight(getCellLine2(leftTile, leftIndex), CELL_WIDTH);
+        std::cout << "|" << getCenterContent(slot1);
+        std::cout << "|" << padRight(getCellLine2(rightTile, rightIndex), CELL_WIDTH);
+        std::cout << "|" << std::endl;
+
+        // --- Border antar petak: kiri/kanan dash, tengah teks ---
+        if (row < middleCount - 1) {
+            cellSeparator(getCenterContent(slot2));
+        }
     }
 }
 
