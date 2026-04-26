@@ -3,7 +3,7 @@
 #include "models/tile/Tile.hpp"
 
 PlayerPiece::PlayerPiece(int startPosition)
-    : position(startPosition), board(nullptr) {}
+    : board(nullptr), position(startPosition) {}
 
 void PlayerPiece::setPosition(int pos) {
     position = pos;

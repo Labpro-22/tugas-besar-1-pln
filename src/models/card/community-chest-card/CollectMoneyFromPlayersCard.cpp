@@ -9,11 +9,10 @@ CollectMoneyFromPlayersCard::CollectMoneyFromPlayersCard(const std::string& mess
 
 void CollectMoneyFromPlayersCard::takeEffect(Player& p, GameManager& gm) {
     std::vector<Player>& allPlayers = gm.getPlayers();
-    int totalCollected = 0;
 
     for (Player& other : allPlayers) {
         if (other.getUsername() != p.getUsername()) {
-            bool canPay = other.giveMoney(p, amount);
+            other.giveMoney(p, amount);
         }
     }
 }
