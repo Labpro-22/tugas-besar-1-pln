@@ -1,0 +1,11 @@
+GOTOJAIL 0 Anda menabrak driver ojol. Anda masuk penjara. 
+GOTOJAIL 0 Anda masuk penjara karena postingan story instagram Anda. 
+GETOUTOFJAIL 0 Dapet orang dalam. Gunakan kartu ini untuk keluar dari penjara. 
+FORCEDMOVE -4 Anda diculik om-om. Dibawa mundur 4 petak ke belakang.
+FORCEDMOVE 10 Nyasar karena salah naik kereta. Maju 10 petak.
+FORCEDMOVE 1 Kepleset. Maju 1 langkah.
+FORCEDMOVE -1 Kejeglong. Mundur 1 langkah.
+FORCEDMOVE 3 Naik odong-odong sampai lupa waktu. Tiba-tiba maju 3 petak ke depan.
+FORCEDMOVE 17 Dapet lemparan dadu gratis 6 + 7. Maju terus hingga 13 petak ke depan. 
+GOTONEARESTSTATION 0 Gerak ke stasiun terdekat. 
+GOTONEARESTSTATION 0 Gerak ke stasiun terdekat. 

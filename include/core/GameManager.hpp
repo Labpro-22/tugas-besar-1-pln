@@ -1,0 +1,115 @@
+#pragma once
+
+#include <queue>
+#include <string>
+#include <vector>
+
+#include "models/bank/Bank.hpp"
+#include "models/board/Board.hpp"
+#include "models/card/Card.hpp"
+#include "models/card/CardDeck.hpp"
+#include "models/card/chance-card/ChanceCard.hpp"
+#include "models/card/community-chest-card/CommunityChestCard.hpp"
+#include "models/card/skill-card/SkillCard.hpp"
+#include "models/player/Player.hpp"
+#include "models/player/PlayerPiece.hpp"
+#include "models/property/Property.hpp"
+#include "models/tile/PropertyTile.hpp"
+#include "models/tile/Tile.hpp"
+#include "utils/config/Config.hpp"
+#include "utils/config/ConfigLoader.hpp"
+#include "utils/log/TransactionLogger.hpp"
+#include "utils/save-load/SaveData.hpp"
+#include "utils/save-load/SaveFileHandler.hpp"
+#include "views/GameView.hpp"
+
+class GameManager {
+private:
+    bool running;
+    bool playing;
+    bool startOfTheTurn;
+    bool skillCardUsedThisTurn;
+    bool diceRolledThisTurn;
+    Config config;
+    GameView gameView;
+    int turn;
+    Board board;
+    std::vector<Player> players;
+    std::queue<Player *> playerQueue;
+    Bank bank;
+    TransactionLogger logger;
+
+    std::vector<ChanceCard *> chanceCards;
+    std::vector<CommunityChestCard *> communityChestCards;
+    std::vector<SkillCard *> skillCards;
+    CardDeck<ChanceCard *> chanceCardDeck;
+    CardDeck<CommunityChestCard *> communityChestCardDeck;
+    CardDeck<SkillCard *> skillCardDeck;
+
+    // Main game runner
+    void gameLoop();
+    bool isRunning() const;
+    bool isGameEnded() const;
+    void initGame();
+    void processTurnStart();
+    void startCurrentPlayerTurn();
+    void nextTurn();
+    void nextPlayer();
+
+public:
+    GameManager();
+    ~GameManager();
+
+    // Main game runner
+    void runGame();
+    void stopGame();
+
+    const Config &getConfig() const;
+    int getCurrentTurn() const;
+    Player &getCurrentPlayer() const;
+    Board &getBoard();
+    Bank &getBank();
+    std::vector<Player> &getPlayers();
+    TransactionLogger &getLogger();
+    CardDeck<ChanceCard *> &getChanceCardDeck();
+    CardDeck<CommunityChestCard *> &getCommunityChestCardDeck();
+    CardDeck<SkillCard *> &getSkillCardDeck();
+
+    void processMainMenu();
+    void processNewGame();
+    void processSaveGame(std::string fileName);
+    void processLoadGame();
+    void processRollDice();
+    void processSetDice(int value1, int value2);
+    void processBuyProperty();
+    void processBuyProperty(Player &player);
+    void processBuyProperty(Player &player, Property *property);
+    void processAuctionProperty(Property *property, Player *excludedPlayer = nullptr);
+    void processMortgageProperty();
+    void processUnmortgageProperty();
+    void processBuild();
+    void processUseSkillCard();
+    void processDropSkillCard();
+    void processLiquidation();
+    void processLiquidation(Player &player);
+    void processOtherPlayerLiquidation(Player &other);
+    void processOtherPlayerLiquidation(Player &other, Player &creditor);
+    void processWin();
+    void processPayRent();
+    void processPayRent(Player &player);
+    void processGoTile();
+    void processLandingMessage();
+    void processGoToJail(const std::string& reason = "");
+    void processGoToJail(Player &player, const std::string& reason = "");
+    void processPayLuxuryTax();
+    void processPayLuxuryTax(Player &player);
+    void processPayIncomeTax();
+    void processPayIncomeTax(Player &player);
+    void processUseCommunityChestCard();
+    void processUseCommunityChestCard(Player &player);
+    void processUseChanceCard();
+    void processUseChanceCard(Player &player);
+    void processStartFestival();
+    void processStartFestival(Player &player);
+    void processExit();
+};

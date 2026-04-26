@@ -1,10 +1,9 @@
-#ifndef NIMONSPOLI_HPP
-#define NIMONSPOLI_HPP
+#pragma once
+
+#include "core/GameManager.hpp"
 
 class Nimonspoli
 {
 public:
-    void run() const;
+    static void run();
 };
-
-#endif
