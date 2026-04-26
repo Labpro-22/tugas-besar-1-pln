@@ -56,17 +56,21 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
         int inputIdx;
         std::cin >> inputIdx;
         if(inputIdx == 0)return nullptr;
-        std::cout<<"\nCColor group [" << colors[idx-1] << "] :\n";
+        if(inputIdx < 1 || inputIdx > (int)colors.size()) {
+            std::cout << "Nomor tidak valid!\n";
+            return nullptr;
+        }
+        std::cout<<"\nColor group [" << colors[inputIdx-1] << "] :\n";
         idx = 1;
         std::vector<StreetProperty*> validBuildings;
 
         int minHouse = 6;
 
-        for (const StreetProperty* p : colorGroup[colors[idx-1]]) {
+        for (const StreetProperty* p : colorGroup[colors[inputIdx-1]]) {
             minHouse = std::min(minHouse, p->getHouseCount());
         }
 
-        for(auto p  : colorGroup[colors[idx-1]]){
+        for(auto p  : colorGroup[colors[inputIdx-1]]){
             if(p->getHouseCount() == minHouse)validBuildings.push_back(p);
         } 
         for(auto p  : validBuildings){
@@ -85,8 +89,12 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
         std::cout << "Pilih nomor properti (0 untuk batal): ";
         std::cin >> inputIdx;
         if(inputIdx == 0)return nullptr;
-
-        StreetProperty* toBuild = validBuildings[inputIdx];
+        
+        if(inputIdx < 1 || inputIdx > (int)validBuildings.size()) {
+            std::cout << "Nomor tidak valid!\n";
+            return nullptr;
+        }
+        StreetProperty* toBuild = validBuildings[inputIdx-1];
         if(toBuild->hasHotel()){
             std::cout << "Properti sudah memiliki hotel, tidak dapat dibangun!\n";
             return nullptr;
@@ -123,4 +131,3 @@ void BuildView::outputBuildStatus(bool success, StreetProperty* pr) const{
         std::cout << "Gagal membangun rumah / hotel!\n";
     }
 }
-
