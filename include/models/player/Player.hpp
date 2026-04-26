@@ -85,6 +85,7 @@ public:
     bool hasEffect(const std::string& name) const;
     int getEffectValue(const std::string& name) const;
     void onNextTurn();
+    std::vector<SkillCard*>& getSkillCardsRef();
 
 private:
     std::string username;
