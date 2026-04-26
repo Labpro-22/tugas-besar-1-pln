@@ -74,13 +74,13 @@ bool MortgageView::sellAllBuildings(std::vector<StreetProperty*>colorGroupProper
         if(in == "y"){
             long long total = 0;
             for(auto sp : colorGroupProperty){
-                std::cout << "Bangunan  " << sp->getName() << "terjual. Kamu menerima M"  << sp->calculateSellValue() - sp->getPrice()<< "\n\n";
-                total += sp->calculateSellValue() -sp->getPrice();
+                std::cout << "Bangunan  " << sp->getName() << " terjual. Kamu menerima M"  << sp->calculateSellValue() - sp->getPrice()<< "\n\n";
+                total += sp->calculateSellValue() - sp->getPrice();
             }
             std::cout << "Uang kamu sekarang: M" << gameManager.getCurrentPlayer().getMoney() + total << "\n\n";
             return true;
-        if(in == "n")return false;
-        std::cout << "Masukan tidak valid!\nJual semua bangunan color group ["   << colorGroupProperty[0]->getColor() << "]? (y/n)";
-        }   
+        } 
+        if(in == "n") return false;
+        std::cout << "Masukan tidak valid!\nJual semua bangunan color group [" << colorGroupProperty[0]->getColor() << "]? (y/n)";
     }
 }

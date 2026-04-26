@@ -135,6 +135,10 @@ void SaveFileHandler::loadPlayer(SaveData &saveData, std::ifstream &in, std::fil
             throw SaveFileFormatException("POSISI_PETAK", path.string(), col, line);
         }
         col++;
+        if (!(bufferStream >> playerData.status)) {
+            throw SaveFileFormatException("STATUS", path.string(), col, line);
+        }
+        col++;
         if (!(bufferStream >> playerData.getOutOfJailCardCount)) {
             playerData.getOutOfJailCardCount = 0;
         }

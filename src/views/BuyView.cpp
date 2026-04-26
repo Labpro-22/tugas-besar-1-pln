@@ -1,5 +1,7 @@
 #include "core/GameManager.hpp"
 #include "views/BuyView.hpp"
+#include <thread>
+#include <chrono>
 
 bool BuyView::promptBuyProperty(Property& pr){
     Property *p = &pr;
@@ -22,11 +24,12 @@ bool BuyView::promptBuyProperty(Property& pr){
             if(i == 0){
                 std::cout <<"|" << std::left << std::setw(COLON_WIDTH) << " Sewa (unimproved)" << std::left << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[0])) << "|\n";
             }
-            else if(i > 0 && i < 6){
-                std::cout << "|" << std::left << std::setw(COLON_WIDTH) << (" Sewa (" + std::to_string(i) + " rumah)") << std::left << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[i])) << "|\n";
-            }
-            else{
+            // i==5 is hotel, must check before i>0&&i<5
+            else if(i == 5){
                 std::cout<< "|" <<std::left << std::setw(COLON_WIDTH) << " Sewa (hotel)" << std::left << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[5])) << "|\n";
+            }
+            else if(i > 0 && i < 5){
+                std::cout << "|" << std::left << std::setw(COLON_WIDTH) << (" Sewa (" + std::to_string(i) + " rumah)") << std::left << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[i])) << "|\n";
             }
         }
         std::cout << "+" << std::string(WIDTH,'-') << "+\n";

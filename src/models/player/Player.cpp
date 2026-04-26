@@ -20,12 +20,13 @@ PlayerState Player::getState() const { return state; }
 PlayerPiece& Player::getPiece() { return piece; }
 const std::vector<Property*>& Player::getProperties() const{ return properties; }
 const std::vector<SkillCard*>& Player::getSkillCards() const{ return skillCards; }
+std::vector<SkillCard*>& Player::getSkillCardsRef() { return skillCards; }
 const std::vector<PlayerEffect>& Player::getEffects() const{ return effects; }
 int Player::getStreetPropertyCount() const { return streetPropertyCount; }
 int Player::getRailroadPropertyCount() const { return railroadPropertyCount; }
 int Player::getUtilityPropertyCount() const { return utilityPropertyCount; }
 
-void Player::rollDiceAndMove() {
+void Player::rollDiceAndMove(GameManager& gm) {
     if (state == PlayerState::BANKRUPT)
         throw AlreadyBankruptException("Pemain " + username + " sudah bangkrut.");
     if (state == PlayerState::JAILED)
@@ -47,11 +48,11 @@ void Player::rollDiceAndMove() {
         doubleRollCounter = 0;
     }
 
-    piece.goForward(total);
+    piece.goForward(total, *this, gm); 
 
     return;
 }
-void Player::setDiceAndMove(int value1, int value2) {
+void Player::setDiceAndMove(int value1, int value2, GameManager& gm) {
     if (state == PlayerState::BANKRUPT)
         throw AlreadyBankruptException("Pemain " + username + " sudah bangkrut.");
     if (state == PlayerState::JAILED)
@@ -72,7 +73,7 @@ void Player::setDiceAndMove(int value1, int value2) {
         doubleRollCounter = 0;
     }
 
-    piece.goForward(total);
+    piece.goForward(total, *this, gm); 
 
     return;
 }
@@ -106,6 +107,35 @@ bool Player::payRent(Property* pr) {
     
     if (pr->getPropertyType() == "UTILITY"){
         rent *= (lastRoll.first + lastRoll.second);
+    }
+
+    if (pr->getPropertyType() == "STREET") {
+        StreetProperty* sp = dynamic_cast<StreetProperty*>(pr);
+        if (sp && sp->getHouseCount() == 0 && sp->getFestivalDuration() == 0) {
+            // Count how many of the same color the owner has vs total in board
+            // Use owner's property list to check monopoly
+            int ownedCount = 0;
+            int totalInColor = 0;
+            for (Property* p : owner->getProperties()) {
+                if (p->getColor() == sp->getColor()) ownedCount++;
+            }
+            // Get total from the board via owner's knowledge - we stored color count per player property check
+            // We approximate: if ownedCount >= 2 for brown/dark blue, or >= 3 for others
+            // Actually use the same isPropertySetComplete logic but we don't have board here.
+            // We track: if ALL properties in color group owned by same player.
+            // Simple approximation: count total same-color properties owner has.
+            // For color groups: brown=2, dark_blue=2, others=3
+            bool isMonopoly = false;
+            std::string color = sp->getColor();
+            if ((color == "COKLAT" || color == "BIRU_TUA") && ownedCount >= 2) {
+                isMonopoly = true;
+            } else if (ownedCount >= 3) {
+                isMonopoly = true;
+            }
+            if (isMonopoly) {
+                rent *= 2;
+            }
+        }
     }
 
     if (hasEffect("DISCOUNT")) {
@@ -304,9 +334,9 @@ void Player::sellBuilding(StreetProperty* pr) {
 }
 
 void Player::addSkillCard(SkillCard* card) {
-    if (skillCards.size() >= 4) {
+    if (skillCards.size() >= 3) {
         throw FullHandException(
-            "Pemain " + username + " sudah memiliki 4 kartu. Harus buang 1.");
+            "Pemain " + username + " sudah memiliki 3 kartu. Harus buang 1.");
     }
     skillCards.push_back(card);
 }
