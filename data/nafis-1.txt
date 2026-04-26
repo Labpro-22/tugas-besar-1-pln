@@ -1,13 +1,13 @@
 1 15
 4
-Wildan 2000 GO ACTIVE 0 0
+Wildan 2000 GO ACTIVE 0 0 0
 0
-Nafis 1850 PLN ACTIVE 0 0
+Nafis 1850 PLN ACTIVE 0 0 2
 1
 DemolitionCard 30
-An-Dafa 2000 GO ACTIVE 0 0
+An-Dafa 2000 GO ACTIVE 0 0 0
 0
-Kloce 2000 GO ACTIVE 0 0
+Kloce 2000 GO ACTIVE 0 0 0
 0
 Wildan Nafis An-Dafa Kloce 
 Nafis

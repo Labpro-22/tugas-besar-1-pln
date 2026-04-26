@@ -31,7 +31,7 @@ class Player
 public:
     Player(const std::string& username, long long initialMoney);
     Player( const std::string& username, long long money, PlayerState state, 
-            const std::vector<SkillCard*>& skillCards , int getOutOfJailCardCount, int jailTurns);
+            const std::vector<SkillCard*>& skillCards , int getOutOfJailCardCount, int jailTurns, int doubleRollCounter = 0);
 
     PlayerPiece& getPiece();
     long long getMoney() const;
@@ -43,6 +43,7 @@ public:
     int getStreetPropertyCount() const;
     int getRailroadPropertyCount() const;
     int getUtilityPropertyCount() const;
+    int getDoubleRollCounter() const;
     
     bool rollDiceAndMove();
     bool setDiceAndMove(int value1, int value2);
