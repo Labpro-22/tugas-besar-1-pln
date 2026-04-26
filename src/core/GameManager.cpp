@@ -737,65 +737,60 @@ void GameManager::processAuctionProperty(Property *property)
     AuctionView &view = gameView.getAuctionView();
     view.outputProperty(*property);
 
-    // Start from player AFTER current player; count (n_active - 1) consecutive passes to end
-    int activePlayers = 0;
-    for (const Player &p : players) {
-        if (!p.isBankrupt()) activePlayers++;
-    }
-    if (activePlayers == 0) return;
-
-    // Build ordered list starting from player after current
     std::vector<Player *> order;
+    Player *current = &getCurrentPlayer();
     bool startQueuing = false;
     for (Player &p : players) {
-        if (p.isBankrupt()) continue;
-        if (startQueuing) order.push_back(&p);
-        if (&p == &getCurrentPlayer()) startQueuing = true;
+        if (startQueuing && !p.isBankrupt()) order.push_back(&p);
+        if (&p == current) startQueuing = true;
     }
     for (Player &p : players) {
-        if (p.isBankrupt()) continue;
-        if (&p == &getCurrentPlayer()) break;
-        order.push_back(&p);
+        if (&p == current) break;
+        if (!p.isBankrupt()) order.push_back(&p);
     }
+    if (!current->isBankrupt()) order.push_back(current);
+
+    if (order.empty()) {
+        property->resetOwnerAsBank();
+        view.outputNoBid(property);
+        return;
+    }
+
+    std::cout << "Urutan lelang dimulai dari pemain setelah Pemain " << current->getUsername() << ".\n\n";
 
     Player *lastBidder = nullptr;
     long long bestBidAmount = -1;
     int consecutivePasses = 0;
+    int N = (int)order.size();
 
     int idx = 0;
     while (true) {
-        Player *bidder = order[idx % order.size()];
+        Player *bidder = order[idx % N];
         long long bid = view.promptBidOrPass(*bidder);
+
         if (bid >= 0 && bid > bestBidAmount) {
             lastBidder = bidder;
             bestBidAmount = bid;
             consecutivePasses = 0;
+            std::cout << "Penawaran tertinggi: M" << bestBidAmount << " (Pemain " << lastBidder->getUsername() << ")\n\n";
             logger.log(turn, bidder->getUsername(), "BID",
                        "Bid " + property->getName() + " [" + property->getCode() + "] M" + std::to_string(bid));
         }
         else {
+            if (bid >= 0) {
+                std::cout << "Bid harus lebih besar dari M" << bestBidAmount << "!\n\n";
+                continue;
+            }
             consecutivePasses++;
             logger.log(turn, bidder->getUsername(), "PASS",
                        "Pass pelelangan " + property->getName() + " [" + property->getCode() + "]");
         }
 
         idx++;
-        if (consecutivePasses >= activePlayers - 1 && lastBidder != nullptr) break;
-        if (consecutivePasses >= activePlayers && lastBidder == nullptr) {
-            // Force the last player who didn't pass to bid
-            Player *forced = order[(idx - 1) % order.size()];
-            long long forcedBid = -1;
-            while (forcedBid < 0) {
-                std::cout << "Minimal satu pemain harus melakukan bid. ";
-                forcedBid = view.promptBidOrPass(*forced);
-                if (forcedBid < 0) std::cout << "Tidak bisa PASS! Harus BID.\n";
-            }
-            lastBidder = forced;
-            bestBidAmount = forcedBid;
-            logger.log(turn, forced->getUsername(), "BID",
-                       "Bid paksa " + property->getName() + " [" + property->getCode() + "] M" + std::to_string(forcedBid));
-            break;
-        }
+
+        if (lastBidder != nullptr && consecutivePasses >= N - 1) break;
+        if (N == 1 && lastBidder != nullptr) break;
+        if (lastBidder == nullptr && consecutivePasses >= N) break;
     }
 
     if (lastBidder == nullptr || bestBidAmount < 0) {
