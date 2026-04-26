@@ -1,4 +1,14 @@
-PAYMONEYCARD 50 Anda kena tilang karena pingin aja. Bayar M50.
-PAYMONEYTOPLAYERSCARD 5 Bagi-bagi takjil tapi punyanya uang. Beri M5 ke semua pemain.
+PAYMONEYCARD 50 Anda kena tilang karena polisinya gabut. Bayar M50.
+PAYMONEYCARD 30 Saku Anda bolong. M30 uang jatuh di jalan.
+PAYMONEYCARD 10 Ngejajan es krim dulu. Hmmm enak! Bayar M10.
+PAYMONEYCARD 100 Bayar makan M10 kepejet 0 terlalu banyak. Jadi bayar M100.
+PAYMONEYCARD 100 Kena scam M100 setelah menghubungi Microsoft Service (boongan). Hilang M100.
+PAYMONEYCARD 67 1, 2, 3, 4, 5, SIX SEVEN!!!!!!!! M67 uang melayang karena brainrot ini.
+PAYMONEYTOPLAYERSCARD 5 Bagi-bagi takjil tapi malas beli takjilnya. Pake uang aja deh. Beri M5 ke semua pemain.
+PAYMONEYTOPLAYERSCARD 1 Orang dermawan ya bagi-bagi duit walau sepeser. Beri M1 ke semua pemain.
 COLLECTMONEYCARD 100 Dapat harta karun dari ujung pelangi. Dapat M100. 
-COLLECTMONEYFROMPLAYERSCARD 10 Waktunya malak semua orang >:). Dapat M10 dari semua pemain.
+COLLECTMONEYCARD 10 Dapat M10 dari Mr. Beast. (Ga subscribe jadinya kehilangan peluang dapat M1000)
+COLLECTMONEYCARD 500 Dapat uang MBG sebesar 500. Harus buat MBG >:I
+COLLECTMONEYCARD 200 Jadi buzzer enak juga dapat duit. Hidup Pemerintah! Dapat M200.
+COLLECTMONEYFROMPLAYERSCARD 20 Waktunya malak semua orang >:). Dapat M20 dari semua pemain.
+COLLECTMONEYFROMPLAYERSCARD 10 Dapat uang kasihan sebesar M10 dari semua pemain.
