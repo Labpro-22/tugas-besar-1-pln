@@ -1,6 +1,7 @@
 #pragma once
 
 #include <queue>
+#include <string>
 #include <vector>
 
 #include "models/bank/Bank.hpp"
@@ -92,7 +93,7 @@ public:
     void processWin();
     void processPayRent();
     void processGoTile();
-    void processGoToJail();
+    void processGoToJail(const std::string& reason = "");
     void processPayLuxuryTax();
     void processPayIncomeTax();
     void processUseCommunityChestCard();
