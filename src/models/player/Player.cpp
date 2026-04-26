@@ -109,6 +109,35 @@ bool Player::payRent(Property* pr) {
         rent *= (lastRoll.first + lastRoll.second);
     }
 
+    if (pr->getPropertyType() == "STREET") {
+        StreetProperty* sp = dynamic_cast<StreetProperty*>(pr);
+        if (sp && sp->getHouseCount() == 0 && sp->getFestivalDuration() == 0) {
+            // Count how many of the same color the owner has vs total in board
+            // Use owner's property list to check monopoly
+            int ownedCount = 0;
+            int totalInColor = 0;
+            for (Property* p : owner->getProperties()) {
+                if (p->getColor() == sp->getColor()) ownedCount++;
+            }
+            // Get total from the board via owner's knowledge - we stored color count per player property check
+            // We approximate: if ownedCount >= 2 for brown/dark blue, or >= 3 for others
+            // Actually use the same isPropertySetComplete logic but we don't have board here.
+            // We track: if ALL properties in color group owned by same player.
+            // Simple approximation: count total same-color properties owner has.
+            // For color groups: brown=2, dark_blue=2, others=3
+            bool isMonopoly = false;
+            std::string color = sp->getColor();
+            if ((color == "COKLAT" || color == "BIRU_TUA") && ownedCount >= 2) {
+                isMonopoly = true;
+            } else if (ownedCount >= 3) {
+                isMonopoly = true;
+            }
+            if (isMonopoly) {
+                rent *= 2;
+            }
+        }
+    }
+
     if (hasEffect("DISCOUNT")) {
         rent = rent * (100 - getEffectValue("DISCOUNT")) / 100;
     }
@@ -305,9 +334,9 @@ void Player::sellBuilding(StreetProperty* pr) {
 }
 
 void Player::addSkillCard(SkillCard* card) {
-    if (skillCards.size() >= 4) {
+    if (skillCards.size() >= 3) {
         throw FullHandException(
-            "Pemain " + username + " sudah memiliki 4 kartu. Harus buang 1.");
+            "Pemain " + username + " sudah memiliki 3 kartu. Harus buang 1.");
     }
     skillCards.push_back(card);
 }
