@@ -2,6 +2,8 @@
 
 class Board;
 class Tile;
+class Player;
+class GameManager;
 
 class PlayerPiece {
 private:
@@ -17,6 +19,6 @@ public:
     void setBoard(Board* board);
     
     void goForward(int tileCount);
+    void goForward(int tileCount, Player& player, GameManager& gm);
     void goBackward(int tileCount);
 };
-
