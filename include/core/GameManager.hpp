@@ -80,7 +80,7 @@ public:
     void processSetDice(int value1, int value2);
     void processBuyProperty();
     void processBuyProperty(Player &player, Property *property);
-    void processAuctionProperty(Property *property);
+    void processAuctionProperty(Property *property, Player *excludedPlayer = nullptr);
     void processMortgageProperty();
     void processUnmortgageProperty();
     void processBuild();

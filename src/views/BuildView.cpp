@@ -1,5 +1,6 @@
 #include "core/GameManager.hpp"
 #include "views/BuildView.hpp"
+#include <limits>
 #define SPACE 30
 StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const{
 
@@ -54,7 +55,12 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
         std::cout << "Uang kamu saat ini: M" << gameManager.getCurrentPlayer().getMoney() << "\n";
         std::cout << "Pilih nomor color group (0 untuk batal): ";
         int inputIdx;
-        std::cin >> inputIdx;
+        if (!(std::cin >> inputIdx)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Color group tidak valid.\n";
+            return nullptr;
+        }
         if (inputIdx == 0) return nullptr;
         if (inputIdx < 1 || inputIdx > static_cast<int>(colors.size())) {
             std::cout << "Color group tidak valid.\n";
@@ -97,7 +103,12 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
             idx++;
         }
         std::cout << "Pilih nomor properti (0 untuk batal): ";
-        std::cin >> inputIdx;
+        if (!(std::cin >> inputIdx)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Properti tidak valid.\n";
+            return nullptr;
+        }
         if (inputIdx == 0) return nullptr;
         if (inputIdx < 1 || inputIdx > static_cast<int>(validBuildings.size())) {
             std::cout << "Properti tidak valid.\n";

@@ -1,5 +1,6 @@
 #include "core/GameManager.hpp"
 #include "views/UnmortgageView.hpp"
+#include <limits>
 #define SPACE 30
 #define SPACE_2 20
 Property* UnmortgageView::promptChooseProperty(std::vector<Property*> pr) const{
@@ -26,7 +27,12 @@ Property* UnmortgageView::promptChooseProperty(std::vector<Property*> pr) const{
         std::cout << "Pilih nomor properti (0 untuk batal): ";
         int input;
         while(true){
-            std::cin >> input;
+            if(!(std::cin >> input)){
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Nomor properti tidak Valid!\n";
+                continue;
+            }
             if(input == 0){
                 std::cout << "\n\n";
                 return nullptr;

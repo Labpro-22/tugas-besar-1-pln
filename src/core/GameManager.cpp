@@ -694,6 +694,7 @@ void GameManager::processRollDice()
                 board.getTile(0)->onPassBy(player, *this);
             }
             PlayerPiece &piece = player.getPiece();
+            view.outputLandedOnTile(*piece.getCurrentTile());
             piece.getCurrentTile()->onLanded(player, *this);
             mainMenuView.outputCurrentPlayerInfo();
             if (DiceRoller::getLastRoll().first == DiceRoller::getLastRoll().second) {
@@ -762,6 +763,7 @@ void GameManager::processSetDice(int value1, int value2)
                 board.getTile(0)->onPassBy(player, *this);
             }
             PlayerPiece &piece = player.getPiece();
+            view.outputLandedOnTile(*piece.getCurrentTile());
             piece.getCurrentTile()->onLanded(player, *this);
             mainMenuView.outputCurrentPlayerInfo();
             if (value1 == value2) {
@@ -820,7 +822,7 @@ void GameManager::processBuyProperty()
                 processBuyProperty(player, tile->getProperty());
             }
             else {
-                processAuctionProperty(tile->getProperty());
+                processAuctionProperty(tile->getProperty(), &player);
             }
         }
         else {
@@ -853,38 +855,93 @@ void GameManager::processBuyProperty(Player &player, Property *property)
         view.outputBuyStatus(false, property);
     }
 }
-void GameManager::processAuctionProperty(Property *property)
+void GameManager::processAuctionProperty(Property *property, Player *excludedPlayer)
 {
     AuctionView &view = gameView.getAuctionView();
-    view.outputProperty(*property);
-
-    Player *lastBidder = &getCurrentPlayer();
-    long long bestBidAmount = 0;
-
-    auto currentBidder = players.begin();
-    while (currentBidder.base() != lastBidder) {
-        currentBidder++;
+    if (property == nullptr) {
+        return;
     }
-    do {
-        long long currentBidAmount = view.promptBidOrPass(*currentBidder);
+
+    view.outputProperty(*property);
+    if (excludedPlayer != nullptr) {
+        view.outputExcludedPlayer(*excludedPlayer);
+    }
+
+    std::vector<Player *> bidders;
+    for (Player &player : players) {
+        if (!player.isBankrupt() && &player != excludedPlayer) {
+            bidders.push_back(&player);
+        }
+    }
+
+    if (bidders.empty()) {
+        property->resetOwnerAsBank();
+        view.outputNoBid(property);
+        return;
+    }
+
+    auto findBidderIndex = [&](Player *player) {
+        for (size_t i = 0; i < bidders.size(); ++i) {
+            if (bidders[i] == player) {
+                return i;
+            }
+        }
+        return static_cast<size_t>(0);
+    };
+
+    Player *startFrom = excludedPlayer != nullptr ? excludedPlayer : &getCurrentPlayer();
+    size_t currentBidderIndex = 0;
+    for (size_t offset = excludedPlayer != nullptr ? 1 : 0; offset <= players.size(); ++offset) {
+        auto playerIt = std::find_if(players.begin(), players.end(), [&](const Player &player) {
+            return &player == startFrom;
+        });
+        if (playerIt == players.end()) {
+            break;
+        }
+        size_t playerIndex = static_cast<size_t>(std::distance(players.begin(), playerIt));
+        Player *candidate = &players[(playerIndex + offset) % players.size()];
+        if (std::find(bidders.begin(), bidders.end(), candidate) != bidders.end()) {
+            currentBidderIndex = findBidderIndex(candidate);
+            break;
+        }
+    }
+
+    Player *lastBidder = nullptr;
+    long long bestBidAmount = 0;
+    std::vector<bool> activeBidders(bidders.size(), true);
+    int activeBidderCount = static_cast<int>(bidders.size());
+
+    while (activeBidderCount > 0) {
+        if (lastBidder != nullptr && activeBidderCount == 1) {
+            break;
+        }
+
+        Player *currentBidder = bidders[currentBidderIndex];
+        if (!activeBidders[currentBidderIndex] || currentBidder == lastBidder) {
+            currentBidderIndex = (currentBidderIndex + 1) % bidders.size();
+            continue;
+        }
+
+        long long currentBidAmount = view.promptBidOrPass(*currentBidder, bestBidAmount, lastBidder, activeBidderCount);
         if (currentBidAmount != 0) {
-            lastBidder = currentBidder.base();
+            lastBidder = currentBidder;
             bestBidAmount = currentBidAmount;
+            view.outputBidAccepted(*currentBidder, currentBidAmount);
             logger.log(turn, currentBidder->getUsername(), "BID",
                        "Melakukan bid terhadap " + property->getName() + " [ " + property->getCode() + "]" +
                            " sebanyak " + std::to_string(currentBidAmount));
         }
         else {
+            activeBidders[currentBidderIndex] = false;
+            activeBidderCount--;
+            view.outputPass(*currentBidder, activeBidderCount);
             logger.log(turn, currentBidder->getUsername(), "PASS",
                        "Melewati pelelangan " + property->getName() + " [ " + property->getCode() + "]");
         }
-        currentBidder++;
-        if (currentBidder == players.end()) {
-            currentBidder = players.begin();
-        }
-    } while (lastBidder != currentBidder.base());
+        currentBidderIndex = (currentBidderIndex + 1) % bidders.size();
+    }
 
-    if (bestBidAmount == 0) {
+    if (lastBidder == nullptr) {
         property->resetOwnerAsBank();
         view.outputNoBid(property);
     }
@@ -1249,6 +1306,7 @@ void GameManager::processStartFestival()
     std::vector<Property *> properties = p.getProperties();
     Property *prop = fesView.promptChooseProperty(properties);
     if (prop == nullptr) return;
+    long long previousMultiplier = prop->getFestivalMultiplier();
     prop->startFestival();
-    fesView.outputFestivalStatus(*prop);
+    fesView.outputFestivalStatus(*prop, previousMultiplier);
 }
