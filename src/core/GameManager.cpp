@@ -497,7 +497,8 @@ void GameManager::processLoadGame()
                                                 : PlayerState::BANKRUPT,
                 playerCards,
                 playerData.getOutOfJailCardCount,
-                playerData.jailTurns});
+                playerData.jailTurns,
+                playerData.doubleRollCounter});
         }
 
         std::map<std::string, int> playerOrder;
@@ -622,6 +623,7 @@ void GameManager::processSaveGame(std::string fileName)
             }
             playerData.getOutOfJailCardCount = player.getGetOutOfJailCardCount();
             playerData.jailTurns = player.getJailTurns();
+            playerData.doubleRollCounter = player.getDoubleRollCounter();
 
             for (SkillCard *card : player.getSkillCards()) {
                 playerData.skillCards.push_back(serializeSkillCard(card));

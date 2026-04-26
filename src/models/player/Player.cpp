@@ -7,11 +7,11 @@ Player::Player(const std::string& username, long long initialMoney) :
     utilityPropertyCount(0), skillCards(), piece(0),
     doubleRollCounter(0), getOutOfJailCardCount(0), jailTurns(0) {}
 Player::Player( const std::string& username, long long money, PlayerState state,
-                const std::vector<SkillCard*>& skillCards, int getOutOfJailCardCount, int jailTurns) : 
+                const std::vector<SkillCard*>& skillCards, int getOutOfJailCardCount, int jailTurns, int doubleRollCounter) : 
     username(username), money(money), state(state),
     properties(), streetPropertyCount(0), railroadPropertyCount(0), 
     utilityPropertyCount(0), skillCards(skillCards), piece(0),
-    doubleRollCounter(0), getOutOfJailCardCount(getOutOfJailCardCount), jailTurns(jailTurns) 
+    doubleRollCounter(doubleRollCounter), getOutOfJailCardCount(getOutOfJailCardCount), jailTurns(jailTurns) 
     { }
 
 const std::string& Player::getUsername() const { return username; }
@@ -25,6 +25,7 @@ const std::vector<PlayerEffect>& Player::getEffects() const{ return effects; }
 int Player::getStreetPropertyCount() const { return streetPropertyCount; }
 int Player::getRailroadPropertyCount() const { return railroadPropertyCount; }
 int Player::getUtilityPropertyCount() const { return utilityPropertyCount; }
+int Player::getDoubleRollCounter() const { return doubleRollCounter; }
 
 bool Player::rollDiceAndMove() {
     if (state == PlayerState::BANKRUPT)
