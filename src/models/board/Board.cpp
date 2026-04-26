@@ -62,6 +62,9 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     if (player != players.end()) {
                         (*player)->addProperty(property);
                         property->setOwner(*player);
+                        if (data.status == "MORTGAGED") {
+                            property->setMortgaged(true);
+                        }
                     }
 
                     prop = property;
@@ -81,6 +84,9 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     if (player != players.end()) {
                         (*player)->addProperty(property);
                         property->setOwner(*player);
+                        if (data.status == "MORTGAGED") {
+                            property->setMortgaged(true);
+                        }
                     }
 
                     prop = property;
@@ -100,6 +106,9 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     if (player != players.end()) {
                         (*player)->addProperty(property);
                         property->setOwner(*player);
+                        if (data.status == "MORTGAGED") {
+                            property->setMortgaged(true);
+                        }
                     }
 
                     prop = property;
