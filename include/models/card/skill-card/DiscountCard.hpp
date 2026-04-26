@@ -9,4 +9,5 @@ public:
     DiscountCard(const std::string &message, int percentage);
     void takeEffect(Player &p, GameManager &gm) override;
     std::string getCardType() const override;
+    int getCardValue() const override { return percentage; }
 };
