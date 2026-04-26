@@ -39,11 +39,12 @@ void PropertyView::outputProperty() const{
                 if(i == 0){
                     std::cout <<"|" << std::left << std::setw(COLON_WIDTH) << " Sewa (unimproved)" << std::left << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[0])) << "|\n";
                 }
-                else if(i > 0 && i < 6){
-                    std::cout << "|" << std::left << std::setw(COLON_WIDTH) << (" Sewa (" + std::to_string(i) + " rumah)") << std::left << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[i])) << "|\n";
-                }
-                else{
+                // i==5 is hotel
+                else if(i == 5){
                     std::cout<< "|" <<std::left << std::setw(COLON_WIDTH) << " Sewa (hotel)" << std::left << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[5])) << "|\n";
+                }
+                else if(i > 0 && i < 5){
+                    std::cout << "|" << std::left << std::setw(COLON_WIDTH) << (" Sewa (" + std::to_string(i) + " rumah)") << std::left << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[i])) << "|\n";
                 }
             }
             std::cout << "+" << std::string(WIDTH,'-') << "+\n";
@@ -180,11 +181,15 @@ void PropertyView::outputRent(Property &pr)const{
         }
         else if(auto up = dynamic_cast<UtilityProperty*>(&pr)){
             std::cout << up->getOwner()->getUtilityPropertyCount() << " Properti Utility dimiliki\n";
+            std::cout << std::left << std::setw(width) << "Faktor Pengali" << ": " << rent << "x jumlah dadu\n";
+            rent = 0; // actual rent depends on dice; show 0 as placeholder
         }
         else if(auto rp = dynamic_cast<RailroadProperty*>(&pr)){
             std::cout << rp->getOwner()->getRailroadPropertyCount() << " Properti Railroad dimiliki\n";
         }
-        std::cout << std::left << std::setw(width) << "Sewa" << ": M" << rent << "\n\n";
+        if(dynamic_cast<UtilityProperty*>(&pr) == nullptr){
+            std::cout << std::left << std::setw(width) << "Sewa" << ": M" << rent << "\n\n";
+        }
         std::cout << std::left << std::setw(width) << "Uang kamu" << ": M" << money;
         if (p.hasEffect("DISCOUNT")) {
             rent *= (100 - p.getEffectValue("DISCOUNT")) / 100;
