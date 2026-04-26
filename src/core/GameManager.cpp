@@ -953,6 +953,9 @@ void GameManager::processAuctionProperty(Property *property, Player *excludedPla
     long long bestBidAmount = -1;
     std::vector<bool> activeBidders(bidders.size(), true);
     int activeBidderCount = static_cast<int>(bidders.size());
+    int activeOpeningBidderCount = static_cast<int>(std::count_if(bidders.begin(), bidders.end(), [&](Player *bidder) {
+        return bidder != excludedPlayer;
+    }));
 
     while (activeBidderCount > 0) {
         if (lastBidder != nullptr && activeBidderCount == 1) {
@@ -965,7 +968,10 @@ void GameManager::processAuctionProperty(Property *property, Player *excludedPla
             continue;
         }
 
-        bool canPass = lastBidder != nullptr || activeBidderCount > 1;
+        bool canPass = lastBidder != nullptr;
+        if (lastBidder == nullptr) {
+            canPass = excludedPlayer == nullptr ? activeBidderCount > 1 : activeOpeningBidderCount > 1;
+        }
         long long currentBidAmount = view.promptBidOrPass(*currentBidder, bestBidAmount, lastBidder, activeBidderCount, canPass);
         if (currentBidAmount >= 0) {
             lastBidder = currentBidder;
@@ -978,6 +984,9 @@ void GameManager::processAuctionProperty(Property *property, Player *excludedPla
         else {
             activeBidders[currentBidderIndex] = false;
             activeBidderCount--;
+            if (currentBidder != excludedPlayer) {
+                activeOpeningBidderCount--;
+            }
             view.outputPass(*currentBidder, activeBidderCount);
             logger.log(turn, currentBidder->getUsername(), "PASS",
                        "Melewati pelelangan " + property->getName() + " [ " + property->getCode() + "]");
