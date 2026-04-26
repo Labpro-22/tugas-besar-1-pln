@@ -1,8 +1,8 @@
-
 #include "views/AuctionView.hpp"
 #include "core/GameManager.hpp"
 #include "models/player/Player.hpp"
 #include <sstream>
+#include <limits>
 void AuctionView::outputProperty(Property &pr) const{
     std::cout << "Properti "<< pr.getName() << "(" << pr.getCode() << ")" << "akan dilelang!\n\n";
     
@@ -15,6 +15,7 @@ long long AuctionView::promptBidOrPass(Player &p) const {
         std::cout << "> ";
 
         std::string input;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::getline(std::cin, input);
 
         std::stringstream ss(input);
@@ -22,11 +23,15 @@ long long AuctionView::promptBidOrPass(Player &p) const {
         ss >> command;
 
         if (command == "PASS") {
-            return 0;
+            return -1;
         } 
         else if (command == "BID") {
             long long bid;
-            if (ss >> bid) {
+            if (ss >> bid && bid >= 0) {
+                if (bid > p.getMoney()) {
+                    std::cout << "Bid melebihi uang yang kamu miliki (M" << p.getMoney() << ")!\n";
+                    continue;
+                }
                 return bid;
             }
         }
