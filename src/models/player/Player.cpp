@@ -90,6 +90,10 @@ long long Player::calculateTotalWealth() const {
 void Player::receiveMoney(long long amount) {
     money += amount;
 }
+
+void Player::deductMoney(long long amount) {
+    money -= amount;
+}
 bool Player::giveMoney(Player& recipient, long long amount) {
     if (hasEffect("SHIELD")) return true;
     money -= amount;
@@ -141,12 +145,14 @@ bool Player::payRent(Property* pr) {
     if (hasEffect("DISCOUNT")) {
         rent = rent * (100 - getEffectValue("DISCOUNT")) / 100;
     }
-    
+
     money -= rent;
     if (money < 0) {
+        // Payer goes bankrupt; owner gets whatever was paid so far (partial), full resolution in processLiquidation
+        // liquidation will handle the transfer
         return false;
     }
-    
+
     owner->receiveMoney(rent);
     return true;
 }
