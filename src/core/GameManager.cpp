@@ -372,6 +372,9 @@ void GameManager::nextPlayer()
     Player &player = getCurrentPlayer();
     player.onNextTurn();
 
+    //FIX: draw board at start of turn so player can see board state
+    gameView.getBoardView().drawBoard();
+
     SkillCard *drawnCard = skillCardDeck.drawCard();
     if (player.getSkillCards().size() >= 4) {
         UseSkillCardView &skillView = gameView.getUseSkillCardView();
@@ -497,7 +500,9 @@ void GameManager::processLoadGame()
                                                 : PlayerState::BANKRUPT,
                 playerCards,
                 playerData.getOutOfJailCardCount,
-                playerData.jailTurns});
+                //FIX: include doubleRollCounter for proper jail state restoration
+                playerData.jailTurns,
+                playerData.doubleRollCounter});
         }
 
         std::map<std::string, int> playerOrder;
@@ -622,14 +627,11 @@ void GameManager::processSaveGame(std::string fileName)
             }
             playerData.getOutOfJailCardCount = player.getGetOutOfJailCardCount();
             playerData.jailTurns = player.getJailTurns();
+            playerData.doubleRollCounter = player.getDoubleRollCounter();
 
             for (SkillCard *card : player.getSkillCards()) {
-                SkillCardSaveData cardData;
-                cardData.type = card->getCardType();
-                cardData.value = card->getCardValue();
-                // DiscountCard stores remaining duration via PlayerEffect; default 1 for others
-                cardData.duration = 1;
-                playerData.skillCards.push_back(cardData);
+                //FIX: use serializeSkillCard for proper type-aware serialization
+                playerData.skillCards.push_back(serializeSkillCard(card));
             }
             saveData.players.push_back(playerData);
         }
@@ -737,8 +739,9 @@ void GameManager::processRollDice()
             PlayerPiece &piece = player.getPiece();
             view.outputLandedOnTile(*piece.getCurrentTile());
             piece.getCurrentTile()->onLanded(player, *this);
-            mainMenuView.outputCurrentPlayerInfo();
             if (DiceRoller::getLastRoll().first == DiceRoller::getLastRoll().second) {
+                gameView.getBoardView().drawBoard();
+                mainMenuView.outputCurrentPlayerInfo();
                 logger.log(turn, player.getUsername(), "LEMPAR_DADU",
                            "Hasil dadu: " +
                                std::to_string(DiceRoller::getLastRoll().first) + " + " + std::to_string(DiceRoller::getLastRoll().second) + " = " +
@@ -822,8 +825,9 @@ void GameManager::processSetDice(int value1, int value2)
             PlayerPiece &piece = player.getPiece();
             view.outputLandedOnTile(*piece.getCurrentTile());
             piece.getCurrentTile()->onLanded(player, *this);
-            mainMenuView.outputCurrentPlayerInfo();
             if (value1 == value2) {
+                gameView.getBoardView().drawBoard();
+                mainMenuView.outputCurrentPlayerInfo();
                 logger.log(turn, player.getUsername(), "ATUR_DADU",
                            "Hasil dadu: " +
                                std::to_string(value1) + " + " + std::to_string(value2) + " = " +
@@ -885,8 +889,8 @@ void GameManager::processBuyProperty(Player &player)
     PropertyTile *tile = dynamic_cast<PropertyTile *>(piece.getCurrentTile());
     if (tile != nullptr) {
         std::string propType = tile->getProperty()->getPropertyType();
+        //FIX: Railroad and Utility auto-acquire without prompt or auction; only Street goes to auction
         if (propType != "STREET") {
-            // Railroad and Utility: auto-acquire without prompting, no auction
             processBuyProperty(player, tile->getProperty());
         }
         else if (player.getMoney() >= tile->getProperty()->getPrice()) {
@@ -894,12 +898,10 @@ void GameManager::processBuyProperty(Player &player)
                 processBuyProperty(player, tile->getProperty());
             }
             else {
-                // Player refused — exclude them from leading the auction (they bid last)
                 processAuctionProperty(tile->getProperty(), &player);
             }
         }
         else {
-            // Can't afford — exclude from leading the auction as well
             processAuctionProperty(tile->getProperty(), &player);
         }
     }
@@ -1415,9 +1417,9 @@ void GameManager::processGoTile()
     board.outputOnPassByStart();
 }
 
+//FIX: kept processLandingMessage from HEAD - used to print landing output for current tile
 void GameManager::processLandingMessage()
 {
-    // Prints the "Kamu mendarat di X" message for the current player's tile
     gameView.getBoardView().outputOnLanded();
 }
 
