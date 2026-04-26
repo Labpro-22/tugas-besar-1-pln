@@ -71,21 +71,20 @@ Perintah dimasukkan langsung di terminal selama giliran pemain.
 
 | Perintah | Keterangan |
 |---|---|
-| `CETAK_PAPAN` | Tampilkan papan permainan beserta posisi semua pemain |
-| `LEMPAR_DADU` | Lempar dadu secara acak |
-| `ATUR_DADU X Y` | Tentukan hasil dadu secara manual (nilai 1–6) |
-| `CETAK_AKTA [KODE]` | Tampilkan akta kepemilikan sebuah properti |
-| `CETAK_PROPERTI` | Tampilkan daftar properti milik pemain aktif |
-| `GADAI` | Gadaikan properti ke bank |
-| `TEBUS` | Tebus properti yang sedang digadaikan |
-| `BANGUN` | Bangun rumah atau hotel di atas properti |
-| `GUNAKAN_KEMAMPUAN` | Aktifkan kartu kemampuan spesial dari tangan |
-| `BAYAR_DENDA` | Bayar denda untuk keluar dari penjara |
-| `SIMPAN [NAMA_FILE]` | Simpan state permainan ke file |
-| `MUAT [NAMA_FILE]` | Muat permainan dari file yang tersimpan |
-| `CETAK_LOG [N]` | Tampilkan N entri log terakhir; tanpa argumen menampilkan semua |
-| `SELESAI` | Akhiri giliran saat ini |
-| `BANTUAN` | Tampilkan daftar perintah yang tersedia |
+| `CETAK_PAPAN` | Menampilkan papan permainan |
+| `LEMPAR_DADU` | Melempar dadu dan bergerak |
+| `ATUR_DADU <dadu1> <dadu2>` | Mengatur hasil dadu secara manual |
+| `CETAK_AKTA` | Menampilkan akta properti |
+| `CETAK_PROPERTI` | Menampilkan properti yang dimiliki |
+| `CETAK_INFO` | Menampilkan informasi pemain saat ini |
+| `GADAI` | Menggadaikan properti |
+| `TEBUS` | Menebus properti yang digadaikan |
+| `BANGUN` | Membangun rumah/hotel di properti |
+| `SIMPAN <nama_file>` | Menyimpan permainan ke file |
+| `GUNAKAN_KEMAMPUAN` | Menggunakan kartu kemampuan |
+| `CETAK_LOG [jumlah]` | Menampilkan log transaksi (opsional: jumlah baris) |
+| `HELP` | Menampilkan daftar perintah |
+| `EXIT` | Keluar dari permainan |
 
 ---
 
