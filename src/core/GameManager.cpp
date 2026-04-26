@@ -385,7 +385,8 @@ void GameManager::processLoadGame()
                                                 : PlayerState::BANKRUPT,
                 playerCards,
                 playerData.getOutOfJailCardCount,
-                playerData.jailTurns});
+                playerData.jailTurns,
+                playerData.doubleRollCounter});
             Player &player = players.back();
             player.getPiece().setPosition(board.getTilePosition(playerData.tileCodePosition));
         }
@@ -480,6 +481,7 @@ void GameManager::processSaveGame(std::string fileName)
             }
             playerData.getOutOfJailCardCount = player.getGetOutOfJailCardCount();
             playerData.jailTurns = player.getJailTurns();
+            playerData.doubleRollCounter = player.getDoubleRollCounter();
 
             for (SkillCard *card : player.getSkillCards()) {
                 SkillCardSaveData cardData;
@@ -582,7 +584,7 @@ void GameManager::processRollDice()
                            "Hasil dadu: " +
                                std::to_string(DiceRoller::getLastRoll().first) + " + " + std::to_string(DiceRoller::getLastRoll().second) + " = " +
                                std::to_string(DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second) +
-                               ". Mendarat di petak " + piece.getCurrentTile()->getName() + " [ " + piece.getCurrentTile()->getCode() + "]" +
+                               ". Mendarat di petak " + piece.getCurrentTile()->getName() + " [" + piece.getCurrentTile()->getCode() + "]" +
                                ". Mendapatkan giliran tambahan karena dua mata dadu sama");
             }
             else {
@@ -590,7 +592,7 @@ void GameManager::processRollDice()
                            "Hasil dadu: " +
                                std::to_string(DiceRoller::getLastRoll().first) + " + " + std::to_string(DiceRoller::getLastRoll().second) + " = " +
                                std::to_string(DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second) +
-                               ". Mendarat di petak " + piece.getCurrentTile()->getName() + " [ " + piece.getCurrentTile()->getCode() + "]");
+                               ". Mendarat di petak " + piece.getCurrentTile()->getName() + " [" + piece.getCurrentTile()->getCode() + "]");
                 nextPlayer();
             }
         }
@@ -648,15 +650,15 @@ void GameManager::processSetDice(int value1, int value2)
                            "Hasil dadu: " +
                                std::to_string(value1) + " + " + std::to_string(value2) + " = " +
                                std::to_string(value1 + value2) +
-                               ". Mendarat di petak " + piece.getCurrentTile()->getName() + " [ " + piece.getCurrentTile()->getCode() + "]" +
-                               ". Mendapatkan giliran tambahan karena dua mata dadu sama");
+                               ". Mendarat di petak " + piece.getCurrentTile()->getName() + " [" + piece.getCurrentTile()->getCode() + "]" +
+                               ". Mendapatkan giliran tambahan karena dua mata dadu sama.");
             }
             else {
                 logger.log(turn, player.getUsername(), "ATUR_DADU",
                            "Hasil dadu: " +
                                std::to_string(value1) + " + " + std::to_string(value2) + " = " +
                                std::to_string(value1 + value2) +
-                               ". Mendarat di petak " + piece.getCurrentTile()->getName() + " [ " + piece.getCurrentTile()->getCode() + "]");
+                               ". Mendarat di petak " + piece.getCurrentTile()->getName() + " [" + piece.getCurrentTile()->getCode() + "]");
                 nextPlayer();
             }
         }
@@ -719,7 +721,7 @@ void GameManager::processBuyProperty(Player &player, Property *property)
                 return;
             }
             logger.log(turn, player.getUsername(), "BELI",
-                       "Properti " + property->getName() + " [ " + property->getCode() + "]" +
+                       "Properti " + property->getName() + " [" + property->getCode() + "]" +
                            " dibeli seharga " + std::to_string(property->getPrice()));
             view.outputBuyStatus(true, property);
         }
