@@ -157,8 +157,15 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
         
         if (newTile) {
             std::string code = newTile->getCode();
-            tilePositions[code] = i;
-            mapTilesCodeTile[code] = newTile;
+            if (tilePositions.find(code) != tilePositions.end()) {
+                std::string uniqueCode = code + "_" + std::to_string(i);
+                tilePositions[uniqueCode] = i;
+                mapTilesCodeTile[uniqueCode] = newTile;
+                newTile->setCode(uniqueCode);
+            } else {
+                tilePositions[code] = i;
+                mapTilesCodeTile[code] = newTile;
+            }
         }
     }
 
