@@ -372,6 +372,8 @@ void GameManager::nextPlayer()
     Player &player = getCurrentPlayer();
     player.onNextTurn();
 
+    gameView.getBoardView().drawBoard();
+
     SkillCard *drawnCard = skillCardDeck.drawCard();
     if (player.getSkillCards().size() >= 4) {
         UseSkillCardView &skillView = gameView.getUseSkillCardView();
@@ -720,8 +722,9 @@ void GameManager::processRollDice()
             PlayerPiece &piece = player.getPiece();
             view.outputLandedOnTile(*piece.getCurrentTile());
             piece.getCurrentTile()->onLanded(player, *this);
-            mainMenuView.outputCurrentPlayerInfo();
             if (DiceRoller::getLastRoll().first == DiceRoller::getLastRoll().second) {
+                gameView.getBoardView().drawBoard();
+                mainMenuView.outputCurrentPlayerInfo();
                 logger.log(turn, player.getUsername(), "LEMPAR_DADU",
                            "Hasil dadu: " +
                                std::to_string(DiceRoller::getLastRoll().first) + " + " + std::to_string(DiceRoller::getLastRoll().second) + " = " +
@@ -795,8 +798,9 @@ void GameManager::processSetDice(int value1, int value2)
             PlayerPiece &piece = player.getPiece();
             view.outputLandedOnTile(*piece.getCurrentTile());
             piece.getCurrentTile()->onLanded(player, *this);
-            mainMenuView.outputCurrentPlayerInfo();
             if (value1 == value2) {
+                gameView.getBoardView().drawBoard();
+                mainMenuView.outputCurrentPlayerInfo();
                 logger.log(turn, player.getUsername(), "ATUR_DADU",
                            "Hasil dadu: " +
                                std::to_string(value1) + " + " + std::to_string(value2) + " = " +
