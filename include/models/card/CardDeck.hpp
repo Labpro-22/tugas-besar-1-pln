@@ -16,6 +16,7 @@ public:
 
     T drawCard();
     void addCard(T card);
+    void returnDrawnCard(T card);
     void operator+=(T card);
     void clearDeck();
     void reshuffle();
@@ -45,6 +46,16 @@ template <typename T>
 void CardDeck<T>::addCard(T card)
 {
     cards.push_back(card);
+}
+
+template <typename T>
+void CardDeck<T>::returnDrawnCard(T card)
+{
+    auto it = std::find(drawnCards.begin(), drawnCards.end(), card);
+    if (it != drawnCards.end()) {
+        drawnCards.erase(it);
+        cards.push_back(card);
+    }
 }
 
 template <typename T>

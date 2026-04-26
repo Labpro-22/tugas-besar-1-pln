@@ -9,6 +9,10 @@ bool BuyView::promptBuyProperty(Property& pr){
 
 bool BuyView::promptBuyProperty(Property& pr, const Player& buyer){
     Property *p = &pr;
+    long long buyPrice = p->getPrice();
+    if (buyer.hasEffect("DISCOUNT")) {
+        buyPrice = buyPrice * (100 - buyer.getEffectValue("DISCOUNT")) / 100;
+    }
     if (auto sp = dynamic_cast<StreetProperty*>(p)) {
         auto centerText = [&](const std::string& text) {
             int padding = WIDTH - text.length();
@@ -41,8 +45,11 @@ bool BuyView::promptBuyProperty(Property& pr, const Player& buyer){
         std::cout << "|" <<std::left << std::setw(COLON_WIDTH) << " Harga Hotel" << std::left << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(sp->getHotelPrice()))<<"|\n";
         std::cout << "+" << std::string(WIDTH, '=') << "+\n";
         std::cout << "Uang Pemain " << buyer.getUsername() << " saat ini: M" << buyer.getMoney() << "\n";
+        if (buyer.hasEffect("DISCOUNT")) {
+            std::cout << "[DISCOUNT ACTIVE] Harga beli menjadi: M" << buyPrice << "\n";
+        }
         std::string yayOrNay;
-        std::cout << "Apakah kamu ingin membeli properti ini seharga M" << sp->getPrice() << "? (y/n): ";
+        std::cout << "Apakah kamu ingin membeli properti ini seharga M" << buyPrice << "? (y/n): ";
         while(true){
             std::cin >> yayOrNay;
             if(yayOrNay == "y"){
@@ -51,7 +58,7 @@ bool BuyView::promptBuyProperty(Property& pr, const Player& buyer){
             if(yayOrNay == "n"){
                 return false;
             }
-            std::cout << "\nInput tidak valid! Apakah kamu ingin membeli properti ini seharga M" << sp->getPrice() << "? (y/n): ";
+            std::cout << "\nInput tidak valid! Apakah kamu ingin membeli properti ini seharga M" << buyPrice << "? (y/n): ";
         }
     }
     else {

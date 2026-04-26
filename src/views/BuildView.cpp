@@ -2,6 +2,15 @@
 #include "views/BuildView.hpp"
 #include <limits>
 #define SPACE 30
+namespace {
+long long discountedPrice(long long price, const Player& player) {
+    if (player.hasEffect("DISCOUNT")) {
+        return price * (100 - player.getEffectValue("DISCOUNT")) / 100;
+    }
+    return price;
+}
+}
+
 StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const{
 
     //bool cek apakah ada setidaknya satu set color group
@@ -30,6 +39,7 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
         return nullptr;
     }
     else{
+        Player& currentPlayer = gameManager.getCurrentPlayer();
         std::vector<std::string> colors;
         int idx = 1;
         for(const auto &[color, prop] : colorGroup){
@@ -40,10 +50,10 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
             for(const auto &p : prop){
                 std::cout<<"\t" << std::left << std::setw(SPACE) <<  s + p->getName() + " (" + p->getCode() + ")" << ": ";
                 if(p->getHouseCount() < 4){
-                    std::cout<<p->getHouseCount() << " rumah (Harga rumah: M" << p->getHousePrice() << ")\n";
+                    std::cout<<p->getHouseCount() << " rumah (Harga rumah: M" << discountedPrice(p->getHousePrice(), currentPlayer) << ")\n";
                 }
                 if(p->getHouseCount() == 4){
-                     std::cout<<p->getHouseCount() << " rumah (Harga hotel: M" << p->getHotelPrice() << ")\n";
+                     std::cout<<p->getHouseCount() << " rumah (Harga hotel: M" << discountedPrice(p->getHotelPrice(), currentPlayer) << ")\n";
                 }
                 if(p->hasHotel()){
                     std::cout << "Hotel  (sudah maksimal, tidak dapat dibangun)\n";
@@ -92,10 +102,10 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
         for(auto p  : validBuildings){
             std::cout<< idx << std::left << std::setw(SPACE) << ". " + p->getName() + " (" + p->getCode() + ")" << ": ";
             if(p->canBuildHouse(1)){
-                std::cout<<p->getHouseCount() << " rumah (Harga rumah: M" << p->getHousePrice() << ")\n";
+                std::cout<<p->getHouseCount() << " rumah (Harga rumah: M" << discountedPrice(p->getHousePrice(), currentPlayer) << ")\n";
             }
             if(p->canBuildHotel()){
-                    std::cout<<p->getHouseCount() << " rumah (Harga hotel: M" << p->getHotelPrice() << ")\n";
+                    std::cout<<p->getHouseCount() << " rumah (Harga hotel: M" << discountedPrice(p->getHotelPrice(), currentPlayer) << ")\n";
             }
             if(p->hasHotel()){
                 std::cout << "Hotel  (sudah maksimal, tidak dapat dibangun)\n";
@@ -123,7 +133,7 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
         if(toBuild->canBuildHotel()){
             std::string yayOrNay;
             while (true) {
-                std::cout << "Upgrade " << toBuild->getName() << " ke hotel? Biaya: M" << toBuild->getHotelPrice() << " (y/n): ";
+                std::cout << "Upgrade " << toBuild->getName() << " ke hotel? Biaya: M" << discountedPrice(toBuild->getHotelPrice(), currentPlayer) << " (y/n): ";
                 std::cin >> yayOrNay;
                 if(yayOrNay == "y"){
                     std::cout << "\n\n";
@@ -142,11 +152,15 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
 
 void BuildView::outputBuildStatus(bool success, StreetProperty* pr) const{
     if(success){
+        Player& currentPlayer = gameManager.getCurrentPlayer();
         if(pr->hasHotel()){
-            std::cout << pr->getName() << " di-upgrade ke Hotel!\n";
+            std::cout << pr->getName() << " di-upgrade ke Hotel! Biaya: M" << discountedPrice(pr->getHotelPrice(), currentPlayer) << "\n";
         }
         else{
-            std::cout << "Kamu membangun 1 rumah di " << pr->getName()<< ". Biaya: M" << pr->getHousePrice() << "\n";
+            std::cout << "Kamu membangun 1 rumah di " << pr->getName()<< ". Biaya: M" << discountedPrice(pr->getHousePrice(), currentPlayer) << "\n";
+        }
+        if (currentPlayer.hasEffect("DISCOUNT")) {
+            std::cout << "[DISCOUNT ACTIVE] Biaya sudah dikenakan diskon.\n";
         }
     }
     else{
