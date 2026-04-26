@@ -1,5 +1,6 @@
 #include "core/GameManager.hpp"
 #include "views/DiceView.hpp"
+#include "models/tile/Tile.hpp"
 
 void DiceView::outputRollDice(bool moved) const{
     
@@ -41,6 +42,10 @@ void DiceView::outputSetDice(int val1, int val2, bool moved) const  {
     else {
         std::cout << "Pemain belum berhasil keluar dari penjara.\n\n";
     }
+}
+
+void DiceView::outputLandedOnTile(const Tile& tile) const {
+    std::cout << "Kamu mendarat di petak " << tile.getName() << " [" << tile.getCode() << "].\n\n";
 }
 
 void DiceView::outputSpeedingToJail(int val1, int val2) const {

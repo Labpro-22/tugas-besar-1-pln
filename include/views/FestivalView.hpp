@@ -10,6 +10,6 @@ private:
 public:
     FestivalView(GameManager& gm) : gameManager(gm) {}
     Property* promptChooseProperty(std::vector<Property*> pr) const;
-    void outputFestivalStatus(Property& pr) const;
+    void outputFestivalStatus(Property& pr, long long previousMultiplier) const;
 };
 

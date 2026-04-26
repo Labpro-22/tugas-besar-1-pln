@@ -1,5 +1,6 @@
 #include "core/GameManager.hpp"
 #include "views/BankruptView.hpp"
+#include <limits>
 #define SPACE 20
 void BankruptView::outputPotentialWealth(Player &p, long long debt) const{
     long double wealth = 0;
@@ -39,14 +40,14 @@ std::pair<std::string, Property*> BankruptView::promptLiquidation(std::vector<Pr
                 else if(sp->getHouseCount() > 0){
                     std::cout << "( termasuk" << sp->getHouseCount() << " Rumah )";
                 }
-                i++;
             }
             propertyIdx.push_back(idx);
+            i++;
             std::cout << "\n";
         }
         idx++;
     }
-    int sell = idx;
+    int sellCount = static_cast<int>(propertyIdx.size());
     idx = 0;
     std::cout << "[Gadai]\n"; 
     
@@ -67,13 +68,28 @@ std::pair<std::string, Property*> BankruptView::promptLiquidation(std::vector<Pr
         }
         idx++;
     }
+
+    if(propertyIdx.empty()){
+        std::cout << "Tidak ada aset yang bisa dilikuidasi.\n";
+        return std::make_pair("Batal", nullptr);
+    }
+
     int input;
     while(true){
         std::cout << "Pilih aksi (0 jika sudah cukup): ";
-        std::cin >>input;
-        if(input <= (int)propertyIdx.size()){
-            Property* p = pr[propertyIdx[input]];
-            if(input < sell){
+        if(!(std::cin >> input)){
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Masukkan tidak valid!\n";
+            continue;
+        }
+        if(input == 0){
+            return std::make_pair("Batal", nullptr);
+        }
+        if(input >= 1 && input <= (int)propertyIdx.size()){
+            int selectedIdx = input - 1;
+            Property* p = pr[propertyIdx[selectedIdx]];
+            if(selectedIdx < sellCount){
                 std::cout << p->getName() << " terjual ke Bank. Kamu menerima M" << p->calculateSellValue();
                 std::cout << ".\nUang kamu sekarang: M" << gameManager.getCurrentPlayer().getMoney() + p->calculateSellValue() << "\n";
                 return std::make_pair("Jual", p);
@@ -84,9 +100,6 @@ std::pair<std::string, Property*> BankruptView::promptLiquidation(std::vector<Pr
                 return std::make_pair("Gadai", p);
             }
             
-        }
-        if(input == 0){
-            return std::make_pair("Batal", nullptr);
         }
         std::cout << "Masukkan tidak valid!\n";
     }

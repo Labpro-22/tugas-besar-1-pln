@@ -1,5 +1,6 @@
 #include "core/GameManager.hpp"
 #include "views/MortgageView.hpp"
+#include <limits>
 #define SPACE 30
 Property* MortgageView::promptChooseProperty(std::vector<Property*> pr) const{
     std::cout<<"=== Properti yang Dapat Digadaikan ===\n";
@@ -27,7 +28,12 @@ Property* MortgageView::promptChooseProperty(std::vector<Property*> pr) const{
         std::cout << "Pilih nomor properti (0 untuk batal): ";
         int input;
         while(true){
-            std::cin >> input;
+            if(!(std::cin >> input)){
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Nomor properti tidak Valid!\n";
+                continue;
+            }
             if(input == 0){
                 std::cout << "\n\n";
                 return nullptr;
@@ -79,8 +85,8 @@ bool MortgageView::sellAllBuildings(std::vector<StreetProperty*>colorGroupProper
             }
             std::cout << "Uang kamu sekarang: M" << gameManager.getCurrentPlayer().getMoney() + total << "\n\n";
             return true;
+        }
         if(in == "n")return false;
         std::cout << "Masukan tidak valid!\nJual semua bangunan color group ["   << colorGroupProperty[0]->getColor() << "]? (y/n)";
-        }   
     }
 }

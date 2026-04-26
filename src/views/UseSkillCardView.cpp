@@ -7,6 +7,7 @@
 #include "models/card/skill-card/TeleportCard.hpp"
 #include "models/tile/PropertyTile.hpp"
 #include <iostream>
+#include <limits>
 #include <string>
 
 namespace {
@@ -50,7 +51,12 @@ int UseSkillCardView::promptChooseCardToUse(const std::vector<SkillCard*>& cards
     int choice;
     while (true) {
         std::cout << "Pilih kartu yang ingin digunakan (0 - " << cards.size() << "): ";
-        std::cin >> choice;
+        if (!(std::cin >> choice)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Pilihan tidak valid.\n";
+            continue;
+        }
 
         if (choice == 0) {
             return -1;
@@ -114,6 +120,10 @@ Player* UseSkillCardView::askForTargetPlayer(GameManager& gm) {
                 }
                 if (p.isBankrupt()) {
                     std::cout << "\nPemain tersebut sudah bangkrut dan tidak bisa ditargetkan.\n";
+                    break;
+                }
+                if (p.isJailed()) {
+                    std::cout << "\nPemain tersebut sedang di penjara dan tidak bisa ditargetkan LassoCard.\n";
                     break;
                 }
                 return &p;
