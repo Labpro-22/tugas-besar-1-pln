@@ -52,6 +52,7 @@ private:
     bool isGameEnded() const;
     void initGame();
     void processTurnStart();
+    void startCurrentPlayerTurn();
     void nextTurn();
     void nextPlayer();
 

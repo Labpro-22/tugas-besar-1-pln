@@ -340,32 +340,12 @@ void GameManager::nextTurn()
     }
 }
 
-void GameManager::nextPlayer()
+void GameManager::startCurrentPlayerTurn()
 {
-    if (!playerQueue.empty()) {
-        playerQueue.front()->removeEffect("SHIELD");
-        playerQueue.front()->resetDoubleRollCounter();
-    }
-
-    if (!playerQueue.empty()) {
-        playerQueue.pop();
-    }
-
-    while (!playerQueue.empty() && playerQueue.front()->isBankrupt()) {
-        playerQueue.pop();
-    }
-
-    if (playerQueue.empty()) {
-        nextTurn();
-        while (!playerQueue.empty() && playerQueue.front()->isBankrupt()) {
-            playerQueue.pop();
-        }
-    }
-
     if (playerQueue.empty()) {
         return;
     }
-    
+
     skillCardUsedThisTurn = false;
     diceRolledThisTurn = false;
 
@@ -411,6 +391,35 @@ void GameManager::nextPlayer()
         processLiquidation();
     }
     startOfTheTurn = true;
+}
+
+void GameManager::nextPlayer()
+{
+    if (!playerQueue.empty()) {
+        playerQueue.front()->removeEffect("SHIELD");
+        playerQueue.front()->resetDoubleRollCounter();
+    }
+
+    if (!playerQueue.empty()) {
+        playerQueue.pop();
+    }
+
+    while (!playerQueue.empty() && playerQueue.front()->isBankrupt()) {
+        playerQueue.pop();
+    }
+
+    if (playerQueue.empty()) {
+        nextTurn();
+        while (!playerQueue.empty() && playerQueue.front()->isBankrupt()) {
+            playerQueue.pop();
+        }
+    }
+
+    if (playerQueue.empty() || isGameEnded()) {
+        return;
+    }
+
+    startCurrentPlayerTurn();
 }
 
 // Getters
@@ -477,7 +486,7 @@ void GameManager::processNewGame()
     playing = true;
     initGame();
     nextTurn();
-    nextPlayer();
+    startCurrentPlayerTurn();
 }
 void GameManager::processLoadGame()
 {
