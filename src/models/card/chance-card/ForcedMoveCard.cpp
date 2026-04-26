@@ -9,7 +9,11 @@ ForcedMoveCard::ForcedMoveCard(const std::string& message, int moveOffset)
     : ChanceCard(message), moveOffset(moveOffset) {}
 
 void ForcedMoveCard::takeEffect(Player& p, GameManager& gm) {
-    p.getPiece().goForward(moveOffset);
+    if (moveOffset < 0) {
+        p.getPiece().goBackward(-moveOffset);
+    } else {
+        p.getPiece().goForward(moveOffset);
+    }
     int currentPos = p.getPiece().getPosition();
     Tile* tile = gm.getBoard().getTile(currentPos);
     if (tile) tile->onLanded(p, gm);
