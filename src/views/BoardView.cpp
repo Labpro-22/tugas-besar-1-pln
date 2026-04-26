@@ -294,7 +294,7 @@ void BoardView::printTopRow() const{
 
     // Baris 1: tag warna + kode
     for (int i = 0; i < topCount; i++) {
-        int tileIndex = sideLength * 2 + (sideLength - i);
+        int tileIndex = sideLength * 2 + i;
         Tile* tile = board.getTile(tileIndex);
         std::cout << "|" << getCellLine1(tile, tileIndex);
     }
@@ -302,7 +302,7 @@ void BoardView::printTopRow() const{
 
     // Baris 2: kepemilikan + bidak
     for (int i = 0; i < topCount; i++) {
-        int tileIndex = sideLength * 2 + (sideLength - i);
+        int tileIndex = sideLength * 2 + i;
         Tile* tile = board.getTile(tileIndex);
         std::cout << "|" << padRight(getCellLine2(tile, tileIndex), CELL_WIDTH);
     }
@@ -349,8 +349,8 @@ void BoardView::printMiddleRows()const {
     int innerWidth = (CELL_WIDTH + 1) * innerCols;
 
     for (int row = 0; row < middleCount; row++) {
-        int leftIndex = sideLength * 2 + 1 + row;   // sisi kiri (atas ke bawah)
-        int rightIndex = sideLength* 4 - 1 - row;        // sisi kanan (atas ke bawah)
+        int leftIndex = sideLength * 2 - 1 - row;        // sisi kiri (atas ke bawah)
+        int rightIndex = sideLength * 3 + 1 + row;       // sisi kanan (atas ke bawah)
 
         Tile* leftTile = board.getTile(leftIndex);
         Tile* rightTile = board.getTile(rightIndex);
