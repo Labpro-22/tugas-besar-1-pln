@@ -9,6 +9,7 @@ GoToNearestStationCard::GoToNearestStationCard(const std::string& message)
 
 void GoToNearestStationCard::takeEffect(Player& p, GameManager& gm) {
     int currentPos = p.getPiece().getPosition();
+    //FIX: use board-aware scan instead of hardcoded modulo formula
     const Board& board = gm.getBoard();
     int tileCount = board.getTileCount();
 

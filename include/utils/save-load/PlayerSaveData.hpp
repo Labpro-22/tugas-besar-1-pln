@@ -14,4 +14,5 @@ public:
     std::vector<SkillCardSaveData> skillCards;
     int getOutOfJailCardCount;
     int jailTurns;
+    int doubleRollCounter;
 };

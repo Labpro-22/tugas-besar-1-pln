@@ -11,9 +11,9 @@ void CollectMoneyFromPlayersCard::takeEffect(Player& p, GameManager& gm) {
     std::vector<Player>& allPlayers = gm.getPlayers();
 
     for (Player& other : allPlayers) {
+        //FIX: use HEAD version - checks bankrupt and handles liquidation if other can't pay
         if (other.getUsername() != p.getUsername() && !other.isBankrupt()) {
             bool canPay = other.giveMoney(p, amount);
-            // If other cannot pay, trigger their liquidation with p as creditor
             if (!canPay) {
                 gm.processOtherPlayerLiquidation(other, p);
             }

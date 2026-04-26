@@ -65,6 +65,7 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                         if (data.status == "MORTGAGED") {
                             property->setMortgaged(true);
                         }
+        //FIX: resolved merge conflict - setOwner inside owner block
                     }
 
                     prop = property;
@@ -87,6 +88,7 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                         if (data.status == "MORTGAGED") {
                             property->setMortgaged(true);
                         }
+        //FIX: resolved merge conflict - setOwner inside owner block
                     }
 
                     prop = property;
@@ -109,6 +111,7 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                         if (data.status == "MORTGAGED") {
                             property->setMortgaged(true);
                         }
+        //FIX: resolved merge conflict - setOwner inside owner block
                     }
 
                     prop = property;
