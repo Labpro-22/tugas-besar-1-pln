@@ -44,8 +44,8 @@ public:
     int getRailroadPropertyCount() const;
     int getUtilityPropertyCount() const;
     
-    void rollDiceAndMove();
-    void setDiceAndMove(int value1, int value2);
+    void rollDiceAndMove(GameManager& gm);
+    void setDiceAndMove(int value1, int value2, GameManager& gm);
 
     long long calculateTotalWealth() const;
     void receiveMoney(long long amount);
@@ -102,4 +102,3 @@ private:
     int jailTurns;
     std::pair<int, int> lastRoll;
 };
-
