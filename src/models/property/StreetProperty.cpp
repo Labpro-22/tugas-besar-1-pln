@@ -77,25 +77,25 @@ long long StreetProperty::calculateSellValue() const noexcept {
 
     int houses = getHouseCount();
     if (houses > 0 && houses <= 4) {
-        sellValue += (houses * getHousePrice());
+        sellValue += (houses * getHousePrice() / 2);
     } else if (houses == 5) {
-        sellValue += (4 * getHousePrice() + getHotelPrice());
+        sellValue += (4 * getHousePrice() / 2 + getHotelPrice() / 2);
     }
 
     return sellValue;
 }
 
 long long StreetProperty::calculateAssetValue() const noexcept {
-    long long sellValue = getPrice();
+    long long assetValue = getPrice();
 
     int houses = getHouseCount();
     if (houses > 0 && houses <= 4) {
-        sellValue += (houses * getHousePrice());
+        assetValue += (houses * getHousePrice());
     } else if (houses == 5) {
-        sellValue += (4 * getHousePrice() + getHotelPrice());
+        assetValue += (4 * getHousePrice() + getHotelPrice());
     }
 
-    return sellValue;
+    return assetValue;
 }
 
 std::array<long long, 6> StreetProperty::getRentPrice() const noexcept {
@@ -107,6 +107,6 @@ long long StreetProperty::redemptionPrice() const noexcept {
 }
 
 void StreetProperty::sellProperty() {
-    removeBuilding();
+    houseCount = 0;
     resetOwnerAsBank();
 }
