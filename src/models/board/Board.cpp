@@ -59,7 +59,7 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     auto player = std::find_if(players.begin(), players.end(), [data](Player *p) {
                         return p->getUsername() == data.owner;
                     });
-                    if (player != players.end()) {
+                    if (data.owner != "BANK" && player != players.end()) {
                         (*player)->addProperty(property);
                         property->setOwner(*player);
                         if (data.status == "MORTGAGED") {
@@ -81,7 +81,7 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     auto player = std::find_if(players.begin(), players.end(), [data](Player *p) {
                         return p->getUsername() == data.owner;
                     });
-                    if (player != players.end()) {
+                    if (data.owner != "BANK" && player != players.end()) {
                         (*player)->addProperty(property);
                         property->setOwner(*player);
                         if (data.status == "MORTGAGED") {
@@ -103,7 +103,7 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     auto player = std::find_if(players.begin(), players.end(), [data](Player *p) {
                         return p->getUsername() == data.owner;
                     });
-                    if (player != players.end()) {
+                    if (data.owner != "BANK" && player != players.end()) {
                         (*player)->addProperty(property);
                         property->setOwner(*player);
                         if (data.status == "MORTGAGED") {
@@ -170,7 +170,6 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                 std::string uniqueCode = code + "_" + std::to_string(i);
                 tilePositions[uniqueCode] = i;
                 mapTilesCodeTile[uniqueCode] = newTile;
-                newTile->setCode(uniqueCode);
             } else {
                 tilePositions[code] = i;
                 mapTilesCodeTile[code] = newTile;

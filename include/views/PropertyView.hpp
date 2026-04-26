@@ -14,5 +14,5 @@ public:
     void outputProperty() const;
     void outputPlayerProperties() const;
     void outputRent(Property &pr)const;
+    void outputRent(Property &pr, Player &player)const;
 };
-

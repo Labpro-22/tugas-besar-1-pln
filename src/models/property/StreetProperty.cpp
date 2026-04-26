@@ -1,7 +1,7 @@
 #include "models/property/StreetProperty.hpp"
 #include "models/player/Player.hpp"
 
-StreetProperty::StreetProperty(const std::string& code, const std::string& name, const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, long long housePrice, long long hotelPrice, long long rent[6], int houseCount): Property(code, name, color, price, mortgageValue, festivalMultiplier, festivalDuration), housePrice(housePrice), hotelPrice(hotelPrice), houseCount(houseCount) {
+StreetProperty::StreetProperty(const std::string& code, const std::string& name, const std::string& color, long long price, long long mortgageValue, long long festivalMultiplier, int festivalDuration, long long housePrice, long long hotelPrice, long long rent[6], int houseCount): Property(code, name, color, price, mortgageValue, festivalMultiplier, festivalDuration), houseCount(houseCount), housePrice(housePrice), hotelPrice(hotelPrice) {
     for (int i = 0; i < 6; i++) {
         rentPrice[i] = rent[i];
     }
@@ -107,6 +107,11 @@ long long StreetProperty::redemptionPrice() const noexcept {
 }
 
 void StreetProperty::sellProperty() {
+    resetToBank();
+}
+
+void StreetProperty::resetToBank() noexcept {
     houseCount = 0;
+    setMortgaged(false);
     resetOwnerAsBank();
 }

@@ -44,8 +44,8 @@ public:
     int getRailroadPropertyCount() const;
     int getUtilityPropertyCount() const;
     
-    void rollDiceAndMove(GameManager& gm);
-    void setDiceAndMove(int value1, int value2, GameManager& gm);
+    bool rollDiceAndMove();
+    bool setDiceAndMove(int value1, int value2);
 
     long long calculateTotalWealth() const;
     void receiveMoney(long long amount);
@@ -83,8 +83,10 @@ public:
     void getOutOfJail();
     int getJailTurns();
     void addEffect(PlayerEffect effect);
+    void removeEffect(const std::string& name);
     bool hasEffect(const std::string& name) const;
     int getEffectValue(const std::string& name) const;
+    void resetDoubleRollCounter();
     void onNextTurn();
     std::vector<SkillCard*>& getSkillCardsRef();
 

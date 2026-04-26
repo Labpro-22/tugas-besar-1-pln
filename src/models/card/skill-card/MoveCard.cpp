@@ -6,9 +6,16 @@
 MoveCard::MoveCard(const std::string& message, int amount) 
     : SkillCard(message), amount(amount) {}
 
+int MoveCard::getAmount() const {
+    return amount;
+}
+
 void MoveCard::takeEffect(Player& p, GameManager& gm) {
     message = "Maju " + std::to_string(amount) + " langkah.";
-    p.getPiece().goForward(amount);
+    bool passedStart = p.getPiece().goForward(amount);
+    if (passedStart) {
+        gm.getBoard().getTile(0)->onPassBy(p, gm);
+    }
     int currentPos = p.getPiece().getPosition();
     gm.getBoard().getTile(currentPos)->onLanded(p, gm);
 }

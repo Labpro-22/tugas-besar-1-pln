@@ -15,13 +15,13 @@ void PropertyTile::onLanded(Player& p, GameManager& gm) {
     Player* owner = property->getOwner();
 
     if (owner == nullptr) {
-        gm.processBuyProperty();
+        gm.processBuyProperty(p);
     }
     else if (owner != &p) {
-        gm.processPayRent();
+        gm.processPayRent(p);
     }
 }
 
-void PropertyTile::onPassBy(Player& p, GameManager& gm) {
+void PropertyTile::onPassBy(Player&, GameManager&) {
     // Kosong, tidak melakukan apapun
 }

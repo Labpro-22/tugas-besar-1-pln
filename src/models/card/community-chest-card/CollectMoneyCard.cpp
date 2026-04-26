@@ -7,7 +7,7 @@
 CollectMoneyCard::CollectMoneyCard(const std::string& message, int amount) 
     : CommunityChestCard(message), amount(amount) {}
 
-void CollectMoneyCard::takeEffect(Player& p, GameManager& gm) {
+void CollectMoneyCard::takeEffect(Player& p, GameManager&) {
     p.receiveMoney(amount);
 }
 

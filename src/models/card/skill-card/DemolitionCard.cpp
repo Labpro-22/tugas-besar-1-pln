@@ -10,21 +10,31 @@ void DemolitionCard::setTargetTileId(int id) {
 }
 
 void DemolitionCard::takeEffect(Player& p, GameManager& gm) {
-    // TODO : adjust size
+    (void)p;
     if (targetTileId >= 0 && targetTileId < gm.getBoard().getTileCount()) {
         Tile* tile = gm.getBoard().getTile(targetTileId);
         if (auto* propTile = dynamic_cast<PropertyTile*>(tile)) {
-            if (propTile->getProperty() != nullptr) {
-                propTile->getProperty()->resetOwnerAsBank();
-                message = "Properti di petak " + std::to_string(targetTileId) + " telah dihancurkan!";
+            Property *property = propTile->getProperty();
+            if (property != nullptr) {
+                if (Player *owner = property->getOwner(); owner != nullptr && owner != &p) {
+                    owner->removeProperty(property);
+                }
+                else {
+                    message = "DemolitionCard hanya bisa digunakan pada properti milik pemain lain.";
+                    targetTileId = -1;
+                    return;
+                }
+                property->resetToBank();
+                message = "Properti " + property->getName() + " [" + property->getCode() + "] telah dihancurkan dan kembali ke bank!";
             }
         }
     }
     targetTileId = -1;
 }
 
-void DemolitionCard::prepareUse(UseSkillCardView& view, GameManager& gm) {
+bool DemolitionCard::prepareUse(UseSkillCardView& view, GameManager&) {
     this->setTargetTileId(view.askForDemolitionTileId());
+    return targetTileId >= 0;
 }
 
 std::string DemolitionCard::getCardType() const {

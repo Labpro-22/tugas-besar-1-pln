@@ -26,7 +26,7 @@ int Player::getStreetPropertyCount() const { return streetPropertyCount; }
 int Player::getRailroadPropertyCount() const { return railroadPropertyCount; }
 int Player::getUtilityPropertyCount() const { return utilityPropertyCount; }
 
-void Player::rollDiceAndMove(GameManager& gm) {
+bool Player::rollDiceAndMove() {
     if (state == PlayerState::BANKRUPT)
         throw AlreadyBankruptException("Pemain " + username + " sudah bangkrut.");
     if (state == PlayerState::JAILED)
@@ -42,17 +42,15 @@ void Player::rollDiceAndMove(GameManager& gm) {
         if (doubleRollCounter >= 3) {
             doubleRollCounter = 0;
             goToJail();
-            return;
+            return false;
         }
     } else {
         doubleRollCounter = 0;
     }
 
-    piece.goForward(total, *this, gm); 
-
-    return;
+    return piece.goForward(total);
 }
-void Player::setDiceAndMove(int value1, int value2, GameManager& gm) {
+bool Player::setDiceAndMove(int value1, int value2) {
     if (state == PlayerState::BANKRUPT)
         throw AlreadyBankruptException("Pemain " + username + " sudah bangkrut.");
     if (state == PlayerState::JAILED)
@@ -67,15 +65,13 @@ void Player::setDiceAndMove(int value1, int value2, GameManager& gm) {
         if (doubleRollCounter >= 3) {
             doubleRollCounter = 0;
             goToJail();
-            return;
+            return false;
         }
     } else {
         doubleRollCounter = 0;
     }
 
-    piece.goForward(total, *this, gm); 
-
-    return;
+    return piece.goForward(total);
 }
 
 long long Player::calculateTotalWealth() const {
@@ -227,9 +223,10 @@ void Player::addProperty(Property* pr) {
 
 void Player::removeProperty(Property* pr) {
     auto it = std::find(properties.begin(), properties.end(), pr);
-    if (it != properties.end()) {
-        properties.erase(it);
+    if (it == properties.end()) {
+        return;
     }
+    properties.erase(it);
     if (pr->getPropertyType() == "STREET") {
         streetPropertyCount--;
     } else if (pr->getPropertyType() == "RAILROAD") {
@@ -240,14 +237,13 @@ void Player::removeProperty(Property* pr) {
 }
 
 bool Player::buyProperty(Property* pr) {
-    if (pr->getPropertyType() == "STREET"){
-        long long price = pr->getPrice();
-        if (hasEffect("DISCOUNT")) {
-            price = price * (100 - getEffectValue("DISCOUNT")) / 100;
-        }
-        if (money < price) return false;
-        money -= price;
+    long long price = pr->getPrice();
+    if (hasEffect("DISCOUNT")) {
+        price = price * (100 - getEffectValue("DISCOUNT")) / 100;
     }
+    if (money < price) return false;
+
+    money -= price;
     addProperty(pr);
     return true;
 }
@@ -270,12 +266,31 @@ void Player::sellProperty(Property* pr) {
 }
 
 void Player::mortgageProperty(Property* pr) {
+    if (pr->isMortgaged()) {
+        throw PropertyException("Properti " + pr->getName() + " sudah digadaikan.");
+    }
+
+    for (Property *ownedProperty : properties) {
+        if (ownedProperty->getColor() != pr->getColor()) {
+            continue;
+        }
+
+        StreetProperty *street = dynamic_cast<StreetProperty *>(ownedProperty);
+        if (street != nullptr && (street->getHouseCount() > 0 || street->hasHotel())) {
+            throw PropertyException("Masih terdapat bangunan pada color group [" + pr->getColor() + "].");
+        }
+    }
+
     long long mortgageVal = pr->getMortgageValue();
     pr->setMortgaged(true);
     money += mortgageVal;
 }
 
 void Player::unmortgageProperty(Property* pr) {
+    if (!pr->isMortgaged()) {
+        throw PropertyException("Properti " + pr->getName() + " tidak sedang digadaikan.");
+    }
+
     long long redeemPrice = pr->redemptionPrice();
     if (hasEffect("DISCOUNT")) {
         redeemPrice = redeemPrice * (100 - getEffectValue("DISCOUNT")) / 100;
@@ -342,7 +357,7 @@ void Player::sellBuilding(StreetProperty* pr) {
 void Player::addSkillCard(SkillCard* card) {
     if (skillCards.size() >= 3) {
         throw FullHandException(
-            "Pemain " + username + " sudah memiliki 3 kartu. Harus buang 1.");
+            "Pemain " + username + " sudah memiliki 4 kartu. Buang 1 kartu terlebih dahulu.");
     }
     skillCards.push_back(card);
 }
@@ -440,6 +455,14 @@ void Player::addEffect(PlayerEffect effect) {
     effects.push_back(effect);
 }
 
+void Player::removeEffect(const std::string& name) {
+    effects.erase(
+        std::remove_if(effects.begin(), effects.end(),
+            [&](const PlayerEffect& e) { return e.getName() == name; }),
+        effects.end()
+    );
+}
+
 bool Player::hasEffect(const std::string& name) const {
     for (const PlayerEffect& e : effects) {
         if (e.getName() == name && !e.isExpired()) return true;
@@ -452,6 +475,10 @@ int Player::getEffectValue(const std::string& name) const {
         if (e.getName() == name && !e.isExpired()) return e.getValue();
     }
     return 0;
+}
+
+void Player::resetDoubleRollCounter() {
+    doubleRollCounter = 0;
 }
 
 void Player::onNextTurn() {

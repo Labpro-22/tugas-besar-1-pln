@@ -3,5 +3,5 @@
 #include "core/GameManager.hpp"
 
 void IncomeTaxTile::onLanded(Player& p, GameManager& gm) {
-    gm.processPayIncomeTax();
-}  
+    gm.processPayIncomeTax(p);
+}

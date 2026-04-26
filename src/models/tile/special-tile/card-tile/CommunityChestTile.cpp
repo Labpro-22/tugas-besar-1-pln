@@ -3,5 +3,5 @@
 #include "core/GameManager.hpp"
 
 void CommunityChestTile::onLanded(Player& p, GameManager& gm) {
-    gm.processUseCommunityChestCard();
+    gm.processUseCommunityChestCard(p);
 }

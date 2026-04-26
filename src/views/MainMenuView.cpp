@@ -1,5 +1,6 @@
 #include "core/GameManager.hpp"
 #include "views/MainMenuView.hpp"
+#include <limits>
 #include <sstream>
 
 int MainMenuView::promptNewGameOrLoadGame(){
@@ -23,7 +24,12 @@ int MainMenuView::promptNewGameOrLoadGame(){
 
         std::cout << "\n";
         std::cout << BOLD << "Pilih opsi: " << RESET;
-        std::cin >> input;
+        if(!(std::cin >> input)){
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << RED << "Masukan tidak valid!\n\n" << RESET;
+            continue;
+        }
         if(input >= 0 && input <= 2){
             return input;
         }
@@ -59,6 +65,11 @@ std::vector<std::string> MainMenuView::promptUsernames(){
 
             if (name.empty()) {
                 std::cout << RED << "Username tidak boleh kosong!\n" << RESET;
+                continue;
+            }
+
+            if (name.find(' ') != std::string::npos) {
+                std::cout << RED << "Username tidak boleh mengandung spasi!\n" << RESET;
                 continue;
             }
 

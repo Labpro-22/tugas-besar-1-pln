@@ -10,7 +10,7 @@ PayMoneyCard::PayMoneyCard(const std::string& message, int amount)
 void PayMoneyCard::takeEffect(Player& p, GameManager& gm) {
     bool pay = p.payTax(amount);
     if (!pay) {
-        gm.processLiquidation();
+        gm.processLiquidation(p);
     }
 }
 
