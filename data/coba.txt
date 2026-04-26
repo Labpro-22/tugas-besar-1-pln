@@ -1,0 +1,26 @@
+15 30
+3
+Gro 1500 GO ACTIVE
+2
+MoveCard 5 
+ShieldCard  
+Kebin 850 BDG ACTIVE
+1
+DiscountCard 25 2
+Stewart 1200 PEN JAILED
+0
+Gro Kebin Stewart
+Gro
+5
+JKT street Gro OWNED 1 0 H
+BDG street Kebin MORTGAGED 0 0 0
+GBR railroad Gro OWNED 1 0 0
+PLN utility Stewart OWNED 1 0 0
+DEN street BANK BANK 1 0 0
+3
+MoveCard
+TeleportCard
+LassoCard
+2
+1 Gro DADU Lempar: 3+2=5 mendarat di Pajak_Penghasilan (PPH)
+1 Gro BELI Beli Jakarta (JKT) seharga M400
