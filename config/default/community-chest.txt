@@ -1,4 +1,4 @@
-PAY 50 Anda kena tilang karena pingin aja. Bayar M50.
-PAYALL 5 Bagi-bagi takjil tapi punyanya uang. Beri M5 ke semua pemain.
-COLLECT 100 Dapat harta karun dari ujung pelangi. Dapat M100. 
-COLLECTALL 10 Waktunya malak semua orang >:). Dapat M10 dari semua pemain.
+PAYMONEYCARD 50 Anda kena tilang karena pingin aja. Bayar M50.
+PAYMONEYTOPLAYERSCARD 5 Bagi-bagi takjil tapi punyanya uang. Beri M5 ke semua pemain.
+COLLECTMONEYCARD 100 Dapat harta karun dari ujung pelangi. Dapat M100. 
+COLLECTMONEYFROMPLAYERSCARD 10 Waktunya malak semua orang >:). Dapat M10 dari semua pemain.

@@ -37,7 +37,7 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
             std::string s = "a. ";
             colors.push_back(color);
             for(const auto &p : prop){
-                std::cout<<"\t" << std::setw(SPACE) <<  s + p->getName() + " (" + p->getCode() + ")" << ": ";
+                std::cout<<"\t" << std::left << std::setw(SPACE) <<  s + p->getName() + " (" + p->getCode() + ")" << ": ";
                 if(p->getHouseCount() < 4){
                     std::cout<<p->getHouseCount() << " rumah (Harga rumah: M" << p->getHousePrice() << ")\n";
                 }
@@ -70,7 +70,7 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
             if(p->getHouseCount() == minHouse)validBuildings.push_back(p);
         } 
         for(auto p  : validBuildings){
-            std::cout<< idx << std::setw(SPACE) << ". " + p->getName() + " (" + p->getCode() + ")" << ": ";
+            std::cout<< idx << std::left << std::setw(SPACE) << ". " + p->getName() + " (" + p->getCode() + ")" << ": ";
             if(p->canBuildHouse(1)){
                 std::cout<<p->getHouseCount() << " rumah (Harga rumah: M" << p->getHousePrice() << ")\n";
             }

@@ -13,10 +13,11 @@ void CollectMoneyFromPlayersCard::takeEffect(Player& p, GameManager& gm) {
 
     for (Player& other : allPlayers) {
         if (other.getUsername() != p.getUsername()) {
-            other.payTax(amount); 
-            totalCollected += amount;
+            bool canPay = other.giveMoney(p, amount);
         }
     }
-    
-    p.receiveMoney(totalCollected);
+}
+
+std::string CollectMoneyFromPlayersCard::getCardType() const {
+    return "COLLECTMONEYFROMPLAYERSCARD";
 }

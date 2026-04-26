@@ -58,13 +58,13 @@ class Property {
 
         virtual std::string getPropertyType() const noexcept = 0;
 
-        virtual long long calculateSellValue() const noexcept;
+        virtual long long calculateSellValue() const noexcept = 0;
         
-        virtual long long calculateAssetValue() const noexcept;
+        virtual long long calculateAssetValue() const noexcept = 0;
 
-        virtual ~Property() {}
+        virtual ~Property() = default;
 
-        virtual void sellProperty();
+        virtual void sellProperty() = 0;
 
     protected:
         Player *owner;

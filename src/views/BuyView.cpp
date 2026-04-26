@@ -10,31 +10,29 @@ bool BuyView::promptBuyProperty(Property& pr){
             int right = padding - left;
             return std::string(left, ' ') + text + std::string(right, ' ');
         };
-        std::cout << "+" << std::string(WIDTH, '=') << "+" ;
+        std::cout << "+" << std::string(WIDTH, '=') << "+\n";
         std::cout << "|" <<  centerText("AKTA KEPEMILIKAN") << "|\n";
         std::cout << "|" << centerText("[" + sp->getColor() +"] " + sp->getName() + " (" + sp->getCode() + ")") <<"|\n";
-        std::cout << "+" << std::string(WIDTH, '=') << "+" ;
-        std::cout << "| " << std::setw(COLON_WIDTH) << " Harga Beli" << std::setw(WIDTH-COLON_WIDTH) << ": M" + std::to_string( sp->getPrice())<<"|\n";
-        std::cout << "| " << std::setw(COLON_WIDTH) << " Nilai Gadai" << std::setw(WIDTH-COLON_WIDTH) << ": M" + std::to_string( sp->getMortgageValue())<<"|\n";
-        std::cout << "+ " <<std::string(WIDTH, '-') << "+\n";
+        std::cout << "+" << std::string(WIDTH, '=') << "+\n";
+        std::cout << "|" << std::left << std::setw(COLON_WIDTH) << " Harga Beli" << std::left << std::setw(WIDTH-COLON_WIDTH) << ": M" + std::to_string( sp->getPrice())<<"|\n";
+        std::cout << "|" << std::left << std::setw(COLON_WIDTH) << " Nilai Gadai" << std::left << std::setw(WIDTH-COLON_WIDTH) << ": M" + std::to_string( sp->getMortgageValue())<<"|\n";
+        std::cout << "+" <<std::string(WIDTH, '-') << "+\n";
         std::array<long long, 6> rent= sp->getRentPrice();
         for(int i=0; i < 6; i++){
             if(i == 0){
-                std::cout <<"|" << std::setw(COLON_WIDTH) << " Sewa (unimproved)" << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[0])) << "|\n";
+                std::cout <<"|" << std::left << std::setw(COLON_WIDTH) << " Sewa (unimproved)" << std::left << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[0])) << "|\n";
             }
             else if(i > 0 && i < 6){
-                std::cout << "|" << std::setw(COLON_WIDTH) << (" Sewa (" + std::to_string(i) + " rumah)") << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[i])) << "|\n";
+                std::cout << "|" << std::left << std::setw(COLON_WIDTH) << (" Sewa (" + std::to_string(i) + " rumah)") << std::left << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[i])) << "|\n";
             }
             else{
-                std::cout<< "|" <<std::setw(COLON_WIDTH) << " Sewa (hotel)" << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[5])) << "|\n";
+                std::cout<< "|" <<std::left << std::setw(COLON_WIDTH) << " Sewa (hotel)" << std::left << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(rent[5])) << "|\n";
             }
         }
         std::cout << "+" << std::string(WIDTH,'-') << "+\n";
-        std::cout << "|" << std::setw(COLON_WIDTH) << " Harga Rumah" << std::setw(WIDTH-COLON_WIDTH) << ( ": M" + std::to_string(sp->getHousePrice()))<<"|\n";
-        std::cout << "|" <<std::setw(COLON_WIDTH) << " Harga Hotel" << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(sp->getHotelPrice()))<<"|\n";
-        std::cout << "+" << std::string(WIDTH, '=') << "+" ;
-
-
+        std::cout << "|" << std::left << std::setw(COLON_WIDTH) << " Harga Rumah" << std::left << std::setw(WIDTH-COLON_WIDTH) << ( ": M" + std::to_string(sp->getHousePrice()))<<"|\n";
+        std::cout << "|" <<std::left << std::setw(COLON_WIDTH) << " Harga Hotel" << std::left << std::setw(WIDTH-COLON_WIDTH) << (": M" + std::to_string(sp->getHotelPrice()))<<"|\n";
+        std::cout << "+" << std::string(WIDTH, '=') << "+\n";
         std::cout << "Uang kamu saat ini: M" << gameManager.getCurrentPlayer().getMoney() << "\n";
         std::string yayOrNay;
         std::cout << "Apakah kamu ingin membeli properti ini seharga M" << sp->getPrice() << "? (y/n): ";
@@ -71,5 +69,6 @@ void BuyView::outputBuyStatus(bool success, Property* pr)const{
             std::cout.flush(); 
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
+        std::cout << "\n";
     }
 }

@@ -6,9 +6,9 @@ private:
     int targetTileId = -1;
 
 public:
-    DemolitionCard(const std::string& message);
+    DemolitionCard(const std::string &message);
     void setTargetTileId(int id);
-    void takeEffect(Player& p, GameManager& gm) override;
+    void takeEffect(Player &p, GameManager &gm) override;
     void prepareUse(UseSkillCardView &view, GameManager &gm) override;
-    std::string getType() const override;
+    std::string getCardType() const override;
 };

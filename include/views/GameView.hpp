@@ -152,5 +152,5 @@ GameView(GameManager &gm)
     JailView& getJailView(){
         return jailView;
     }
-    void InputNextCommand();
+    void inputNextCommand();
 };

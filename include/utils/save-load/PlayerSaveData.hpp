@@ -12,4 +12,6 @@ public:
     std::string tileCodePosition;
     std::string status;
     std::vector<SkillCardSaveData> skillCards;
+    int getOutOfJailCardCount;
+    int jailTurns;
 };

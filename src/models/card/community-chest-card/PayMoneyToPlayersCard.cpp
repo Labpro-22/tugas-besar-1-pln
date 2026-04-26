@@ -10,11 +10,21 @@ PayMoneyToPlayersCard::PayMoneyToPlayersCard(const std::string& message, int amo
 void PayMoneyToPlayersCard::takeEffect(Player& p, GameManager& gm) {
     std::vector<Player>& allPlayers = gm.getPlayers();
     int totalPaid = 0;
-
-    for (Player& other : allPlayers) {
-        if (other.getUsername() != p.getUsername()) {
-            p.giveMoney(other, amount);
+    int expectedTotalPaid = (allPlayers.size() - 1) * amount;
+    int moneyNow = p.getMoney() - expectedTotalPaid;
+    p.setMoney(moneyNow);
+    if (p.getMoney() < 0) {
+        gm.processLiquidation();
+    }
+    if (p.getState() != PlayerState::BANKRUPT) {
+        for (Player& other : allPlayers) {
+            if (other.getUsername() != p.getUsername()) {
+                other.receiveMoney(amount);
+            }
         }
     }
-        
+}
+
+std::string PayMoneyToPlayersCard::getCardType() const {
+    return "PAYMONEYTOPLAYERSCARD";
 }

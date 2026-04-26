@@ -8,5 +8,12 @@ PayMoneyCard::PayMoneyCard(const std::string& message, int amount)
     : CommunityChestCard(message), amount(amount) {}
 
 void PayMoneyCard::takeEffect(Player& p, GameManager& gm) {
-    p.payTax(amount);
+    bool pay = p.payTax(amount);
+    if (!pay) {
+        gm.processLiquidation();
+    }
+}
+
+std::string PayMoneyCard::getCardType() const {
+    return "PAYMONEYCARD";
 }

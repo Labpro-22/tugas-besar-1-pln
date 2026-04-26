@@ -18,8 +18,8 @@ Property* UnmortgageView::promptChooseProperty(std::vector<Property*> pr) const{
         for(auto p : pr){
             if(p->isMortgaged()){
                 indeks[idx] = i;
-                std::cout << idx++ << ". " << std::setw(SPACE)<<p->getName() + 
-                " (" + p->getCode() + ")" << std::setw(SPACE_2) <<  "[" + p->getColor() + "]" << "[M]  " <<  "Harga Tebus: M" << p->redemptionPrice()<< "\n"; 
+                std::cout << idx++ << ". " << std::left << std::setw(SPACE)<<p->getName() + 
+                " (" + p->getCode() + ")" << std::left << std::setw(SPACE_2) <<  "[" + p->getColor() + "]" << "[M]  " <<  "Harga Tebus: M" << p->redemptionPrice()<< "\n"; 
             }
             i++;
         }
