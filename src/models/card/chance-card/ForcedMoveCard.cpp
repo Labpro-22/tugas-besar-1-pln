@@ -9,10 +9,7 @@ ForcedMoveCard::ForcedMoveCard(const std::string& message, int moveOffset)
     : ChanceCard(message), moveOffset(moveOffset) {}
 
 void ForcedMoveCard::takeEffect(Player& p, GameManager& gm) {
-    bool passedStart = p.getPiece().goForward(moveOffset);
-    if (passedStart) {
-        gm.getBoard().getTile(0)->onPassBy(p, gm);
-    }
+    p.getPiece().goForward(moveOffset);
     int currentPos = p.getPiece().getPosition();
     Tile* tile = gm.getBoard().getTile(currentPos);
     if (tile) tile->onLanded(p, gm);

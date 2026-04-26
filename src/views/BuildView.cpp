@@ -55,34 +55,20 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
         std::cout << "Pilih nomor color group (0 untuk batal): ";
         int inputIdx;
         std::cin >> inputIdx;
-        if (inputIdx == 0) return nullptr;
-        if (inputIdx < 1 || inputIdx > static_cast<int>(colors.size())) {
-            std::cout << "Color group tidak valid.\n";
-            return nullptr;
-        }
-
-        const std::string &selectedColor = colors[inputIdx - 1];
-        std::cout << "\nColor group [" << selectedColor << "] :\n";
+        if(inputIdx == 0)return nullptr;
+        std::cout<<"\nCColor group [" << colors[idx-1] << "] :\n";
         idx = 1;
         std::vector<StreetProperty*> validBuildings;
 
         int minHouse = 6;
 
-        for (const StreetProperty* p : colorGroup[selectedColor]) {
+        for (const StreetProperty* p : colorGroup[colors[idx-1]]) {
             minHouse = std::min(minHouse, p->getHouseCount());
         }
 
-        for (auto p : colorGroup[selectedColor]) {
-            if (p->getHouseCount() == minHouse && !p->hasHotel()) {
-                validBuildings.push_back(p);
-            }
-        }
-
-        if (validBuildings.empty()) {
-            std::cout << "Tidak ada properti yang bisa dibangun saat ini.\n";
-            return nullptr;
-        }
-
+        for(auto p  : colorGroup[colors[idx-1]]){
+            if(p->getHouseCount() == minHouse)validBuildings.push_back(p);
+        } 
         for(auto p  : validBuildings){
             std::cout<< idx << std::left << std::setw(SPACE) << ". " + p->getName() + " (" + p->getCode() + ")" << ": ";
             if(p->canBuildHouse(1)){
@@ -98,22 +84,17 @@ StreetProperty* BuildView::promptChooseProperty(std::vector<Property*> pr) const
         }
         std::cout << "Pilih nomor properti (0 untuk batal): ";
         std::cin >> inputIdx;
-        if (inputIdx == 0) return nullptr;
-        if (inputIdx < 1 || inputIdx > static_cast<int>(validBuildings.size())) {
-            std::cout << "Properti tidak valid.\n";
-            return nullptr;
-        }
+        if(inputIdx == 0)return nullptr;
 
-        StreetProperty* toBuild = validBuildings[inputIdx - 1];
+        StreetProperty* toBuild = validBuildings[inputIdx];
         if(toBuild->hasHotel()){
             std::cout << "Properti sudah memiliki hotel, tidak dapat dibangun!\n";
             return nullptr;
         } 
         if(toBuild->canBuildHotel()){
             std::string yayOrNay;
-            while (true) {
-                std::cout << "Upgrade " << toBuild->getName() << " ke hotel? Biaya: M" << toBuild->getHotelPrice() << " (y/n): ";
-                std::cin >> yayOrNay;
+            while(std::cin >> yayOrNay){
+                std::cout<<"Upgrade " << toBuild->getName() << " ke hotel? Biaya: M" << toBuild->getHotelPrice() << " (y/n): ";
                 if(yayOrNay == "y"){
                     std::cout << "\n\n";
                     break;

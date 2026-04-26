@@ -8,10 +8,5 @@ class Tile;
 class SkillCard : public Card {
 public:
     SkillCard(const std::string& message) : Card(message) {}
-    virtual bool prepareUse(UseSkillCardView& view, GameManager& gm)
-    {
-        (void)view;
-        (void)gm;
-        return true;
-    }
+    virtual void prepareUse(UseSkillCardView& view, GameManager& gm) {};
 };

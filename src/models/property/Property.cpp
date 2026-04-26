@@ -54,10 +54,6 @@ void Property::setMortgaged(bool mortgaged) noexcept {
     }
 }
 
-void Property::resetToBank() noexcept {
-    resetOwnerAsBank();
-}
-
 void Property::startFestival() {
     festivalDuration = 3;
     if (festivalMultiplier < 8) {

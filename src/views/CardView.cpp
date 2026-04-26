@@ -2,19 +2,18 @@
 #include "views/CardView.hpp"
 
 void CardView::outputCard(Card& card) const{
-    std::cout << "Mengambil kartu";
+    std::cout <<"Mengambil kartu";
     for (int i = 0; i < 3; i++) {
         std::cout << ".";
         std::cout.flush(); 
-        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
-    std::cout << "\n";
-    std::cout << "+------------------------------+\n";
-    std::cout << "| Kartu: " << card.getCardType() << "\n";
+    std::cout <<"\n";
+    std::cout << "Kartu: " << card.getCardType();
     if (!card.getMessage().empty()) {
-        std::cout << "| Efek : " << card.getMessage() << "\n";
+        std::cout << " - " << card.getMessage();
     }
-    std::cout << "+------------------------------+\n";
+    std::cout << '\n';
 }
 
 void CardView::outputShielded() const {

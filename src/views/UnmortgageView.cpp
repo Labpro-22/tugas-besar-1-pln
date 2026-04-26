@@ -45,11 +45,11 @@ Property* UnmortgageView::promptChooseProperty(std::vector<Property*> pr) const{
 
 void UnmortgageView::outputUnmortgageStatus(bool success, Property &pr) const{
     if(success){
-        std::cout << pr.getName() << " berhasil ditebus!\nKamu membayar M" << pr.redemptionPrice() << " ke Bank.\nUang kamu sekarang: M" 
+        std::cout << pr.getName() << " berhasil ditebus!\nKamu membayar M" << pr.getPrice() << " ke Bank.\nUang kamu sekarang: M" 
         << gameManager.getCurrentPlayer().getMoney() << "\n\n";
     }
     else{
-        std::cout << "Uang kamu tidak cukup untuk menebus "  << pr.getName() <<".\nHarga tebus: M" << pr.redemptionPrice() <<
+        std::cout << "Uang kamu tidak cukup untuk menebus "  << pr.getName() <<".\nHarga tebus: M" << pr.getPrice() <<
          "| Uang kamu: M" << gameManager.getCurrentPlayer().getMoney() << "\n\n";
     }
 }

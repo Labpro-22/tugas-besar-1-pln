@@ -2,8 +2,6 @@
 #include <thread>
 #include <chrono>
 
-#include "models/card/Card.hpp"
-
 class GameManager;
 
 class CardView

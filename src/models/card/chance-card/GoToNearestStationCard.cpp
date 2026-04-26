@@ -11,9 +11,6 @@ void GoToNearestStationCard::takeEffect(Player& p, GameManager& gm) {
     // TODO : adjust for custom range
     int targetStation = (((currentPos + 5) / 10) * 10 + 5) % 40;
     
-    if (targetStation < currentPos) {
-        gm.getBoard().getTile(0)->onPassBy(p, gm);
-    }
     p.getPiece().setPosition(targetStation);
     message = "Anda berpindah ke stasiun terdekat di petak " + std::to_string(targetStation) + "!";
 

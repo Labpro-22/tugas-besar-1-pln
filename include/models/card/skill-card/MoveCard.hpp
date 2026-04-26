@@ -7,7 +7,6 @@ private:
 
 public:
     MoveCard(const std::string &message, int amount);
-    int getAmount() const;
     void takeEffect(Player &p, GameManager &gm) override;
     std::string getCardType() const override;
 };

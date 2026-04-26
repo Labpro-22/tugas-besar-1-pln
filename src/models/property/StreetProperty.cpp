@@ -107,11 +107,6 @@ long long StreetProperty::redemptionPrice() const noexcept {
 }
 
 void StreetProperty::sellProperty() {
-    resetToBank();
-}
-
-void StreetProperty::resetToBank() noexcept {
-    houseCount = 0;
-    setMortgaged(false);
+    removeBuilding();
     resetOwnerAsBank();
 }

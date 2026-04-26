@@ -60,12 +60,11 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     auto player = std::find_if(players.begin(), players.end(), [data](Player *p) {
                         return p->getUsername() == data.owner;
                     });
-                    if (data.owner != "BANK" && player != players.end()) {
+                    if (player != players.end()) {
                         (*player)->addProperty(property);
+                        property->setOwner(*player);
                     }
-                    if (data.status == "MORTGAGED") {
-                        property->setMortgaged(true);
-                    }
+                    property->setOwner(*player);
 
                     prop = property;
                 }
@@ -81,12 +80,11 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     auto player = std::find_if(players.begin(), players.end(), [data](Player *p) {
                         return p->getUsername() == data.owner;
                     });
-                    if (data.owner != "BANK" && player != players.end()) {
+                    if (player != players.end()) {
                         (*player)->addProperty(property);
+                        property->setOwner(*player);
                     }
-                    if (data.status == "MORTGAGED") {
-                        property->setMortgaged(true);
-                    }
+                    property->setOwner(*player);
 
                     prop = property;
                 }
@@ -102,12 +100,11 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                     auto player = std::find_if(players.begin(), players.end(), [data](Player *p) {
                         return p->getUsername() == data.owner;
                     });
-                    if (data.owner != "BANK" && player != players.end()) {
+                    if (player != players.end()) {
                         (*player)->addProperty(property);
+                        property->setOwner(*player);
                     }
-                    if (data.status == "MORTGAGED") {
-                        property->setMortgaged(true);
-                    }
+                    property->setOwner(*player);
 
                     prop = property;
                 }

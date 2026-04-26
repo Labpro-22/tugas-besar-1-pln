@@ -5,32 +5,21 @@
 
 int DropSkillCardView::promptChooseSkillCard(const std::vector<SkillCard *> &cards)
 {
-    std::cout << "\n[Warning] Tangan Anda penuh! (Maksimal 4 kartu)\n";
+    std::cout << "\n[Warning] Tangan Anda penuh! (Maksimal 3 Kartu)\n";
     std::cout << "Pilih kartu yang ingin dibuang untuk memberi ruang:\n";
 
     for (size_t i = 0; i < cards.size(); ++i) {
-        std::cout << i + 1 << ". " << cards[i]->getCardType();
-        if (!cards[i]->getMessage().empty()) {
-            std::cout << " - " << cards[i]->getMessage();
-        }
-        std::cout << "\n";
+        std::cout << i + 1 << ". " << cards[i]->getMessage() << "\n";
     }
 
     int choice;
-    while (true) {
-        std::cout << "Masukkan nomor kartu yang dibuang (1 - " << cards.size() << ", 0 untuk batal): ";
-        std::cin >> choice;
-        if (choice == 0) {
-            return -1;
-        }
-        if (choice >= 1 && choice <= static_cast<int>(cards.size())) {
-            return choice - 1;
-        }
-        std::cout << "Pilihan tidak valid.\n";
-    }
+    std::cout << "Masukkan nomor (1 - " << cards.size() << "): ";
+    std::cin >> choice;
+
+    return choice - 1;
 }
 
 void DropSkillCardView::outputDropSkillCardStatus(SkillCard &card)
 {
-    std::cout << card.getCardType() << " telah dibuang.\n\n";
+    std::cout << card.getCardType() << " telah dibuang. Sekarang kamu memiliki 3 kartu di tangan.\n\n";
 }
