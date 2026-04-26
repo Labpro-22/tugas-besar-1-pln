@@ -13,7 +13,7 @@ void AuctionView::outputProperty(Property &pr) const{
     std::cout << "Harga beli normal: M" << pr.getPrice() << "\n\n";
     
 }
-long long AuctionView::promptBidOrPass(Player &p, long long currentBid, const Player* currentLeader, int activeBidderCount) const {
+long long AuctionView::promptBidOrPass(Player &p, long long currentBid, const Player* currentLeader, int activeBidderCount, bool canPass) const {
     std::cout << "----------------------------------------\n";
     std::cout << "Giliran bid: " << p.getUsername() << " | Uang: M" << p.getMoney() << "\n";
     std::cout << "Peserta aktif: " << activeBidderCount << "\n";
@@ -24,8 +24,15 @@ long long AuctionView::promptBidOrPass(Player &p, long long currentBid, const Pl
         std::cout << "Bid tertinggi: M" << currentBid << " oleh " << currentLeader->getUsername() << "\n";
     }
 
+    long long minimumBid = currentLeader == nullptr ? 0 : currentBid + 1;
+
     while (true) {
-        std::cout << "Aksi (PASS / BID <jumlah>, minimal M" << currentBid + 1 << ")\n";
+        if (canPass) {
+            std::cout << "Aksi (PASS / BID <jumlah>)\n";
+        }
+        else {
+            std::cout << "Aksi (BID <jumlah>)\n";
+        }
         std::cout << "> ";
 
         std::string input;
@@ -39,13 +46,22 @@ long long AuctionView::promptBidOrPass(Player &p, long long currentBid, const Pl
                        [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
 
         if (command == "PASS") {
+            if (!canPass) {
+                std::cout << "Minimal harus ada satu bid. Kamu harus melakukan BID.\n";
+                continue;
+            }
             return -1;
         }
         else if (command == "BID") {
             long long bid;
             if (ss >> bid) {
-                if (bid <= currentBid) {
-                    std::cout << "Bid harus lebih besar dari M" << currentBid << ".\n";
+                if (bid < minimumBid) {
+                    if (currentLeader == nullptr) {
+                        std::cout << "Bid tidak boleh negatif.\n";
+                    }
+                    else {
+                        std::cout << "Bid harus lebih besar dari M" << currentBid << ".\n";
+                    }
                     continue;
                 }
                 if (bid > p.getMoney()) {
@@ -60,7 +76,7 @@ long long AuctionView::promptBidOrPass(Player &p, long long currentBid, const Pl
     }
 }
 void AuctionView::outputExcludedPlayer(const Player &p) const{
-    std::cout << p.getUsername() << " menolak membeli properti ini, jadi tidak ikut lelang.\n\n";
+    std::cout << p.getUsername() << " menolak membeli properti ini, jadi mendapat giliran lelang setelah pemain lain.\n\n";
 }
 
 void AuctionView::outputBidAccepted(Player &p, long long bid) const{

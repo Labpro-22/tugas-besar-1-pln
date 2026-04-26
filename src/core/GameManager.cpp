@@ -890,9 +890,29 @@ void GameManager::processAuctionProperty(Property *property, Player *excludedPla
     }
 
     std::vector<Player *> bidders;
-    for (Player &player : players) {
-        if (!player.isBankrupt() && &player != excludedPlayer) {
-            bidders.push_back(&player);
+    size_t currentBidderIndex = 0;
+    if (excludedPlayer != nullptr) {
+        auto playerIt = std::find_if(players.begin(), players.end(), [&](const Player &player) {
+            return &player == excludedPlayer;
+        });
+        if (playerIt != players.end()) {
+            size_t rejectedPlayerIndex = static_cast<size_t>(std::distance(players.begin(), playerIt));
+            for (size_t offset = 1; offset < players.size(); ++offset) {
+                Player *candidate = &players[(rejectedPlayerIndex + offset) % players.size()];
+                if (!candidate->isBankrupt()) {
+                    bidders.push_back(candidate);
+                }
+            }
+        }
+        if (!excludedPlayer->isBankrupt()) {
+            bidders.push_back(excludedPlayer);
+        }
+    }
+    else {
+        for (Player &player : players) {
+            if (!player.isBankrupt()) {
+                bidders.push_back(&player);
+            }
         }
     }
 
@@ -911,25 +931,26 @@ void GameManager::processAuctionProperty(Property *property, Player *excludedPla
         return static_cast<size_t>(0);
     };
 
-    Player *startFrom = excludedPlayer != nullptr ? excludedPlayer : &getCurrentPlayer();
-    size_t currentBidderIndex = 0;
-    for (size_t offset = excludedPlayer != nullptr ? 1 : 0; offset <= players.size(); ++offset) {
-        auto playerIt = std::find_if(players.begin(), players.end(), [&](const Player &player) {
-            return &player == startFrom;
-        });
-        if (playerIt == players.end()) {
-            break;
-        }
-        size_t playerIndex = static_cast<size_t>(std::distance(players.begin(), playerIt));
-        Player *candidate = &players[(playerIndex + offset) % players.size()];
-        if (std::find(bidders.begin(), bidders.end(), candidate) != bidders.end()) {
-            currentBidderIndex = findBidderIndex(candidate);
-            break;
+    if (excludedPlayer == nullptr) {
+        Player *startFrom = &getCurrentPlayer();
+        for (size_t offset = 0; offset <= players.size(); ++offset) {
+            auto playerIt = std::find_if(players.begin(), players.end(), [&](const Player &player) {
+                return &player == startFrom;
+            });
+            if (playerIt == players.end()) {
+                break;
+            }
+            size_t playerIndex = static_cast<size_t>(std::distance(players.begin(), playerIt));
+            Player *candidate = &players[(playerIndex + offset) % players.size()];
+            if (std::find(bidders.begin(), bidders.end(), candidate) != bidders.end()) {
+                currentBidderIndex = findBidderIndex(candidate);
+                break;
+            }
         }
     }
 
     Player *lastBidder = nullptr;
-    long long bestBidAmount = 0;
+    long long bestBidAmount = -1;
     std::vector<bool> activeBidders(bidders.size(), true);
     int activeBidderCount = static_cast<int>(bidders.size());
 
@@ -944,8 +965,9 @@ void GameManager::processAuctionProperty(Property *property, Player *excludedPla
             continue;
         }
 
-        long long currentBidAmount = view.promptBidOrPass(*currentBidder, bestBidAmount, lastBidder, activeBidderCount);
-        if (currentBidAmount != 0) {
+        bool canPass = lastBidder != nullptr || activeBidderCount > 1;
+        long long currentBidAmount = view.promptBidOrPass(*currentBidder, bestBidAmount, lastBidder, activeBidderCount, canPass);
+        if (currentBidAmount >= 0) {
             lastBidder = currentBidder;
             bestBidAmount = currentBidAmount;
             view.outputBidAccepted(*currentBidder, currentBidAmount);
