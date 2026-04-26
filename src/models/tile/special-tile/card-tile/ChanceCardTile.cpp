@@ -3,5 +3,5 @@
 #include "core/GameManager.hpp"
 
 void ChanceCardTile::onLanded(Player& p, GameManager& gm) {
-    gm.processUseChanceCard();
+    gm.processUseChanceCard(p);
 }

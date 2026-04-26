@@ -39,6 +39,8 @@ class StreetProperty: public Property {
 
         void sellProperty() override;
 
+        void resetToBank() noexcept override;
+
     private:
         int houseCount;
 

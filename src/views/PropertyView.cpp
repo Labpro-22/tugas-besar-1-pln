@@ -164,12 +164,15 @@ void PropertyView::outputPlayerProperties() const{
 }
 
 void PropertyView::outputRent(Property &pr)const{
+    outputRent(pr, gameManager.getCurrentPlayer());
+}
+
+void PropertyView::outputRent(Property &pr, Player &p)const{
     if(pr.isMortgaged()){
         std::cout<<"Properti ini sedang digadaikan [M]. Tidak ada sewa yang dikenakan.\n\n";
     }
     else{
         int width = pr.getOwner()->getUsername().length() + 15;
-        Player& p = gameManager.getCurrentPlayer();
         if (p.hasEffect("SHIELD")) {
             std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu membayar sewa.\n";
             return;
@@ -190,7 +193,7 @@ void PropertyView::outputRent(Property &pr)const{
         if(dynamic_cast<UtilityProperty*>(&pr) == nullptr){
             std::cout << std::left << std::setw(width) << "Sewa" << ": M" << rent << "\n\n";
         }
-        std::cout << std::left << std::setw(width) << "Uang kamu" << ": M" << money;
+        std::cout << std::left << std::setw(width) << "Uang Pemain "+ p.getUsername() << ": M" << money;
         if (p.hasEffect("DISCOUNT")) {
             rent *= (100 - p.getEffectValue("DISCOUNT")) / 100;
             std::cout << std::left << std::setw(width) << "[DISCOUNT ACTIVE] Tagihan sewa menjadi" << ": M" << rent << "\n\n";

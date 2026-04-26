@@ -3,5 +3,5 @@
 #include "core/GameManager.hpp"
 
 void FestiveTile::onLanded(Player& p, GameManager& gm) {
-    gm.processStartFestival();
-}   
+    gm.processStartFestival(p);
+}

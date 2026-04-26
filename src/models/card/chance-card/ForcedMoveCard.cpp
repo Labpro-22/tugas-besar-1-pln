@@ -11,8 +11,12 @@ ForcedMoveCard::ForcedMoveCard(const std::string& message, int moveOffset)
 void ForcedMoveCard::takeEffect(Player& p, GameManager& gm) {
     if (moveOffset < 0) {
         p.getPiece().goBackward(-moveOffset);
-    } else {
-        p.getPiece().goForward(moveOffset);
+    }
+    else {
+        bool passedStart = p.getPiece().goForward(moveOffset);
+        if (passedStart) {
+            gm.getBoard().getTile(0)->onPassBy(p, gm);
+        }
     }
     int currentPos = p.getPiece().getPosition();
     Tile* tile = gm.getBoard().getTile(currentPos);
