@@ -50,7 +50,7 @@ int UseSkillCardView::promptChooseCardToUse(const std::vector<SkillCard*>& cards
     
     int choice;
     while (true) {
-        std::cout << "Pilih kartu yang ingin digunakan (0 - " << cards.size() << "): ";
+        std::cout << "\nPilih kartu yang ingin digunakan (0 - " << cards.size() << "): ";
         if (!(std::cin >> choice)) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');

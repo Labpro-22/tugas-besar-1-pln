@@ -68,6 +68,11 @@ std::vector<std::string> MainMenuView::promptUsernames(){
                 continue;
             }
 
+            if (name.find(' ') != std::string::npos) {
+                std::cout << RED << "Username tidak boleh mengandung spasi!\n" << RESET;
+                continue;
+            }
+
             if (std::find(names.begin(), names.end(), name) != names.end()) {
                 std::cout << RED << "Username sudah digunakan! Pilih nama lain.\n" << RESET;
                 continue;
