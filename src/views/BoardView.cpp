@@ -16,6 +16,7 @@ void BoardView::outputOnLanded()const{
             if(owner->getUsername() != p.getUsername()){
                 std::cout <<", milik Pemain " << owner->getUsername();
             }
+            else {std::cout <<", milikmu";}
         }
     }
     else{

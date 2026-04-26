@@ -376,18 +376,23 @@ void GameManager::nextPlayer()
     gameView.getBoardView().drawBoard();
 
     SkillCard *drawnCard = skillCardDeck.drawCard();
+    bool shouldKeepDrawnCard = true;
+    bool cardAlreadyShown = false;
     if (player.getSkillCards().size() >= 3) {
         UseSkillCardView &skillView = gameView.getUseSkillCardView();
         DropSkillCardView &dropView = gameView.getDropSkillCardView();
         skillView.outputReceivedCard(*drawnCard);
+        cardAlreadyShown = true;
 
-        while (player.getSkillCards().size() >= 3) {
-            int droppedIndex = dropView.promptChooseSkillCard(player.getSkillCards());
-            if (droppedIndex < 0) {
-                std::cout << "Kamu harus membuang 1 kartu untuk menyimpan kartu baru.\n";
-                continue;
-            }
-
+        int droppedIndex = dropView.promptChooseSkillCard(player.getSkillCards());
+        if (droppedIndex < 0) {
+            skillCardDeck.returnDrawnCard(drawnCard);
+            shouldKeepDrawnCard = false;
+            std::cout << "Kartu baru ditolak dan dikembalikan ke deck.\n\n";
+            logger.log(turn, player.getUsername(), "REJECT_CARD",
+                       drawnCard->getCardType() + " ditolak karena tangan penuh.");
+        }
+        else {
             SkillCard *droppedCard = player.getSkillCards()[droppedIndex];
             player.dropSkillCard(droppedIndex);
             dropView.outputDropSkillCardStatus(*droppedCard);
@@ -396,8 +401,12 @@ void GameManager::nextPlayer()
         }
     }
 
-    player.addSkillCard(drawnCard);
-    gameView.getUseSkillCardView().outputReceivedCard(*drawnCard);
+    if (shouldKeepDrawnCard) {
+        player.addSkillCard(drawnCard);
+        if (!cardAlreadyShown) {
+            gameView.getUseSkillCardView().outputReceivedCard(*drawnCard);
+        }
+    }
     if (player.getMoney() < 0) {
         processLiquidation();
     }
@@ -902,6 +911,10 @@ void GameManager::processBuyProperty(Player &player, Property *property)
 
     if (property != nullptr) {
         try {
+            long long buyPrice = property->getPrice();
+            if (player.hasEffect("DISCOUNT")) {
+                buyPrice = buyPrice * (100 - player.getEffectValue("DISCOUNT")) / 100;
+            }
             bool beli = player.buyProperty(property);
             if (!beli) {
                 processAuctionProperty(property);
@@ -909,7 +922,7 @@ void GameManager::processBuyProperty(Player &player, Property *property)
             }
             logger.log(turn, player.getUsername(), "BELI",
                        "Properti " + property->getName() + " [ " + property->getCode() + "]" +
-                           " dibeli seharga " + std::to_string(property->getPrice()));
+                           " dibeli seharga " + std::to_string(buyPrice));
             view.outputBuyStatus(true, property, player);
         }
         catch (const PlayerException &e) {
@@ -1136,15 +1149,20 @@ void GameManager::processBuild()
     StreetProperty *street = view.promptChooseProperty(player.getProperties());
     if (street != nullptr) {
         try {
+            long long buildPrice = street->getHouseCount() < 4 ? street->getHousePrice() : street->getHotelPrice();
+            if (player.hasEffect("DISCOUNT")) {
+                buildPrice = buildPrice * (100 - player.getEffectValue("DISCOUNT")) / 100;
+            }
             if (street->getHouseCount() < 4) {
                 player.buildOnProperty(street);
                 logger.log(turn, player.getUsername(), "BANGUN",
-                           street->getName() + " di-upgrade dan sekarang memiliki " + std::to_string(street->getHouseCount()) + " rumah");
+                           street->getName() + " di-upgrade seharga M" + std::to_string(buildPrice) +
+                               " dan sekarang memiliki " + std::to_string(street->getHouseCount()) + " rumah");
             }
             else {
                 player.buildOnProperty(street);
                 logger.log(turn, player.getUsername(), "BANGUN",
-                           street->getName() + " di-upgrade dan sekarang memiliki hotel");
+                           street->getName() + " di-upgrade menjadi hotel seharga M" + std::to_string(buildPrice));
             }
             view.outputBuildStatus(true, street);
         }
