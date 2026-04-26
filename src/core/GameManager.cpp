@@ -253,7 +253,6 @@ void GameManager::nextPlayer()
 
     Player &player = getCurrentPlayer();
     player.onNextTurn();
-    //FIX: catch FullHandException when player already has 3 cards; trigger drop before adding
     try {
         player.addSkillCard(skillCardDeck.drawCard());
     }
@@ -560,7 +559,7 @@ void GameManager::processRollDice()
     DiceView view = gameView.getDiceView();
     MainMenuView &mainMenuView = gameView.getMainMenuView();
     if (player.getState() == PlayerState::ACTIVE) {
-        player.rollDiceAndMove(*this); 
+        player.rollDiceAndMove(*this);
         if (player.isJailed()) {
             player.getPiece().setPosition(board.getTilePosition("PEN"));
             view.outputSpeedingToJail(DiceRoller::getLastRoll().first, DiceRoller::getLastRoll().second);
