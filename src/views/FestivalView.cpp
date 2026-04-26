@@ -20,16 +20,18 @@ Property* FestivalView::promptChooseProperty(std::vector<Property*> pr) const{
     return pr[propertyIndex[code]-1];
 }
 void FestivalView::outputFestivalStatus(Property& pr) const{
-    if(pr.getFestivalMultiplier() == 2){
+    long long mult = pr.getFestivalMultiplier();
+    if(mult == 2){
         std::cout<<"Efek festival aktif!\n\nSewa awal: M" << pr.calculateRent() / 2 << "\nSewa sekarang: M" <<pr.calculateRent() << 
         "\nDurasi: 3 giliran\n";
     }
-    if(pr.getFestivalMultiplier() == 4 || (pr.getFestivalMultiplier() == 8 && pr.getFestivalDuration() == 3)){
-        std::cout<<"Efek diperkuat!\n\nSewa awal: M" << pr.calculateRent() / 2 << "\nSewa sekarang: M" <<pr.calculateRent() << 
-        "\nDurasi: 3 giliran\n";
-    }
-    else{
-        std::cout << "Efek sudah maksimum (harga sewa sudah digandakan tiga kali)\n\nDurasi di-reset menjadi: 3 giliran";
+    else if(mult == 4 || mult == 8){
+        if(mult < 8){
+            std::cout<<"Efek diperkuat!\n\nSewa sebelumnya: M" << pr.calculateRent() / 2 << "\nSewa sekarang: M" <<pr.calculateRent() << 
+            "\nDurasi di-reset menjadi: 3 giliran\n";
+        }
+        else{
+            std::cout << "Efek sudah maksimum (harga sewa sudah digandakan tiga kali)\n\nDurasi di-reset menjadi: 3 giliran\n";
+        }
     }
 }
-
