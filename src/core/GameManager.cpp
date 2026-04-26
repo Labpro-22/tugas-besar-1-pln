@@ -253,7 +253,17 @@ void GameManager::nextPlayer()
 
     Player &player = getCurrentPlayer();
     player.onNextTurn();
-    player.addSkillCard(skillCardDeck.drawCard());
+    try {
+        player.addSkillCard(skillCardDeck.drawCard());
+    }
+    catch (const FullHandException &) {
+        SkillCard* newCard = skillCardDeck.drawCard();
+        // Temporarily add the 4th card so player can choose which to drop
+        player.getSkillCardsRef().push_back(newCard);
+        std::cout << "\nKamu mendapatkan 1 kartu acak baru!\n";
+        std::cout << "Kartu yang didapat: " << newCard->getCardType() << ".\n";
+        processDropSkillCard();
+    }
     if (player.getMoney() < 0) {
         processLiquidation();
     }
@@ -549,7 +559,7 @@ void GameManager::processRollDice()
     DiceView view = gameView.getDiceView();
     MainMenuView &mainMenuView = gameView.getMainMenuView();
     if (player.getState() == PlayerState::ACTIVE) {
-        player.rollDiceAndMove();
+        player.rollDiceAndMove(*this);
         if (player.isJailed()) {
             player.getPiece().setPosition(board.getTilePosition("PEN"));
             view.outputSpeedingToJail(DiceRoller::getLastRoll().first, DiceRoller::getLastRoll().second);
@@ -614,7 +624,7 @@ void GameManager::processSetDice(int value1, int value2)
     DiceView view = gameView.getDiceView();
     MainMenuView &mainMenuView = gameView.getMainMenuView();
     if (player.getState() == PlayerState::ACTIVE) {
-        player.setDiceAndMove(value1, value2);
+        player.setDiceAndMove(value1, value2, *this);
         if (player.isJailed()) {
             player.getPiece().setPosition(board.getTilePosition("PEN"));
             view.outputSpeedingToJail(value1, value2);
@@ -825,12 +835,13 @@ void GameManager::processUnmortgageProperty()
     Property *property = view.promptChooseProperty(player.getProperties());
     if (property == nullptr) return;
 
-    StreetProperty *street = dynamic_cast<StreetProperty *>(property);
-    if (street != nullptr && (street->getHouseCount() > 0 || street->hasHotel())) {
-        street->removeBuilding();
-    }
-    else {
+    try {
         player.unmortgageProperty(property);
+        gameView.getUnmortgageView().outputUnmortgageStatus(true, *property);
+    }
+    catch (const PlayerException &e) {
+        std::cout << e.what() << std::endl;
+        gameView.getUnmortgageView().outputUnmortgageStatus(false, *property);
     }
 }
 void GameManager::processBuild()
@@ -842,15 +853,13 @@ void GameManager::processBuild()
     StreetProperty *street = view.promptChooseProperty(player.getProperties());
     if (street != nullptr) {
         try {
-            if (street->getHouseCount() < 4) {
-                street->buildHouse(1);
-                logger.log(turn, player.getUsername(), "BANGUN",
-                           street->getName() + " di-upgrade dan sekarang memiliki " + std::to_string(street->getHouseCount()) + " rumah");
-            }
-            else {
-                street->buildHotel();
+            player.buildOnProperty(street);
+            if (street->hasHotel()) {
                 logger.log(turn, player.getUsername(), "BANGUN",
                            street->getName() + " di-upgrade dan sekarang memiliki hotel");
+            } else {
+                logger.log(turn, player.getUsername(), "BANGUN",
+                           street->getName() + " di-upgrade dan sekarang memiliki " + std::to_string(street->getHouseCount()) + " rumah");
             }
             view.outputBuildStatus(true, street);
         }
@@ -1052,9 +1061,6 @@ void GameManager::processWin()
 
 void GameManager::processPayRent()
 {
-    BoardView &boardView = gameView.getBoardView();
-    boardView.outputOnLanded();
-
     Player &player = getCurrentPlayer();
     PlayerPiece &piece = player.getPiece();
 
