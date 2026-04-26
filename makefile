@@ -3,7 +3,7 @@
 # Compiler settings
 CXX      := g++
 CXXFLAGS := -Wall -Wextra -std=c++17 -I include
-LDFLAGS  := -lsfml-graphics -lsfml-window -lsfml-system
+LDFLAGS  := # -lsfml-graphics -lsfml-window -lsfml-system
 
 # Directories
 SRC_DIR     := src
@@ -18,9 +18,9 @@ TARGET := $(BIN_DIR)/game
 
 # 1. Recursive Source Finding
 # Secara otomatis mencari semua file .cpp di dalam src/ dan semua sub-foldernya
-# SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
-SRCS := $(filter-out $(SRC_DIR)/GuiApp.cpp, $(SRCS))
-SRCS := $(filter-out $(wildcard $(SRC_DIR)/core/GUI/%), $(SRCS))
+SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
+# SRCS := $(filter-out $(SRC_DIR)/GuiApp.cpp, $(SRCS))
+# SRCS := $(filter-out $(wildcard $(SRC_DIR)/core/GUI/%), $(SRCS))
 
 # 2. Dynamic Object Mapping
 # Mengubah path src/xxx/yyy.cpp menjadi build/xxx/yyy.o
