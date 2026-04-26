@@ -131,7 +131,8 @@ bool GameManager::isGameEnded() const
             activeCount++;
         }
     }
-    return turn > config.maxTurn || activeCount == 1;
+    bool maxTurnReached = (config.maxTurn >= 1) && (turn > config.maxTurn);
+    return maxTurnReached || activeCount <= 1;
 }
 
 void GameManager::initGame()
@@ -170,30 +171,44 @@ void GameManager::processTurnStart()
     view.outputCurrentPlayerInfo();
 
     if (player.isJailed()) {
-        int choice = jailView.promptRollOrBailOrUseCard();
-        if (choice == 1) {
-            std::cout << "Gunakan perintah LEMPAR_DADU atau ATUR_DADU untuk mencoba keluar dari penjara.\n\n";
-        }
-        else if (choice == 2) {
+        if (player.getJailTurns() >= 3) {
+            std::cout << "Sudah 4 giliran di penjara. Kamu wajib membayar denda M" << config.jailFine << ".\n\n";
             try {
                 player.payFineToGetOutOfJail(config.jailFine);
                 std::cout << "Kamu membayar jaminan sebesar M" << config.jailFine << " dan keluar dari penjara.\n\n";
                 logger.log(turn, player.getUsername(), "BAYAR_JAMINAN",
-                           "Membayar jaminan sebesar M" + std::to_string(config.jailFine) + " untuk keluar dari penjara.");
+                           "Membayar jaminan paksa M" + std::to_string(config.jailFine) + " (giliran ke-4 di penjara).");
             }
             catch (const PlayerException &e) {
                 std::cout << e.what() << std::endl;
             }
         }
-        else if (choice == 3) {
-            try {
-                player.useGetOutOfJailCard();
-                std::cout << "Kamu menggunakan kartu bebas dari penjara.\n\n";
-                logger.log(turn, player.getUsername(), "PAKAI_KARTU_PENJARA",
-                           "Menggunakan kartu bebas dari penjara.");
+        else {
+            int choice = jailView.promptRollOrBailOrUseCard();
+            if (choice == 1) {
+                std::cout << "Gunakan perintah LEMPAR_DADU atau ATUR_DADU untuk mencoba keluar dari penjara.\n\n";
             }
-            catch (const PlayerException &e) {
-                std::cout << e.what() << std::endl;
+            else if (choice == 2) {
+                try {
+                    player.payFineToGetOutOfJail(config.jailFine);
+                    std::cout << "Kamu membayar jaminan sebesar M" << config.jailFine << " dan keluar dari penjara.\n\n";
+                    logger.log(turn, player.getUsername(), "BAYAR_JAMINAN",
+                               "Membayar jaminan sebesar M" + std::to_string(config.jailFine) + " untuk keluar dari penjara.");
+                }
+                catch (const PlayerException &e) {
+                    std::cout << e.what() << std::endl;
+                }
+            }
+            else if (choice == 3) {
+                try {
+                    player.useGetOutOfJailCard();
+                    std::cout << "Kamu menggunakan kartu bebas dari penjara.\n\n";
+                    logger.log(turn, player.getUsername(), "PAKAI_KARTU_PENJARA",
+                               "Menggunakan kartu bebas dari penjara.");
+                }
+                catch (const PlayerException &e) {
+                    std::cout << e.what() << std::endl;
+                }
             }
         }
     }
@@ -408,8 +423,7 @@ void GameManager::processLoadGame()
         skillCardDeck.reshuffle();
 
         playing = true;
-        initGame();
-        nextTurn();
+        startOfTheTurn = true;
     }
     catch (const SaveFileNotFoundException &e) {
         std::cout << e.what() << std::endl;
@@ -516,6 +530,7 @@ void GameManager::processSaveGame(std::string fileName)
             logData.username = log.getUsername();
             logData.action = log.getAction();
             logData.details = log.getDetails();
+            saveData.logs.push_back(logData);
         }
 
         SaveFileHandler::saveGame(saveData, fileName);
@@ -710,33 +725,65 @@ void GameManager::processAuctionProperty(Property *property)
     AuctionView &view = gameView.getAuctionView();
     view.outputProperty(*property);
 
-    Player *lastBidder = &getCurrentPlayer();
-    long long bestBidAmount = 0;
-
-    auto currentBidder = players.begin();
-    while (currentBidder.base() != lastBidder) {
-        currentBidder++;
+    // Start from player AFTER current player; count (n_active - 1) consecutive passes to end
+    int activePlayers = 0;
+    for (const Player &p : players) {
+        if (!p.isBankrupt()) activePlayers++;
     }
-    do {
-        long long currentBidAmount = view.promptBidOrPass(*currentBidder);
-        if (currentBidAmount != 0) {
-            lastBidder = currentBidder.base();
-            bestBidAmount = currentBidAmount;
-            logger.log(turn, currentBidder->getUsername(), "BID",
-                       "Melakukan bid terhadap " + property->getName() + " [ " + property->getCode() + "]" +
-                           " sebanyak " + std::to_string(currentBidAmount));
+    if (activePlayers == 0) return;
+
+    // Build ordered list starting from player after current
+    std::vector<Player *> order;
+    bool startQueuing = false;
+    for (Player &p : players) {
+        if (p.isBankrupt()) continue;
+        if (startQueuing) order.push_back(&p);
+        if (&p == &getCurrentPlayer()) startQueuing = true;
+    }
+    for (Player &p : players) {
+        if (p.isBankrupt()) continue;
+        if (&p == &getCurrentPlayer()) break;
+        order.push_back(&p);
+    }
+
+    Player *lastBidder = nullptr;
+    long long bestBidAmount = 0;
+    int consecutivePasses = 0;
+
+    int idx = 0;
+    while (true) {
+        Player *bidder = order[idx % order.size()];
+        long long bid = view.promptBidOrPass(*bidder);
+
+        if (bid > bestBidAmount) {
+            lastBidder = bidder;
+            bestBidAmount = bid;
+            consecutivePasses = 0;
+            logger.log(turn, bidder->getUsername(), "BID",
+                       "Bid " + property->getName() + " [" + property->getCode() + "] M" + std::to_string(bid));
         }
         else {
-            logger.log(turn, currentBidder->getUsername(), "PASS",
-                       "Melewati pelelangan " + property->getName() + " [ " + property->getCode() + "]");
+            consecutivePasses++;
+            logger.log(turn, bidder->getUsername(), "PASS",
+                       "Pass pelelangan " + property->getName() + " [" + property->getCode() + "]");
         }
-        currentBidder++;
-        if (currentBidder == players.end()) {
-            currentBidder = players.begin();
-        }
-    } while (lastBidder != currentBidder.base());
 
-    if (bestBidAmount == 0) {
+        idx++;
+        if (consecutivePasses >= activePlayers - 1 && lastBidder != nullptr) break;
+        if (consecutivePasses >= activePlayers && lastBidder == nullptr) {
+            Player *forced = order[(idx - 1) % order.size()];
+            long long forcedBid = view.promptBidOrPass(*forced);
+            if (forcedBid > 0) {
+                lastBidder = forced;
+                bestBidAmount = forcedBid;
+                logger.log(turn, forced->getUsername(), "BID",
+                           "Bid paksa " + property->getName() + " [" + property->getCode() + "] M" + std::to_string(forcedBid));
+            }
+            break;
+        }
+    }
+
+    if (lastBidder == nullptr || bestBidAmount == 0) {
         property->resetOwnerAsBank();
         view.outputNoBid(property);
     }
@@ -744,8 +791,7 @@ void GameManager::processAuctionProperty(Property *property)
         try {
             lastBidder->buyProperty(property, bestBidAmount);
             logger.log(turn, lastBidder->getUsername(), "BELI",
-                       "Properti " + property->getName() + " [ " + property->getCode() + "]" +
-                           " dibeli seharga " + std::to_string(bestBidAmount));
+                       "Properti " + property->getName() + " [" + property->getCode() + "] dibeli seharga M" + std::to_string(bestBidAmount));
             view.outputWinner(lastBidder, property, bestBidAmount);
         }
         catch (const PlayerException &e) {
@@ -982,16 +1028,21 @@ void GameManager::processLiquidation(Player &creditor)
 
 void GameManager::processWin()
 {
-    Player *winner = nullptr;
     std::vector<Player *> remainingPlayer;
     for (Player &player : players) {
         if (!player.isBankrupt()) {
             remainingPlayer.push_back(&player);
-            if (winner == nullptr || winner->calculateTotalWealth() < player.calculateTotalWealth()) {
-                winner = &player;
-            }
         }
     }
+
+    auto cmp = [](const Player *a, const Player *b) {
+        if (a->getMoney() != b->getMoney()) return a->getMoney() > b->getMoney();
+        if (a->getProperties().size() != b->getProperties().size()) return a->getProperties().size() > b->getProperties().size();
+        return a->getSkillCards().size() > b->getSkillCards().size();
+    };
+    std::sort(remainingPlayer.begin(), remainingPlayer.end(), cmp);
+
+    Player *winner = remainingPlayer.empty() ? nullptr : remainingPlayer.front();
 
     WinView view = gameView.getWinView();
     view.outputWinner(winner, remainingPlayer);
@@ -1055,9 +1106,7 @@ void GameManager::processPayIncomeTax()
         amount = config.incomeFlatTax;
     }
     else if (input == 2) {
-        amount = 0;
-        amount += p.calculateTotalWealth();
-        amount *= (config.incomePercentageTax / 100);
+        amount = p.calculateTotalWealth() * config.incomePercentageTax / 100;
     }
     else {
         return;
