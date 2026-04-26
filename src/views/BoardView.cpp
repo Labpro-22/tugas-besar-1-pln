@@ -91,7 +91,7 @@ std::string BoardView::padCenter(const std::string& str, int width) const{
 std::string BoardView::getPlayersAtPosition(int position)const {
     std::string result = "";
     auto& players = gameManager.getPlayers();
-    for (int i = 0; i < players.size(); i++) {
+    for (size_t i = 0; i < players.size(); i++) {
         if (players[i].getState() == PlayerState::BANKRUPT) continue;
         if (players[i].getPiece().getPosition() == position) {
             if (!result.empty()) result += " ";
@@ -107,7 +107,7 @@ std::string BoardView::getOwnershipInfo(Property* pr) const{
     std::string info = "";
     if (pr->getOwner() != nullptr) {
         auto& players = gameManager.getPlayers();
-        for (int i = 0; i < players.size(); i++) {
+        for (size_t i = 0; i < players.size(); i++) {
             if (&players[i] == pr->getOwner()) {
                 info += "P" + std::to_string(i + 1);
                 break;
@@ -140,7 +140,7 @@ static std::string getTileColor(Tile* tile, const BoardView& bv) {
     return "";
 }
 
-std::string BoardView::getCellLine1(Tile* tile, int tileIndex) const{
+std::string BoardView::getCellLine1(Tile* tile, int) const{
     if (tile == nullptr) {
         return padRight("[DF] ???", CELL_WIDTH);
     }
@@ -318,8 +318,6 @@ void BoardView::printMiddleRows()const {
     Board &board = gameManager.getBoard();
     int sideLength = board.getTileCount() / 4;
     int middleCount = sideLength - 1;
-    int innerCols = sideLength - 1;
-    int innerWidth = (CELL_WIDTH + 1) * innerCols - 1;
 
     auto cellSeparator = [&](const std::string& centerLine) {
         std::cout << "+";

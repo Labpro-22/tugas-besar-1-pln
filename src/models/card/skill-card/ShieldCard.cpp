@@ -4,7 +4,7 @@
 
 ShieldCard::ShieldCard(const std::string& message) : SkillCard(message) {}
 
-void ShieldCard::takeEffect(Player& p, GameManager& gm) {
+void ShieldCard::takeEffect(Player& p, GameManager&) {
     p.addEffect(PlayerEffect("SHIELD", false, 1, 0));
     message = "Shield anda aktif! anda kebal dari bayar sewa/pajak untuk 1 putaran.";
 }

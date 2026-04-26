@@ -19,6 +19,6 @@ void PropertyTile::onLanded(Player& p, GameManager& gm) {
     }
 }
 
-void PropertyTile::onPassBy(Player& p, GameManager& gm) {
+void PropertyTile::onPassBy(Player&, GameManager&) {
     // Kosong, tidak melakukan apapun
 }

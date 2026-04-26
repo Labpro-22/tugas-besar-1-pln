@@ -27,7 +27,7 @@ void DemolitionCard::takeEffect(Player& p, GameManager& gm) {
     targetTileId = -1;
 }
 
-bool DemolitionCard::prepareUse(UseSkillCardView& view, GameManager& gm) {
+bool DemolitionCard::prepareUse(UseSkillCardView& view, GameManager&) {
     this->setTargetTileId(view.askForDemolitionTileId());
     return targetTileId >= 0;
 }

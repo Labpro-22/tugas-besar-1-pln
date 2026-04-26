@@ -9,7 +9,6 @@ PayMoneyToPlayersCard::PayMoneyToPlayersCard(const std::string& message, int amo
 
 void PayMoneyToPlayersCard::takeEffect(Player& p, GameManager& gm) {
     std::vector<Player>& allPlayers = gm.getPlayers();
-    int totalPaid = 0;
     int expectedTotalPaid = (allPlayers.size() - 1) * amount;
     int moneyNow = p.getMoney() - expectedTotalPaid;
     p.setMoney(moneyNow);

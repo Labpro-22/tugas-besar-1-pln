@@ -2,6 +2,6 @@
 #include "models/player/Player.hpp"
 #include "core/GameManager.hpp"
 
-void LuxuryTaxTile::onLanded(Player& p, GameManager& gm) {
+void LuxuryTaxTile::onLanded(Player&, GameManager& gm) {
     gm.processPayLuxuryTax();
 }  
