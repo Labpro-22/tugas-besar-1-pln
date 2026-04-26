@@ -84,7 +84,12 @@ void GameView::inputNextCommand(){
         std::cout << "GUNAKAN_KEMAMPUAN" << "           - Menggunakan kartu kemampuan\n";
         std::cout << "CETAK_LOG [jumlah]" << "          - Menampilkan log transaksi (opsional: jumlah baris)\n";
         std::cout << "HELP" << "                        - Menampilkan daftar perintah\n";
+        std::cout << "EXIT" << "                        - Keluar dari permainan\n";
         std::cout << std::endl;
+    }
+    else if (command == "EXIT") {
+        std::cout << "Keluar dari permainan..." << std::endl;
+        gameManager.processExit();
     }
     else {
         handled = false;
