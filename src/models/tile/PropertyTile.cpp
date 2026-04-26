@@ -9,6 +9,9 @@ Property* PropertyTile::getProperty() const noexcept {
 }
 
 void PropertyTile::onLanded(Player& p, GameManager& gm) {
+    // Print landing message before any buy/rent logic
+    gm.processLandingMessage();
+
     Player* owner = property->getOwner();
 
     if (owner == nullptr) {
