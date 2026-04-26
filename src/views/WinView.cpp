@@ -16,7 +16,7 @@ void WinView::outputWinner(Player* winner, std::vector<Player*> remaining)  cons
     else if(remaining.size() == 1){
         std::cout << "Permainan selesai! (Semua pemain kecuali satu bangkrut)\n\n";
         std::cout <<  "Pemain tersisa: \n";
-        std::cout << " - Pemain" << winner->getUsername() << "\n\n";
+        std::cout << " - Pemain " << winner->getUsername() << "\n\n";
         std::cout << "Pemenang : Pemain " << winner->getUsername() << "\n\n"    ;
     }
     
