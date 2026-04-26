@@ -26,7 +26,8 @@ void SaveFileHandler::savePlayer(SaveData &saveData, std::ofstream &out)
             << player.tileCodePosition << " "
             << player.status << " "
             << player.getOutOfJailCardCount << " "
-            << player.jailTurns << "\n";
+            << player.jailTurns << " "
+            << player.doubleRollCounter << "\n";
         out << player.skillCards.size() << "\n";
         for (SkillCardSaveData &card : player.skillCards) {
             if (card.type == "DiscountCard") {
@@ -145,6 +146,10 @@ void SaveFileHandler::loadPlayer(SaveData &saveData, std::ifstream &in, std::fil
         col++;
         if (!(bufferStream >> playerData.jailTurns)) {
             playerData.jailTurns = 0;
+        }
+        col++;
+        if (!(bufferStream >> playerData.doubleRollCounter)) {
+            playerData.doubleRollCounter = 0;
         }
 
         int skillCardCount;
@@ -307,6 +312,7 @@ void SaveFileHandler::loadLog(SaveData &saveData, std::ifstream &in, std::filesy
             throw SaveFileFormatException("JENIS_AKSI", path.string(), 1, line);
         }
         col++;
+        bufferStream >> std::ws;
         if (!(std::getline(bufferStream, logData.details))) {
             throw SaveFileFormatException("DETAIL", path.string(), 1, line);
         }
