@@ -18,6 +18,7 @@ const std::string& Player::getUsername() const { return username; }
 long long Player::getMoney() const { return money; }
 PlayerState Player::getState() const { return state; }
 PlayerPiece& Player::getPiece() { return piece; }
+const PlayerPiece& Player::getPiece() const { return piece; } 
 const std::vector<Property*>& Player::getProperties() const{ return properties; }
 const std::vector<SkillCard*>& Player::getSkillCards() const{ return skillCards; }
 std::vector<SkillCard*>& Player::getSkillCardsRef() { return skillCards; }

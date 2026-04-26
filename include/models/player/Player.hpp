@@ -34,6 +34,7 @@ public:
             const std::vector<SkillCard*>& skillCards , int getOutOfJailCardCount, int jailTurns, int doubleRollCounter = 0);
 
     PlayerPiece& getPiece();
+    const PlayerPiece& getPiece() const;
     long long getMoney() const;
     PlayerState getState() const;
     const std::string& getUsername() const;

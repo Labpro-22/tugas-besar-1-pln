@@ -5,6 +5,7 @@
 
 #include "core/GameManager.hpp"
 #include "core/GameManagerException.hpp"
+#include "GUI/IGuiState.hpp" 
 #include "models/card/chance-card/ChanceCard.hpp"
 #include "models/card/chance-card/ForcedMoveCard.hpp"
 #include "models/card/chance-card/GetOutOfJailCard.hpp"
@@ -372,7 +373,6 @@ void GameManager::nextPlayer()
     Player &player = getCurrentPlayer();
     player.onNextTurn();
 
-    //FIX: draw board at start of turn so player can see board state
     gameView.getBoardView().drawBoard();
 
     SkillCard *drawnCard = skillCardDeck.drawCard();
@@ -509,7 +509,6 @@ void GameManager::processLoadGame()
                                                 : PlayerState::BANKRUPT,
                 playerCards,
                 playerData.getOutOfJailCardCount,
-                //FIX: include doubleRollCounter for proper jail state restoration
                 playerData.jailTurns,
                 playerData.doubleRollCounter});
         }
@@ -639,7 +638,6 @@ void GameManager::processSaveGame(std::string fileName)
             playerData.doubleRollCounter = player.getDoubleRollCounter();
 
             for (SkillCard *card : player.getSkillCards()) {
-                //FIX: use serializeSkillCard for proper type-aware serialization
                 playerData.skillCards.push_back(serializeSkillCard(card));
             }
             saveData.players.push_back(playerData);
@@ -728,7 +726,14 @@ void GameManager::processRollDice()
     MainMenuView &mainMenuView = gameView.getMainMenuView();
     diceRolledThisTurn = true;
     if (player.getState() == PlayerState::ACTIVE) {
+        int fromPos = player.getPiece().getPosition() + 1;
+        int playerIdx = 0;
+        for (int i = 0; i < (int)players.size(); ++i)
+            if (&players[i] == &player) { playerIdx = i; break; }
+
         bool passedStart = player.rollDiceAndMove();
+        int steps = DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second;
+
         if (player.isJailed()) {
             player.getPiece().setPosition(board.getTilePosition("PEN"));
             view.outputSpeedingToJail(DiceRoller::getLastRoll().first, DiceRoller::getLastRoll().second);
@@ -741,6 +746,7 @@ void GameManager::processRollDice()
             nextPlayer();
         }
         else {
+            notifyGuiMove(playerIdx, fromPos, steps); 
             view.outputRollDice();
             if (passedStart) {
                 board.getTile(0)->onPassBy(player, *this);
@@ -807,7 +813,13 @@ void GameManager::processSetDice(int value1, int value2)
     MainMenuView &mainMenuView = gameView.getMainMenuView();
     diceRolledThisTurn = true;
     if (player.getState() == PlayerState::ACTIVE) {
+        int fromPos = player.getPiece().getPosition() + 1;
+        int playerIdx = 0;
+        for (int i = 0; i < (int)players.size(); ++i)
+            if (&players[i] == &player) { playerIdx = i; break; }
+
         bool passedStart = player.setDiceAndMove(value1, value2);
+
         if (player.isJailed()) {
             player.getPiece().setPosition(board.getTilePosition("PEN"));
             view.outputSpeedingToJail(value1, value2);
@@ -820,6 +832,7 @@ void GameManager::processSetDice(int value1, int value2)
             nextPlayer();
         }
         else {
+            notifyGuiMove(playerIdx, fromPos, value1 + value2);
             view.outputSetDice(value1, value2);
             if (passedStart) {
                 board.getTile(0)->onPassBy(player, *this);
@@ -888,7 +901,6 @@ void GameManager::processBuyProperty(Player &player)
     PropertyTile *tile = dynamic_cast<PropertyTile *>(piece.getCurrentTile());
     if (tile != nullptr) {
         std::string propType = tile->getProperty()->getPropertyType();
-        //FIX: Railroad and Utility auto-acquire without prompt or auction; only Street goes to auction
         if (propType != "STREET") {
             processBuyProperty(player, tile->getProperty());
         }
@@ -1425,7 +1437,11 @@ void GameManager::processGoTile()
     board.outputOnPassByStart();
 }
 
-//FIX: kept processLandingMessage from HEAD - used to print landing output for current tile
+void GameManager::notifyGuiMove(int playerIdx, int fromPos, int steps)
+{
+    if (guiState) guiState->notifyRoll(playerIdx, fromPos, steps);
+}
+
 void GameManager::processLandingMessage()
 {
     gameView.getBoardView().outputOnLanded();
@@ -1440,6 +1456,16 @@ void GameManager::processGoToJail(Player &player, const std::string& reason)
 {
     JailView &jail = gameView.getJailView();
     jail.outputGoToJail(player, reason);
+    if (guiState) {
+        const auto& all = players;
+        for (int i = 0; i < (int)all.size(); ++i) {
+            if (&all[i] == &player) {
+                int jailPos = board.getTilePosition("PEN") + 1;
+                guiState->notifyRoll(i, jailPos, 0);
+                break;
+            }
+        }
+    }
 }
 
 void GameManager::processPayLuxuryTax()

@@ -1,68 +1,72 @@
-# Makefile for C++ OOP Project
-
 CXX      := g++
-CXXFLAGS := -Wall -Wextra -std=c++17 -I include
-LDFLAGS  := # -lsfml-graphics -lsfml-window -lsfml-system
+STD      := -std=c++17
+WARN     := -Wall -Wextra -Wno-unused-parameter
+INC      := -I include
 
-SRC_DIR     := src
-OBJ_DIR     := build
-BIN_DIR     := bin
-DATA_DIR    := data
-CONFIG_DIR  := config
+# Source directories
+SRC_DIR := src
+OBJ_DIR := build
 
-ifeq ($(OS),Windows_NT)
-TARGET := $(BIN_DIR)/game.exe
-else
-TARGET := $(BIN_DIR)/game
-endif
+# ─── Shared model/util/view sources (used by both CLI and GUI) ───────────────
+SHARED_SRCS := $(shell find $(SRC_DIR) -name '*.cpp' \
+    ! -name 'main.cpp' \
+    ! -name 'main_gui.cpp' \
+    ! -path '$(SRC_DIR)/GuiApp.cpp')
 
-rwildcard = $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
-SRCS := $(call rwildcard,$(SRC_DIR)/,*.cpp)
-OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
+# CLI = shared + main.cpp  (no SFML)
+CLI_SRCS  := $(SHARED_SRCS) $(SRC_DIR)/main.cpp
+CLI_OBJS  := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/cli/%.o, $(CLI_SRCS))
+CLI_BIN   := bin/game
 
-ifeq ($(OS),Windows_NT)
-define make-dir
-if not exist "$(subst /,\,$1)" mkdir "$(subst /,\,$1)"
-endef
+# GUI = shared + main_gui.cpp + GuiApp.cpp  (needs SFML)
+GUI_SRCS  := $(SHARED_SRCS) $(SRC_DIR)/main_gui.cpp $(SRC_DIR)/GuiApp.cpp
+GUI_OBJS  := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/gui/%.o, $(GUI_SRCS))
+GUI_BIN   := bin/game_gui
 
-define remove-dir
-if exist "$(subst /,\,$1)" rmdir /s /q "$(subst /,\,$1)"
-endef
-else
-define make-dir
-mkdir -p $1
-endef
+# GUI cpp files that live inside include/GUI/  (SFML renderer, animation, style, etc.)
+GUI_EXTRA_SRCS := $(shell find include/GUI -name '*.cpp')
+GUI_EXTRA_OBJS := $(patsubst include/GUI/%.cpp, $(OBJ_DIR)/gui_extra/%.o, $(GUI_EXTRA_SRCS))
 
-define remove-dir
-rm -rf $1
-endef
-endif
+SFML_LIBS  := -lsfml-graphics -lsfml-window -lsfml-system
+THREAD_LIB := -pthread
 
-all: directories $(TARGET)
+# ─── Default: build CLI only ──────────────────────────────────────────────────
+.PHONY: all cli gui clean
 
-directories:
-	@$(call make-dir,$(OBJ_DIR))
-	@$(call make-dir,$(BIN_DIR))
-	@$(call make-dir,$(DATA_DIR))
-	@$(call make-dir,$(CONFIG_DIR))
+all: cli
 
-$(TARGET): $(OBJS)
-	$(file >$(BIN_DIR)/objects.rsp,$^)
-	$(CXX) $(CXXFLAGS) @$(BIN_DIR)/objects.rsp -o $@ $(LDFLAGS)
-	@echo "Build successful! Executable is at $(TARGET)"
+cli: $(CLI_BIN)
+	@echo "Build CLI sukses → $(CLI_BIN)"
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@$(call make-dir,$(dir $@))
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+gui: $(GUI_BIN)
+	@echo "Build GUI sukses → $(GUI_BIN)"
 
-run: all
-	$(TARGET)
+# ─── CLI link ────────────────────────────────────────────────────────────────
+$(CLI_BIN): $(CLI_OBJS)
+	@mkdir -p bin
+	$(CXX) $(STD) $^ -o $@ $(THREAD_LIB)
 
+# CLI compile rule
+$(OBJ_DIR)/cli/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(STD) $(WARN) $(INC) -c $< -o $@
+
+# ─── GUI link ─────────────────────────────────────────────────────────────────
+$(GUI_BIN): $(GUI_OBJS) $(GUI_EXTRA_OBJS)
+	@mkdir -p bin
+	$(CXX) $(STD) $^ -o $@ $(SFML_LIBS) $(THREAD_LIB)
+
+# GUI compile rule (src/) — needs include/GUI for GuiApp.hpp etc.
+$(OBJ_DIR)/gui/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(STD) $(WARN) $(INC) -c $< -o $@
+
+# GUI extra compile rule (include/GUI/ renderer + animation + style cpp files)
+# -I include/GUI so renderer files find each other with "renderer/Dice.hpp" style paths
+$(OBJ_DIR)/gui_extra/%.o: include/GUI/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(STD) $(WARN) $(INC) -I include/GUI -c $< -o $@
+
+# ─── Clean ───────────────────────────────────────────────────────────────────
 clean:
-	@$(call remove-dir,$(OBJ_DIR))
-	@$(call remove-dir,$(BIN_DIR))
-	@echo "Cleaned up $(OBJ_DIR) and $(BIN_DIR)"
-
-rebuild: clean all
-
-.PHONY: all clean rebuild run directories
+	rm -rf $(OBJ_DIR) bin

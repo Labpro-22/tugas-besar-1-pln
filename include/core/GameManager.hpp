@@ -46,6 +46,11 @@ private:
     CardDeck<CommunityChestCard *> communityChestCardDeck;
     CardDeck<SkillCard *> skillCardDeck;
 
+    class IGuiState* guiState = nullptr;
+
+    // Helper: notify GUI of a dice-driven piece move
+    void notifyGuiMove(int playerIdx, int fromPos, int steps);
+
     // Main game runner
     void gameLoop();
     bool isRunning() const;
@@ -111,4 +116,5 @@ public:
     void processStartFestival();
     void processStartFestival(Player &player);
     void processExit();
+    void setGuiState(class IGuiState* gs) { guiState = gs; }
 };
