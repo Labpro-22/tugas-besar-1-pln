@@ -9,12 +9,10 @@ void CardView::outputCard(Card& card) const{
         std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
     std::cout << "\n";
-    std::cout << "+------------------------------+\n";
-    std::cout << "| Kartu: " << card.getCardType() << "\n";
+    std::cout << "Kartu: " << card.getCardType() << "\n";
     if (!card.getMessage().empty()) {
-        std::cout << "| Efek : " << card.getMessage() << "\n";
+        std::cout << "Efek : " << card.getMessage() << "\n";
     }
-    std::cout << "+------------------------------+\n";
 }
 
 void CardView::outputShielded() const {

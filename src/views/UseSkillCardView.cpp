@@ -20,7 +20,7 @@ std::string getCardDescription(const SkillCard &card)
         return "Diskon " + std::to_string(discountCard->getPercentage()) + "% untuk transaksi 1 putaran.";
     }
     if (card.getCardType() == "ShieldCard") {
-        return "Kebal dari pajak, sewa, dan hukuman finansial selama 1 putaran.";
+        return "Kebal dari pajak, sewa, dan hukuman finansial sampai giliran aktif ini selesai.";
     }
     if (card.getCardType() == "TeleportCard") {
         return "Pindah ke petak mana pun yang kamu pilih.";
@@ -105,6 +105,19 @@ int UseSkillCardView::askForTargetPosition() {
 }
 Player* UseSkillCardView::askForTargetPlayer(GameManager& gm) {
     std::string name;
+    std::vector<Player*> candidates;
+
+    std::cout << "\nDaftar pemain yang bisa ditarik:\n";
+    for (Player &p : gm.getPlayers()) {
+        if (&p != &gm.getCurrentPlayer() && !p.isBankrupt() && !p.isJailed()) {
+            candidates.push_back(&p);
+            std::cout << "- " << p.getUsername() << "\n";
+        }
+    }
+    if (candidates.empty()) {
+        std::cout << "Tidak ada pemain yang bisa ditargetkan LassoCard.\n";
+        return nullptr;
+    }
 
     while(true){
         bool foundPlayer = false;
@@ -138,6 +151,25 @@ Player* UseSkillCardView::askForTargetPlayer(GameManager& gm) {
 int UseSkillCardView::askForDemolitionTileId() {
     std::string tileCode;
     Board& b = gameManager.getBoard();
+    Player& currentPlayer = gameManager.getCurrentPlayer();
+    bool hasTarget = false;
+
+    std::cout << "\nDaftar properti lawan yang bisa dihancurkan:\n";
+    for (Player &owner : gameManager.getPlayers()) {
+        if (&owner == &currentPlayer || owner.isBankrupt()) {
+            continue;
+        }
+        for (Property *property : owner.getProperties()) {
+            hasTarget = true;
+            std::cout << "- " << property->getName() << " (" << property->getCode() << ")"
+                      << " | Pemilik: " << owner.getUsername() << "\n";
+        }
+    }
+    if (!hasTarget) {
+        std::cout << "Tidak ada properti lawan yang bisa dihancurkan.\n";
+        return -1;
+    }
+
     while(true){
         std::cout << "Pilih kode properti yang ingin dihancurkan (0 untuk batal): ";
         std::cin >> tileCode;
@@ -159,6 +191,10 @@ int UseSkillCardView::askForDemolitionTileId() {
         }
         if (propertyTile->getProperty()->getOwner() == nullptr) {
             std::cout << "\nProperti tersebut masih milik bank, jadi tidak perlu dihancurkan.\n";
+            continue;
+        }
+        if (propertyTile->getProperty()->getOwner() == &currentPlayer) {
+            std::cout << "\nKamu tidak bisa menghancurkan properti sendiri.\n";
             continue;
         }
         return tileId;

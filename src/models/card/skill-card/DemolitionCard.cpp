@@ -16,8 +16,13 @@ void DemolitionCard::takeEffect(Player& p, GameManager& gm) {
         if (auto* propTile = dynamic_cast<PropertyTile*>(tile)) {
             Property *property = propTile->getProperty();
             if (property != nullptr) {
-                if (Player *owner = property->getOwner(); owner != nullptr) {
+                if (Player *owner = property->getOwner(); owner != nullptr && owner != &p) {
                     owner->removeProperty(property);
+                }
+                else {
+                    message = "DemolitionCard hanya bisa digunakan pada properti milik pemain lain.";
+                    targetTileId = -1;
+                    return;
                 }
                 property->resetToBank();
                 message = "Properti " + property->getName() + " [" + property->getCode() + "] telah dihancurkan dan kembali ke bank!";

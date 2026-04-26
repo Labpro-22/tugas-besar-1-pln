@@ -81,6 +81,7 @@ public:
     void processRollDice();
     void processSetDice(int value1, int value2);
     void processBuyProperty();
+    void processBuyProperty(Player &player);
     void processBuyProperty(Player &player, Property *property);
     void processAuctionProperty(Property *property, Player *excludedPlayer = nullptr);
     void processMortgageProperty();
@@ -94,12 +95,19 @@ public:
     void processOtherPlayerLiquidation(Player &other, Player &creditor);
     void processWin();
     void processPayRent();
+    void processPayRent(Player &player);
     void processGoTile();
     void processGoToJail(const std::string& reason = "");
+    void processGoToJail(Player &player, const std::string& reason = "");
     void processPayLuxuryTax();
+    void processPayLuxuryTax(Player &player);
     void processPayIncomeTax();
+    void processPayIncomeTax(Player &player);
     void processUseCommunityChestCard();
+    void processUseCommunityChestCard(Player &player);
     void processUseChanceCard();
+    void processUseChanceCard(Player &player);
     void processStartFestival();
+    void processStartFestival(Player &player);
     void processExit();
 };

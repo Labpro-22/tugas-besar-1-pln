@@ -2,7 +2,10 @@
 #include "core/GameManager.hpp"
 #include <limits>
 void JailView::outputGoToJail(const std::string& reason) const {
-    Player& p = gameManager.getCurrentPlayer();
+    outputGoToJail(gameManager.getCurrentPlayer(), reason);
+}
+
+void JailView::outputGoToJail(Player &p, const std::string& reason) const {
     if (p.hasEffect("SHIELD")) {
         std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu pergi ke penjara.\n";
         return;

@@ -9,7 +9,6 @@ void LassoCard::setTargetPlayer(Player* p) {
 }
 
 void LassoCard::takeEffect(Player& p, GameManager& gm) {
-    (void)gm;
     if (targetPlayer == nullptr) {
         message = "Kartu batal digunakan.";
         return;
@@ -18,6 +17,7 @@ void LassoCard::takeEffect(Player& p, GameManager& gm) {
     targetPlayer->getPiece().setPosition(currentPos);
     Tile *currentTile = p.getPiece().getCurrentTile();
     message = targetPlayer->getUsername() + " ditarik ke petak " + currentTile->getName() + " [" + currentTile->getCode() + "]!";
+    currentTile->onLanded(*targetPlayer, gm);
     targetPlayer = nullptr;
 }
 

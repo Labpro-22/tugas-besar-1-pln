@@ -12,10 +12,10 @@ void PropertyTile::onLanded(Player& p, GameManager& gm) {
     Player* owner = property->getOwner();
 
     if (owner == nullptr) {
-        gm.processBuyProperty();
+        gm.processBuyProperty(p);
     }
     else if (owner != &p) {
-        gm.processPayRent();
+        gm.processPayRent(p);
     }
 }
 
