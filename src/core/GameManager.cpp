@@ -173,7 +173,7 @@ void GameManager::processTurnStart()
     view.outputCurrentPlayerInfo();
 
     if (player.isJailed()) {
-        if (player.getJailTurns() >= 3) {
+        if (player.getJailTurns() > 3) {
             std::cout << "Sudah 4 giliran di penjara. Kamu wajib membayar denda M" << config.jailFine << ".\n\n";
             try {
                 player.payFineToGetOutOfJail(config.jailFine);
