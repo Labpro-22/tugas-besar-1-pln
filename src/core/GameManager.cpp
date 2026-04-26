@@ -253,6 +253,7 @@ void GameManager::nextPlayer()
 
     Player &player = getCurrentPlayer();
     player.onNextTurn();
+
     try {
         player.addSkillCard(skillCardDeck.drawCard());
     }
