@@ -1,4 +1,3 @@
-
 #include "models/board/Board.hpp"
 #include "models/tile/PropertyTile.hpp"
 #include "models/tile/special-tile/StartTile.hpp"
@@ -64,7 +63,6 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                         (*player)->addProperty(property);
                         property->setOwner(*player);
                     }
-                    property->setOwner(*player);
 
                     prop = property;
                 }
@@ -84,7 +82,6 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                         (*player)->addProperty(property);
                         property->setOwner(*player);
                     }
-                    property->setOwner(*player);
 
                     prop = property;
                 }
@@ -104,7 +101,6 @@ Board::Board(int tileCount, const Config& config, const std::vector<Player*>& pl
                         (*player)->addProperty(property);
                         property->setOwner(*player);
                     }
-                    property->setOwner(*player);
 
                     prop = property;
                 }
