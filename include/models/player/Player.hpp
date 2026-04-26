@@ -49,6 +49,7 @@ public:
 
     long long calculateTotalWealth() const;
     void receiveMoney(long long amount);
+    void deductMoney(long long amount);
     void setMoney(long long amount);
     bool giveMoney(Player& recipient, long long amount);
     bool payRent(Property* pr);
