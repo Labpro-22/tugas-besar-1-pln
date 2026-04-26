@@ -25,7 +25,7 @@ int Player::getStreetPropertyCount() const { return streetPropertyCount; }
 int Player::getRailroadPropertyCount() const { return railroadPropertyCount; }
 int Player::getUtilityPropertyCount() const { return utilityPropertyCount; }
 
-void Player::rollDiceAndMove() {
+void Player::rollDiceAndMove(GameManager& gm) {
     if (state == PlayerState::BANKRUPT)
         throw AlreadyBankruptException("Pemain " + username + " sudah bangkrut.");
     if (state == PlayerState::JAILED)
@@ -47,11 +47,11 @@ void Player::rollDiceAndMove() {
         doubleRollCounter = 0;
     }
 
-    piece.goForward(total);
+    piece.goForward(total, *this, gm); 
 
     return;
 }
-void Player::setDiceAndMove(int value1, int value2) {
+void Player::setDiceAndMove(int value1, int value2, GameManager& gm) {
     if (state == PlayerState::BANKRUPT)
         throw AlreadyBankruptException("Pemain " + username + " sudah bangkrut.");
     if (state == PlayerState::JAILED)
@@ -72,7 +72,7 @@ void Player::setDiceAndMove(int value1, int value2) {
         doubleRollCounter = 0;
     }
 
-    piece.goForward(total);
+    piece.goForward(total, *this, gm); 
 
     return;
 }
