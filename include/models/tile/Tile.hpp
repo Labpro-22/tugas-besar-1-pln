@@ -25,6 +25,10 @@ class Tile {
         return code;
     }
 
+    void setCode(const std::string& newCode) noexcept {
+        code = newCode;
+    }
+
     protected:
         std::string name;
 
