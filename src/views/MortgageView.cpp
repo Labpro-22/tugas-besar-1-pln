@@ -60,7 +60,7 @@ bool MortgageView::sellAllBuildings(std::vector<StreetProperty*>colorGroupProper
     for(auto sp : colorGroupProperty){
         std::cout << i << ". " << std::left << std::setw(SPACE) << sp->getName() + " (" + sp->getCode() + ")"  << " - ";
         if(sp->hasHotel()){
-            std::cout << "Hotel -> Nilai jual bangunan : M" << sp->calculateSellValue() + sp->getPrice()<< "\n";
+            std::cout << "Hotel -> Nilai jual bangunan : M" << sp->calculateSellValue() - sp->getPrice()<< "\n";
         }
         else{
             std::cout << sp->getHouseCount() <<" rumah  -> Nilai jual bangunan : M" << sp->calculateSellValue() - sp->getPrice()<<"\n";
