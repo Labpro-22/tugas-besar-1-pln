@@ -1224,3 +1224,8 @@ void GameManager::processStartFestival()
     prop->startFestival();
     fesView.outputFestivalStatus(*prop);
 }
+
+void GameManager::processExit() {
+    running = false;
+    playing = false;
+}
