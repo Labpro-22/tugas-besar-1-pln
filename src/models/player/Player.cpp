@@ -20,6 +20,7 @@ PlayerState Player::getState() const { return state; }
 PlayerPiece& Player::getPiece() { return piece; }
 const std::vector<Property*>& Player::getProperties() const{ return properties; }
 const std::vector<SkillCard*>& Player::getSkillCards() const{ return skillCards; }
+std::vector<SkillCard*>& Player::getSkillCardsRef() { return skillCards; }
 const std::vector<PlayerEffect>& Player::getEffects() const{ return effects; }
 int Player::getStreetPropertyCount() const { return streetPropertyCount; }
 int Player::getRailroadPropertyCount() const { return railroadPropertyCount; }
