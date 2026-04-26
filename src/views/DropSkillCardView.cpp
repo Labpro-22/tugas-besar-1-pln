@@ -6,7 +6,7 @@
 
 int DropSkillCardView::promptChooseSkillCard(const std::vector<SkillCard *> &cards)
 {
-    std::cout << "\n[Warning] Tangan Anda penuh! (Maksimal 4 kartu)\n";
+    std::cout << "\n[Warning] Tangan Anda penuh! (Maksimal 3 kartu)\n";
     if (cards.empty()) {
         std::cout << "Kamu tidak memiliki Skill Card untuk dibuang.\n\n";
         return -1;

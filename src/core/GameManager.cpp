@@ -376,12 +376,12 @@ void GameManager::nextPlayer()
     gameView.getBoardView().drawBoard();
 
     SkillCard *drawnCard = skillCardDeck.drawCard();
-    if (player.getSkillCards().size() >= 4) {
+    if (player.getSkillCards().size() >= 3) {
         UseSkillCardView &skillView = gameView.getUseSkillCardView();
         DropSkillCardView &dropView = gameView.getDropSkillCardView();
         skillView.outputReceivedCard(*drawnCard);
 
-        while (player.getSkillCards().size() >= 4) {
+        while (player.getSkillCards().size() >= 3) {
             int droppedIndex = dropView.promptChooseSkillCard(player.getSkillCards());
             if (droppedIndex < 0) {
                 std::cout << "Kamu harus membuang 1 kartu untuk menyimpan kartu baru.\n";
@@ -761,24 +761,17 @@ void GameManager::processRollDice()
     }
     else if (player.getState() == PlayerState::JAILED) {
         player.rollToGetOutOfJail();
-        view.outputRollDice(!player.isJailed());
+        view.outputJailRollDice(!player.isJailed());
         if (!player.isJailed()) {
-            // Escaped jail — move the piece using the roll that freed them
-            int total = DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second;
-            bool passedStart = player.getPiece().goForward(total);
-            if (passedStart) {
-                board.getTile(0)->onPassBy(player, *this);
-            }
-            PlayerPiece &piece = player.getPiece();
-            piece.getCurrentTile()->onLanded(player, *this);
+            diceRolledThisTurn = false;
+            std::cout << "Kamu berhasil keluar dari penjara. Lempar dadu lagi untuk bergerak.\n\n";
+            gameView.getBoardView().drawBoard();
             mainMenuView.outputCurrentPlayerInfo();
             logger.log(turn, player.getUsername(), "LEMPAR_DADU",
                        "Hasil dadu: " +
                            std::to_string(DiceRoller::getLastRoll().first) + " + " + std::to_string(DiceRoller::getLastRoll().second) + " = " +
                            std::to_string(DiceRoller::getLastRoll().first + DiceRoller::getLastRoll().second) +
-                           ". Berhasil keluar dari penjara karena dua mata dadu sama. Mendarat di petak " +
-                           piece.getCurrentTile()->getName() + " [" + piece.getCurrentTile()->getCode() + "].");
-            nextPlayer();
+                           ". Berhasil keluar dari penjara karena dua mata dadu sama. Harus melempar dadu lagi untuk bergerak.");
         }
         else {
             logger.log(turn, player.getUsername(), "LEMPAR_DADU",
@@ -847,20 +840,17 @@ void GameManager::processSetDice(int value1, int value2)
     }
     else if (player.getState() == PlayerState::JAILED) {
         player.setDiceToGetOutOfJail(value1, value2);
-        view.outputSetDice(value1, value2, !player.isJailed());
+        view.outputJailSetDice(value1, value2, !player.isJailed());
         if (!player.isJailed()) {
-            // Escaped jail — move the piece using the set dice values
-            player.getPiece().goForward(value1 + value2);
-            PlayerPiece &piece = player.getPiece();
-            piece.getCurrentTile()->onLanded(player, *this);
+            diceRolledThisTurn = false;
+            std::cout << "Kamu berhasil keluar dari penjara. Lempar dadu lagi untuk bergerak.\n\n";
+            gameView.getBoardView().drawBoard();
             mainMenuView.outputCurrentPlayerInfo();
             logger.log(turn, player.getUsername(), "ATUR_DADU",
                        "Hasil dadu: " +
                            std::to_string(value1) + " + " + std::to_string(value2) + " = " +
                            std::to_string(value1 + value2) +
-                           ". Berhasil keluar dari penjara karena dua mata dadu sama. Mendarat di petak " +
-                           piece.getCurrentTile()->getName() + " [" + piece.getCurrentTile()->getCode() + "].");
-            nextPlayer();
+                           ". Berhasil keluar dari penjara karena dua mata dadu sama. Harus melempar dadu lagi untuk bergerak.");
         }
         else {
             logger.log(turn, player.getUsername(), "ATUR_DADU",

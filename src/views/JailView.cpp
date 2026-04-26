@@ -25,10 +25,11 @@ int JailView::promptRollOrBailOrUseCard(){
     while(true){
         std::cout <<"Pilih aksi:\n";
         std::cout << "1. Lempar dadu (coba keluar dengan mendapatkan angka dobel)\n";
-        std::cout << "2. Bayar jaminan (Uang kamu: M" << p.getMoney() << ")\n";
+        std::cout << "2. Bayar jaminan M" << gameManager.getConfig().jailFine << " (Uang kamu: M" << p.getMoney() << ")\n";
         int cardCount = p.getGetOutOfJailCardCount(); 
         std::cout << "3. Gunakan kartu bebas dari penjara (Jumlah kartu bebas dari penjara yang dimiliki: " << cardCount << " Kartu)\n"; 
         int input ;
+        std::cout << p.getUsername() << "> ";
         if(!(std::cin >> input)){
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');

@@ -44,6 +44,29 @@ void DiceView::outputSetDice(int val1, int val2, bool moved) const  {
     }
 }
 
+void DiceView::outputJailRollDice(bool escaped) const {
+    std::cout<<"Mengocok dadu";
+    for (int i = 0; i < 3; i++) {
+        std::cout << ".";
+        std::cout.flush();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+    int val1 = DiceRoller::getLastRoll().first, val2 = DiceRoller::getLastRoll().second;
+    std::cout <<"\n";
+    std::cout<< "Hasil: " << val1 << " + " << val2 << " = " <<  val1 + val2 << "\n";
+    if (!escaped) {
+        std::cout << "Pemain belum berhasil keluar dari penjara.\n\n";
+    }
+}
+
+void DiceView::outputJailSetDice(int val1, int val2, bool escaped) const {
+    std::cout << "Dadu diatur secara manual.\n";
+    std::cout<< "Hasil: " << val1 << " + " << val2 << " = " <<  val1 + val2 << "\n";
+    if (!escaped) {
+        std::cout << "Pemain belum berhasil keluar dari penjara.\n\n";
+    }
+}
+
 void DiceView::outputLandedOnTile(const Tile& tile) const {
     std::cout << "Kamu mendarat di petak " << tile.getName() << " [" << tile.getCode() << "].\n\n";
 }

@@ -26,6 +26,7 @@ int Player::getStreetPropertyCount() const { return streetPropertyCount; }
 int Player::getRailroadPropertyCount() const { return railroadPropertyCount; }
 int Player::getUtilityPropertyCount() const { return utilityPropertyCount; }
 int Player::getDoubleRollCounter() const { return doubleRollCounter; }
+int Player::getLastRollTotal() const { return lastRoll.first + lastRoll.second; }
 
 bool Player::rollDiceAndMove() {
     if (state == PlayerState::BANKRUPT)
@@ -358,7 +359,7 @@ void Player::sellBuilding(StreetProperty* pr) {
 void Player::addSkillCard(SkillCard* card) {
     if (skillCards.size() >= 3) {
         throw FullHandException(
-            "Pemain " + username + " sudah memiliki 4 kartu. Buang 1 kartu terlebih dahulu.");
+            "Pemain " + username + " sudah memiliki 3 kartu. Buang 1 kartu terlebih dahulu.");
     }
     skillCards.push_back(card);
 }

@@ -44,6 +44,7 @@ public:
     int getRailroadPropertyCount() const;
     int getUtilityPropertyCount() const;
     int getDoubleRollCounter() const;
+    int getLastRollTotal() const;
     
     bool rollDiceAndMove();
     bool setDiceAndMove(int value1, int value2);

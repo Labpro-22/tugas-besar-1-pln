@@ -10,6 +10,12 @@ int TaxView::promptIncomeTax(long long flat, double percentage, Player &p) const
         std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu membayar pajak.\n";
         return -1;
     }
+    auto applyDiscount = [&](long long amount) {
+        if (p.hasEffect("DISCOUNT")) {
+            return amount * (100 - p.getEffectValue("DISCOUNT")) / 100;
+        }
+        return amount;
+    };
     int input;
     while(true){
         std::cout << "Pilih opsi pembayaran pajak:\n";
@@ -24,9 +30,12 @@ int TaxView::promptIncomeTax(long long flat, double percentage, Player &p) const
         if(input == 1 || input == 2){
             std::cout << "\n\n";
             long long money = p.getMoney();
-            double tax = 0;
+            long long tax = 0;
             if(input == 1){
-                tax = flat;
+                tax = applyDiscount(flat);
+                if (p.hasEffect("DISCOUNT")) {
+                    std::cout << "[DISCOUNT ACTIVE] Pajak flat menjadi: M" << tax << "\n";
+                }
                 if(tax > money){
                     std::cout << "Kamu tidak mampu membayar pajak flat M" << tax << "!\nUang kamu saat ini: M" << money <<"\n\n";
                 }
@@ -52,9 +61,13 @@ int TaxView::promptIncomeTax(long long flat, double percentage, Player &p) const
                 }
                 std::cout << buildingBuyPriceTotal << "\n";
                 long long total = money + propertyBuyPriceTotal + buildingBuyPriceTotal;
-                tax = std::abs(percentage*total/100);
+                long long originalTax = static_cast<long long>(std::abs(percentage*total/100));
+                tax = applyDiscount(originalTax);
                 std::cout << std::left << std::setw(COLON_WIDTH) << "Total" << ": M" << total << "\n";
-                std::cout << std::left << std::setw(COLON_WIDTH) << ("Pajak " + std::to_string(percentage) + "%") << ": M" << tax << "\n";
+                std::cout << std::left << std::setw(COLON_WIDTH) << ("Pajak " + std::to_string(percentage) + "%") << ": M" << originalTax << "\n";
+                if (p.hasEffect("DISCOUNT")) {
+                    std::cout << std::left << std::setw(COLON_WIDTH) << "[DISCOUNT ACTIVE] Pajak menjadi" << ": M" << tax << "\n";
+                }
                 std::cout << std::left << std::setw(COLON_WIDTH) <<"Uang kamu" << ": M" << money;
                 if(tax > money){
                     std::cout << "\nKamu tidak mampu membayar pajak persentase M" << tax << "!\n\n";
@@ -77,10 +90,17 @@ void TaxView::outputLuxuryTax(long long tax, Player &p)const{
         std::cout << "[SHIELD ACTIVE]: Efek ShieldCard melindungi anda. Tidak perlu membayar pajak.\n";
         return;
     }
+    long long discountedTax = tax;
+    if (p.hasEffect("DISCOUNT")) {
+        discountedTax = tax * (100 - p.getEffectValue("DISCOUNT")) / 100;
+    }
     std::cout << "Pajak sebesar M" << tax << " langsung dipotong.\n";
+    if (p.hasEffect("DISCOUNT")) {
+        std::cout << "[DISCOUNT ACTIVE] Pajak menjadi: M" << discountedTax << "\n";
+    }
     long long money = p.getMoney();
-    if(money >= tax){
-        std::cout << "Uang kamu: M" << money << " -> M" << money - tax << "\n\n";
+    if(money >= discountedTax){
+        std::cout << "Uang kamu: M" << money << " -> M" << money - discountedTax << "\n\n";
     }
     else{
         std::cout <<"Kamu tidak mampu membayar pajak!\nUang kamu saat ini: " << money << "\n\n";
