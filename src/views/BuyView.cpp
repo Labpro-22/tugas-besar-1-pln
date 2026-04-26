@@ -1,5 +1,7 @@
 #include "core/GameManager.hpp"
 #include "views/BuyView.hpp"
+#include <thread>
+#include <chrono>
 
 bool BuyView::promptBuyProperty(Property& pr){
     Property *p = &pr;
