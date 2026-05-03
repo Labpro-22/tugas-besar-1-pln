@@ -188,6 +188,7 @@ std::string BoardView::getCellLine2(Tile* tile, int tileIndex) const{
         auto& players = gameManager.getPlayers();
         for (int i = 0; i < (int)players.size(); i++) {
             if (players[i].getPiece().getPosition() == tileIndex) {
+                if (players[i].isBankrupt()) continue;
                 std::string tag = "(" + std::to_string(i + 1) + ")";
                 if (players[i].isJailed()) inList += tag;
                 else visitList += tag;

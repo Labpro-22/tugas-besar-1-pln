@@ -4,9 +4,9 @@
 #define SPACE 20
 void BankruptView::outputPotentialWealth(Player &p, long long debt) const{
     long double wealth = 0;
-    std::cout<<"Uang kamu       : M" << p.getMoney() << "\n";
+    std::cout<<"Uang kamu       : M" << p.getMoney() + debt << "\n";
     std::cout<<"Total kewajiban : M" << debt << "\n";
-    std::cout<<"Kekurangan      : M" << debt - p.getMoney() << "\n";
+    std::cout<<"Kekurangan      : M" << -p.getMoney() << "\n";
     std::cout<<"Estimasi dana maksimum dari likuidasi:\n";
     for(auto p: p.getProperties()){
         if(!p->isMortgaged()){
@@ -26,7 +26,7 @@ void BankruptView::outputPotentialWealth(Player &p, long long debt) const{
 
 std::pair<std::string, Property*> BankruptView::promptLiquidation(std::vector<Property*> pr, long long debt){
     std::cout << "=== Panel Likuidasi ===\n";
-    std::cout << "Uang kamu saat ini: M" << gameManager.getCurrentPlayer().getMoney() << "  |  Kewajiban: M" << debt << "\n\n";
+    std::cout << "Uang kamu saat ini: M" << gameManager.getCurrentPlayer().getMoney() + debt << "  |  Kewajiban: M" << debt << "\n\n";
 
     std::vector<int> propertyIdx;
     int idx = 0;

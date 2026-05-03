@@ -1183,7 +1183,7 @@ void GameManager::processLiquidation() {
     long long debt = -player.getMoney();
     view.outputPotentialWealth(player, -player.getMoney());
 
-    if (player.calculateTotalWealth() >= -player.getMoney()) {
+    if (player.calculateTotalWealth() >= 0) {
         while (player.getMoney() < 0) {
             auto chosenProperty = view.promptLiquidation(player.getProperties(), -player.getMoney());
             if (chosenProperty.first == "Batal") {
@@ -1233,7 +1233,7 @@ void GameManager::processOtherPlayerLiquidation(Player &other) {
     long long debt = -other.getMoney();
     view.outputPotentialWealth(other, -other.getMoney());
 
-    if (other.calculateTotalWealth() >= -other.getMoney()) {
+    if (other.calculateTotalWealth() >= 0) {
         while (other.getMoney() < 0) {
             auto chosenProperty = view.promptLiquidation(other.getProperties(), -other.getMoney());
             if (chosenProperty.first == "Jual") {
@@ -1276,7 +1276,7 @@ void GameManager::processOtherPlayerLiquidation(Player &other, Player &creditor)
     long long debt = -other.getMoney();
     view.outputPotentialWealth(other, -other.getMoney());
 
-    if (other.calculateTotalWealth() >= -other.getMoney()) {
+    if (other.calculateTotalWealth() >= 0) {
         while (other.getMoney() < 0) {
             auto chosenProperty = view.promptLiquidation(other.getProperties(), -other.getMoney());
             if (chosenProperty.first == "Jual") {
@@ -1306,7 +1306,7 @@ void GameManager::processLiquidation(Player &creditor) {
     long long debt = -player.getMoney();
     view.outputPotentialWealth(player, -player.getMoney());
 
-    if (player.calculateTotalWealth() >= -player.getMoney()) {
+    if (player.calculateTotalWealth() >= 0) {
         while (player.getMoney() < 0) {
             auto chosenProperty = view.promptLiquidation(player.getProperties(), -player.getMoney());
             if (chosenProperty.first == "Batal") {
