@@ -130,8 +130,12 @@ void BankruptView::outputBankruptByBank(Player &p) const{
         }
     }
     std::cout << p.getUsername() << " telah keluar dari permainan.\n";
+    int sisaPlayer = 0;
+    for (auto &&p : gameManager.getPlayers()) {
+        sisaPlayer += p.isBankrupt();
+    }
     if(gameManager.getPlayers().size() >1){
-        std::cout << "Permainan berlanjut dengan " << gameManager.getPlayers().size()<< " pemain tersisa.\n";
+        std::cout << "Permainan berlanjut dengan " << sisaPlayer << " pemain tersisa.\n";
     }
     std::cout << "Memasuki sistem lelang";
     for (int i = 0; i < 3; i++) {
@@ -176,8 +180,12 @@ void BankruptView::outputBankruptByPlayer(Player &p, Player& creditor) const{
     }
     std::cout <<"\n" << creditor.getUsername() << "menerima semua aset " << p.getUsername() << ".\n"; 
     std::cout << p.getUsername() << " telah keluar dari permainan.\n";
+    int sisaPlayer = 0;
+    for (auto &&p : gameManager.getPlayers()) {
+        sisaPlayer += p.isBankrupt();
+    }
     if(gameManager.getPlayers().size() >1){
-        std::cout << "Permainan berlanjut dengan " << gameManager.getPlayers().size()<< " pemain tersisa.\n";
+        std::cout << "Permainan berlanjut dengan " << sisaPlayer << " pemain tersisa.\n";
     }
     std::cout <<"\n\n";
 }
