@@ -1,0 +1,79 @@
+2 45
+4
+1 1807 PEN JAILED 0 1 0
+1
+ShieldCard 0
+2 1090 DEN ACTIVE 0 0 0
+2
+DemolitionCard 0
+ShieldCard 0
+3 2170 GBR ACTIVE 0 0 0
+2
+LassoCard 0
+DiscountCard 34 1
+4 2050 DNU ACTIVE 0 0 1
+3
+DemolitionCard 0
+LassoCard 0
+DiscountCard 25 1
+4 1 2 3 
+4
+28
+GRT STREET BANK BANK 1 0 0
+TSK STREET BANK BANK 1 0 0
+GBR RAILROAD 3 OWNED 1 0 0
+BGR STREET BANK BANK 1 0 0
+DPK STREET BANK BANK 1 0 0
+BKS STREET BANK BANK 1 0 0
+MGL STREET BANK BANK 1 0 0
+PLN UTILITY 3 OWNED 1 0 0
+SOL STREET BANK BANK 1 0 0
+YOG STREET BANK BANK 1 0 0
+STB RAILROAD 4 OWNED 1 0 0
+MAL STREET BANK BANK 1 0 0
+SMG STREET BANK BANK 1 0 0
+SBY STREET BANK BANK 1 0 0
+MKS STREET BANK BANK 1 0 0
+BLP STREET BANK BANK 1 0 0
+MND STREET BANK BANK 1 0 0
+TUG RAILROAD BANK BANK 1 0 0
+PLB STREET BANK BANK 1 0 0
+PKB STREET BANK BANK 1 0 0
+PAM UTILITY 3 OWNED 1 0 0
+MED STREET 2 OWNED 1 0 0
+BDG STREET 2 OWNED 1 0 0
+DEN STREET 2 OWNED 1 0 0
+MTR STREET BANK BANK 1 0 0
+GUB RAILROAD BANK BANK 1 0 0
+JKT STREET BANK BANK 1 0 0
+IKN STREET BANK BANK 1 0 0
+5
+MoveCard 7 1
+MoveCard 6 1
+MoveCard 6 1
+MoveCard 8 1
+DiscountCard 37 1
+23
+1 1 ATUR_DADU Hasil dadu: 1 + 1 = 2. Mendarat di petak Dana_Umum [ DNU]. Mendapatkan giliran tambahan karena dua mata dadu sama
+1 1 ATUR_DADU Hasil dadu: 1 + 1 = 2. Mendarat di petak Pajak_Penghasilan [ PPH]. Mendapatkan giliran tambahan karena dua mata dadu sama
+1 1 ATUR_DADU Hasil dadu: 1 + 1 = 2. Masuk penjara karena mendapat dua mata dadu sama tiga kali.
+1 2 BELI Properti MEDAN [ MED] dibeli seharga 280
+1 2 ATUR_DADU Hasil dadu: 12 + 17 = 29. Mendarat di petak MEDAN [ MED]
+1 3 ATUR_DADU Hasil dadu: 15 + 15 = 30. Mendarat di petak Penjara [ PEN]. Mendapatkan giliran tambahan karena dua mata dadu sama
+1 3 ATUR_DADU Hasil dadu: 1 + 2 = 3. Gagal keluar dari penjara.
+1 4 ATUR_DADU Hasil dadu: 5 + 5 = 10. Mendarat di petak Penjara [ PEN]. Mendapatkan giliran tambahan karena dua mata dadu sama
+1 4 BELI Properti STASIUN_BANDUNG [ STB] dibeli seharga 0
+1 4 ATUR_DADU Hasil dadu: 2 + 3 = 5. Mendarat di petak STASIUN_BANDUNG [ STB]
+2 1 ATUR_DADU Hasil dadu: 0 + 1 = 1. Gagal keluar dari penjara.
+2 2 BELI Properti BANDUNG [ BDG] dibeli seharga 300
+2 2 ATUR_DADU Hasil dadu: 1 + 1 = 2. Mendarat di petak BANDUNG [ BDG]. Mendapatkan giliran tambahan karena dua mata dadu sama
+2 2 BELI Properti DENPASAR [ DEN] dibeli seharga 300
+2 2 ATUR_DADU Hasil dadu: 0 + 1 = 1. Mendarat di petak DENPASAR [ DEN]
+2 3 ATUR_DADU Hasil dadu: 6 + 6 = 12. Berhasil keluar dari penjara karena dua mata dadu sama. Harus melempar dadu lagi untuk bergerak.
+2 3 BELI Properti PLN [ PLN] dibeli seharga 0
+2 3 ATUR_DADU Hasil dadu: 1 + 1 = 2. Mendarat di petak PLN [ PLN]. Mendapatkan giliran tambahan karena dua mata dadu sama
+2 3 BELI Properti PAM [ PAM] dibeli seharga 0
+2 3 ATUR_DADU Hasil dadu: 8 + 8 = 16. Mendarat di petak PAM [ PAM]. Mendapatkan giliran tambahan karena dua mata dadu sama
+2 3 BELI Properti STASIUN_GAMBIR [ GBR] dibeli seharga 0
+2 3 ATUR_DADU Hasil dadu: 2 + 6 = 8. Mendarat di petak STASIUN_GAMBIR [ GBR]
+2 4 ATUR_DADU Hasil dadu: 1 + 1 = 2. Mendarat di petak Dana_Umum [ DNU]. Mendapatkan giliran tambahan karena dua mata dadu sama

@@ -24,10 +24,10 @@ void GameView::inputNextCommand(){
     else if(command == "ATUR_DADU"){
         int val1,val2;
         if (ss >> val1 >> val2) {
-            if (val1 < 1 || val1 > 6 || val2 < 1 || val2 > 6) {
-                std::cout << "Nilai dadu harus antara 1 sampai 6.\n\n";
-                return;
-            }
+            // if (val1 < 1 || val1 > 6 || val2 < 1 || val2 > 6) {
+            //     std::cout << "Nilai dadu harus antara 1 sampai 6.\n\n";
+            //     return;
+            // }
             gameManager.processSetDice(val1,val2);
         }
         else {

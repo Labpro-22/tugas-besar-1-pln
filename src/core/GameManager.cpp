@@ -806,10 +806,10 @@ void GameManager::processRollDice()
 }
 void GameManager::processSetDice(int value1, int value2)
 {
-    if (value1 < 1 || value1 > 6 || value2 < 1 || value2 > 6) {
-        std::cout << "Nilai dadu harus antara 1 sampai 6.\n\n";
-        return;
-    }
+    // if (value1 < 1 || value1 > 6 || value2 < 1 || value2 > 6) {
+    //     std::cout << "Nilai dadu harus antara 1 sampai 6.\n\n";
+    //     return;
+    // }
 
     Player &player = getCurrentPlayer();
     DiceView view = gameView.getDiceView();
