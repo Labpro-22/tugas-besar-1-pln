@@ -264,6 +264,11 @@ void GameManager::gameLoop()
             processWin();
         }
         else {
+            if(!playerQueue.empty() && playerQueue.front()->isBankrupt()){
+                std::cout<<"asdja\n";
+                nextPlayer();
+                return;
+            }
             if (startOfTheTurn) {
                 processTurnStart();
             }
@@ -284,7 +289,11 @@ void GameManager::processTurnStart()
         if (player.getJailTurns() > 3) {
             std::cout << "Sudah 4 giliran di penjara. Kamu wajib membayar denda M" << config.jailFine << ".\n\n";
             try {
-                player.payFineToGetOutOfJail(config.jailFine);
+                if(!player.payFineToGetOutOfJail(config.jailFine)){
+                    processLiquidation();
+                    nextPlayer();
+                    return;
+                }
                 std::cout << "Kamu membayar jaminan sebesar M" << config.jailFine << " dan keluar dari penjara.\n\n";
                 logger.log(turn, player.getUsername(), "BAYAR_JAMINAN",
                            "Membayar jaminan paksa M" + std::to_string(config.jailFine) + " (giliran ke-4 di penjara).");
