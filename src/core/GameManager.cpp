@@ -614,19 +614,9 @@ void GameManager::processSaveGame(std::string fileName) {
         }
         saveData.currentPlayer = getCurrentPlayer().getUsername();
 
-        // Build turn order from players vector (sorted by turn order on load)
-        // Reconstruct the round-robin order starting from current player
-        {
-            std::string current = saveData.currentPlayer;
-            bool started = false;
-            for (Player &p : players) {
-                if (p.getUsername() == current) started = true;
-                if (started && !p.isBankrupt()) saveData.playerOrder.push_back(p.getUsername());
-            }
-            for (Player &p : players) {
-                if (p.getUsername() == current) break;
-                if (!p.isBankrupt()) saveData.playerOrder.push_back(p.getUsername());
-            }
+        std::string current = saveData.currentPlayer;
+        for (Player &p : players) {
+            saveData.playerOrder.push_back(p.getUsername());
         }
 
         for (Property *property : board.getPropertyList()) {
