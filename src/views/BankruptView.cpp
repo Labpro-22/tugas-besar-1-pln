@@ -96,13 +96,13 @@ std::pair<std::string, Property*> BankruptView::promptLiquidation(std::vector<Pr
             Property* p = pr[propertyIdx[selectedIdx]];
             if(selectedIdx < sellCount){
                 std::cout << p->getName() << " terjual ke Bank. Kamu menerima M" << p->calculateSellValue();
-                std::cout << ".\nUang kamu sekarang: M" << gameManager.getCurrentPlayer().getMoney() + p->calculateSellValue() << "\n";
+                std::cout << ".\nUang kamu sekarang: M" << gameManager.getCurrentPlayer().getMoney() + p->calculateSellValue() + debt<< "\n";
                 return std::make_pair("Jual", p);
             }
 
             long long liquidationValue = p->calculateSellValue() - p->getPrice() + p->getMortgageValue();
             std::cout << p->getName() << " digadaikan ke Bank. Kamu menerima M" << liquidationValue;
-            std::cout << ".\nUang kamu sekarang: M" << gameManager.getCurrentPlayer().getMoney() + liquidationValue << "\n";
+            std::cout << ".\nUang kamu sekarang: M" << gameManager.getCurrentPlayer().getMoney() + liquidationValue + debt << "\n";
             return std::make_pair("Gadai", p);
         }
         std::cout << "Masukkan tidak valid!\n";

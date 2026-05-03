@@ -138,8 +138,6 @@ bool Player::payRent(Property* pr) {
 
     money -= rent;
     if (money < 0) {
-        // Payer goes bankrupt; owner gets whatever was paid so far (partial), full resolution in processLiquidation
-        // Do NOT pay owner here — liquidation will handle the transfer
         return false;
     }
 

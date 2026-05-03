@@ -1185,7 +1185,7 @@ void GameManager::processLiquidation() {
 
     if (player.calculateTotalWealth() >= 0) {
         while (player.getMoney() < 0) {
-            auto chosenProperty = view.promptLiquidation(player.getProperties(), -player.getMoney());
+            auto chosenProperty = view.promptLiquidation(player.getProperties(), debt);
             if (chosenProperty.first == "Batal") {
                 if (player.getMoney() < 0) {
                     std::cout << "Kamu masih memiliki kewajiban! Kamu harus melikuidasi aset.\n";
@@ -1215,8 +1215,6 @@ void GameManager::processLiquidation() {
                 player.mortgageProperty(chosenProperty.second);
             }
         }
-        // Deduct debt from player (tax goes to bank and is removed from circulation)
-        player.deductMoney(debt);
     } else {
         view.outputBankruptByBank(player);
         std::vector<Property *> auctionedProperty = player.getProperties();
@@ -1235,7 +1233,7 @@ void GameManager::processOtherPlayerLiquidation(Player &other) {
 
     if (other.calculateTotalWealth() >= 0) {
         while (other.getMoney() < 0) {
-            auto chosenProperty = view.promptLiquidation(other.getProperties(), -other.getMoney());
+            auto chosenProperty = view.promptLiquidation(other.getProperties(), debt);
             if (chosenProperty.first == "Jual") {
                 StreetProperty *sp = dynamic_cast<StreetProperty *>(chosenProperty.second);
                 long long refund = 0;
@@ -1259,7 +1257,6 @@ void GameManager::processOtherPlayerLiquidation(Player &other) {
                 other.mortgageProperty(chosenProperty.second);
             }
         }
-        other.deductMoney(debt);
     } else {
         view.outputBankruptByBank(other);
         std::vector<Property *> auctionedProperty = other.getProperties();
@@ -1278,14 +1275,13 @@ void GameManager::processOtherPlayerLiquidation(Player &other, Player &creditor)
 
     if (other.calculateTotalWealth() >= 0) {
         while (other.getMoney() < 0) {
-            auto chosenProperty = view.promptLiquidation(other.getProperties(), -other.getMoney());
+            auto chosenProperty = view.promptLiquidation(other.getProperties(), debt);
             if (chosenProperty.first == "Jual") {
                 other.sellProperty(chosenProperty.second);
             } else if (chosenProperty.first == "Gadai") {
                 other.mortgageProperty(chosenProperty.second);
             }
         }
-        other.deductMoney(debt);
         creditor.receiveMoney(debt);
         view.outputDebtPaid(debt, &creditor);
     } else {
@@ -1308,7 +1304,7 @@ void GameManager::processLiquidation(Player &creditor) {
 
     if (player.calculateTotalWealth() >= 0) {
         while (player.getMoney() < 0) {
-            auto chosenProperty = view.promptLiquidation(player.getProperties(), -player.getMoney());
+            auto chosenProperty = view.promptLiquidation(player.getProperties(), debt);
             if (chosenProperty.first == "Batal") {
                 if (player.getMoney() < 0) {
                     std::cout << "Kamu masih memiliki kewajiban! Kamu harus melikuidasi aset.\n";
@@ -1321,7 +1317,6 @@ void GameManager::processLiquidation(Player &creditor) {
                 player.mortgageProperty(chosenProperty.second);
             }
         }
-        player.deductMoney(debt);
         creditor.receiveMoney(debt);
         view.outputDebtPaid(debt, &creditor);
     } else {
