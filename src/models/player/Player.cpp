@@ -438,7 +438,7 @@ bool Player::payFineToGetOutOfJail(long long fine) {
         fine = fine * (100 - getEffectValue("DISCOUNT")) / 100;
     }
     money -= fine;
-    if (money < fine){
+    if (money < 0){
         return false;
     }
         

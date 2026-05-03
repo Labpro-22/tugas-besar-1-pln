@@ -260,14 +260,14 @@ void GameManager::processTurnStart() {
         if (player.getJailTurns() > 3) {
             std::cout << "Sudah 4 giliran di penjara. Kamu wajib membayar denda M" << config.jailFine << ".\n\n";
             try {
-                if(!player.payFineToGetOutOfJail(config.jailFine)){
+                std::cout << "Kamu membayar jaminan sebesar M" << config.jailFine << " dan keluar dari penjara.\n\n";
+                logger.log(turn, player.getUsername(), "BAYAR_JAMINAN",
+                           "Membayar jaminan paksa M" + std::to_string(config.jailFine) + " (giliran ke-4 di penjara).");
+                if (!player.payFineToGetOutOfJail(config.jailFine)) {
                     processLiquidation();
                     nextPlayer();
                     return;
                 }
-                std::cout << "Kamu membayar jaminan sebesar M" << config.jailFine << " dan keluar dari penjara.\n\n";
-                logger.log(turn, player.getUsername(), "BAYAR_JAMINAN",
-                           "Membayar jaminan paksa M" + std::to_string(config.jailFine) + " (giliran ke-4 di penjara).");
             } catch (const PlayerException &e) {
                 std::cout << e.what() << std::endl;
             }
@@ -277,10 +277,14 @@ void GameManager::processTurnStart() {
                 std::cout << "Gunakan perintah LEMPAR_DADU atau ATUR_DADU untuk mencoba keluar dari penjara.\n\n";
             } else if (choice == 2) {
                 try {
-                    player.payFineToGetOutOfJail(config.jailFine);
                     std::cout << "Kamu membayar jaminan sebesar M" << config.jailFine << " dan keluar dari penjara.\n\n";
                     logger.log(turn, player.getUsername(), "BAYAR_JAMINAN",
                                "Membayar jaminan sebesar M" + std::to_string(config.jailFine) + " untuk keluar dari penjara.");
+                    if (!player.payFineToGetOutOfJail(config.jailFine)) {
+                        processLiquidation();
+                        nextPlayer();
+                        return;
+                    }
                 } catch (const PlayerException &e) {
                     std::cout << e.what() << std::endl;
                 }
