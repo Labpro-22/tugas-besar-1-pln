@@ -429,20 +429,23 @@ void Player::setDiceToGetOutOfJail(int value1, int value2) {
     }
 }
 
-void Player::payFineToGetOutOfJail(long long fine) {
+bool Player::payFineToGetOutOfJail(long long fine) {
+
     if (state != PlayerState::JAILED)
         throw InJailException("Pemain tidak sedang di penjara.");
 
     if (hasEffect("DISCOUNT")) {
         fine = fine * (100 - getEffectValue("DISCOUNT")) / 100;
     }
-
-    if (money < fine)
-        throw InsufficientFundsException(
-            "Uang tidak cukup untuk bayar denda M" + std::to_string(fine));
-
     money -= fine;
+    if (money < fine){
+        return false;
+    }
+        
+
+
     getOutOfJail();
+    return true;
 }
 void Player::getOutOfJail() {
     state = PlayerState::ACTIVE;

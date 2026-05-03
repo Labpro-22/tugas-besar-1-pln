@@ -81,7 +81,7 @@ public:
     void addGetOutOfJailCard();
     void rollToGetOutOfJail();
     void setDiceToGetOutOfJail(int value1, int value2);
-    void payFineToGetOutOfJail(long long fine);
+    bool payFineToGetOutOfJail(long long fine);
     void getOutOfJail();
     int getJailTurns();
     void addEffect(PlayerEffect effect);

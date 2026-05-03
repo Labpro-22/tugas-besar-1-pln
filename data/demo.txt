@@ -1,26 +1,27 @@
 2 45
 4
-1 1807 PEN JAILED 0 1 0
-1
-ShieldCard 0
-2 1090 DEN ACTIVE 0 0 0
+4 1980 TSK ACTIVE 0 0 0
 2
 DemolitionCard 0
+DiscountCard 25 1
+1 0 PEN JAILED 0 3 0
+2
 ShieldCard 0
-3 2170 GBR ACTIVE 0 0 0
+DiscountCard 37 1
+2 1080 DEN ACTIVE 0 0 0
+3
+DemolitionCard 0
+ShieldCard 0
+MoveCard 8
+3 2200 DNU ACTIVE 0 0 0
 2
 LassoCard 0
 DiscountCard 34 1
-4 2050 DNU ACTIVE 0 0 1
-3
-DemolitionCard 0
-LassoCard 0
-DiscountCard 25 1
-4 1 2 3 
-4
+2 3 4 1 
+2
 28
 GRT STREET BANK BANK 1 0 0
-TSK STREET BANK BANK 1 0 0
+TSK STREET 4 OWNED 1 0 0
 GBR RAILROAD 3 OWNED 1 0 0
 BGR STREET BANK BANK 1 0 0
 DPK STREET BANK BANK 1 0 0
@@ -47,13 +48,11 @@ MTR STREET BANK BANK 1 0 0
 GUB RAILROAD BANK BANK 1 0 0
 JKT STREET BANK BANK 1 0 0
 IKN STREET BANK BANK 1 0 0
-5
+3
 MoveCard 7 1
 MoveCard 6 1
 MoveCard 6 1
-MoveCard 8 1
-DiscountCard 37 1
-23
+27
 1 1 ATUR_DADU Hasil dadu: 1 + 1 = 2. Mendarat di petak Dana_Umum [ DNU]. Mendapatkan giliran tambahan karena dua mata dadu sama
 1 1 ATUR_DADU Hasil dadu: 1 + 1 = 2. Mendarat di petak Pajak_Penghasilan [ PPH]. Mendapatkan giliran tambahan karena dua mata dadu sama
 1 1 ATUR_DADU Hasil dadu: 1 + 1 = 2. Masuk penjara karena mendapat dua mata dadu sama tiga kali.
@@ -77,3 +76,7 @@ DiscountCard 37 1
 2 3 BELI Properti STASIUN_GAMBIR [ GBR] dibeli seharga 0
 2 3 ATUR_DADU Hasil dadu: 2 + 6 = 8. Mendarat di petak STASIUN_GAMBIR [ GBR]
 2 4 ATUR_DADU Hasil dadu: 1 + 1 = 2. Mendarat di petak Dana_Umum [ DNU]. Mendapatkan giliran tambahan karena dua mata dadu sama
+2 4 USE_CARD LassoCard dipakai. 3 ditarik ke petak Dana_Umum [DNU]!
+2 4 BELI Properti TASIKMALAYA [ TSK] dibeli seharga 60
+2 4 ATUR_DADU Hasil dadu: 0 + 1 = 1. Mendarat di petak TASIKMALAYA [ TSK]
+2 1 ATUR_DADU Hasil dadu: 2 + 3 = 5. Gagal keluar dari penjara.

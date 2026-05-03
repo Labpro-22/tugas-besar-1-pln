@@ -4,7 +4,7 @@
 
 #include "models/tile/special-tile/JailTile.hpp"
 #define TILE_WIDTH 10
-#define CELL_WIDTH 10
+#define CELL_WIDTH 15
 #define TILE_HEIGHT 2
 void BoardView::outputOnLanded()const{
     Player &p = gameManager.getCurrentPlayer();
