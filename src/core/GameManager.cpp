@@ -238,15 +238,8 @@ void GameManager::gameLoop() {
     if (!playing) {
         processMainMenu();
     } else {
-        while (!playerQueue.empty() && playerQueue.front()->isBankrupt()) {
-            playerQueue.pop();
-        }
-
-        if (playerQueue.empty()) {
-            nextTurn();
-            while (!playerQueue.empty() && playerQueue.front()->isBankrupt()) {
-                playerQueue.pop();
-            }
+        if (getCurrentPlayer().isBankrupt()) {
+            nextPlayer();
         }
         if (isGameEnded()) {
             processWin();
